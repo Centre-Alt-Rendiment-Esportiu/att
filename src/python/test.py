@@ -16,7 +16,7 @@ def build_regressor():
 	processor = ATTMatrixHitProcessor()
 	regressor = ATTClassicHitRegressor(processor)
 	
-	(hits_training_values, Y) = regressor.collect_train_hits_from_file("test/data/train_points_2.txt")
+	(hits_training_values, Y) = regressor.collect_train_hits_from_file("data/train_points_2.txt")
 	print "Train Values: ", np.shape(hits_training_values), np.shape(Y)
 	
 	regressor.train(hits_training_values, Y)
@@ -27,7 +27,7 @@ def build_Sklearn_Regressor():
 	processor = ATTPlainHitProcessor()
 	regressor = ATTSkLearnHitRegressor(processor)
 	
-	(hits_training_values, Y) = regressor.collect_train_hits_from_file("test/data/train_points_2.txt")
+	(hits_training_values, Y) = regressor.collect_train_hits_from_file("data/train_points_2.txt")
 	print "Train Values: ", np.shape(hits_training_values), np.shape(Y)
 	#print hits_training_values
 	regressor.train(hits_training_values, Y)

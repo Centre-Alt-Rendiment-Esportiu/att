@@ -9,8 +9,8 @@
  */
 
 // Constants
-const int THRESHOLD = 3;
-const int SENSOR_COUNT = 6;
+const int THRESHOLD = 4;
+const int SENSOR_COUNT = 8;
 //NOTE: There are 8 but for the time being we only use 7 as this is more compatible with available software
 
 struct Hit {
@@ -23,11 +23,11 @@ struct Hit {
 };
 
 //Pin mapping of Teensy
-int rightPins[] = { A8, A9, A10, A11, A12, A13/*, A14, A15*/}; // clockwise from top left
-int leftPins[] = { A0, A1, A2, A3, A4, A5/*, A6, A7*/}; // clockwise from top left
+int rightPins[] = { A8, A9, A10, A11, A12, A13, A14, A15}; // clockwise from top left
+int leftPins[] = { A0, A1, A2, A3, A4, A5, A6, A7}; // clockwise from top left
 
 const unsigned long NO_RECORD = -1;
-const unsigned long TIMEOUT_BETWEEN_HITS = 100000; // in millis
+const unsigned long TIMEOUT_BETWEEN_HITS = 10000; // in micros
 const char LEFT = 'l';
 const char RIGHT = 'r';
 
@@ -41,7 +41,7 @@ void setup() {
 void loop() {
   //delay(5);
   readPins(leftPins, LEFT);
-  //readPins(rightPins, RIGHT);
+  readPins(rightPins, RIGHT);
 
   //Serial.println(curHit.volumes[0]);
 

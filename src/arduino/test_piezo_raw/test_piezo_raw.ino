@@ -8,7 +8,7 @@ void setup() {
 }
 
 void loop() {
-  val0 = analogRead(7);
+  val0 = analogRead(A7);
 
   
   if (val0 >= THRESHOLD ) {

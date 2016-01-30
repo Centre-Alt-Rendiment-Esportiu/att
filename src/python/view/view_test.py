@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-sys.path.insert(0, '/home/asanso/workspace/python/att/src/python/')
+sys.path.insert(0, '/home/asanso/workspace/att-spyder/att/src/python/')
 
 import pygame
 
@@ -80,7 +80,7 @@ if __name__ == '__main__':
 	serial_reader = ATTArduinoSerialPort(port, baud)
 	
 	
- -l	pygame.init()
+ 	pygame.init()
 	regressor = build_regressor()
 	
 	myThread = ThreadedSerialReader(1, "Thread-1", workQueue, None, builder, port, baud, serial_reader)
