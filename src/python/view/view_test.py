@@ -31,9 +31,20 @@ import numpy as np
 TRAIN_DATA_FILE = "../data/train_points_20160129_left.txt"
 HITS_DATA_FILE = "../../arduino/data/train_20160129_left.txt"
 
-def build_regressor():
+def build_regressor_Classic():
 	processor = ATTMatrixHitProcessor()
 	regressor = ATTClassicHitRegressor(processor)
+
+	(hits_training_values, Y) = regressor.collect_train_hits_from_file(TRAIN_DATA_FILE)
+	print "Train Values: ", np.shape(hits_training_values), np.shape(Y)
+	
+	regressor.train(hits_training_values, Y)
+
+	return regressor
+	
+def build_regressor_SKLearn():
+	processor = ATTPlainHitProcessor()
+	regressor = ATTSkLearnHitRegressor(processor)
 	
 	(hits_training_values, Y) = regressor.collect_train_hits_from_file(TRAIN_DATA_FILE)
 	print "Train Values: ", np.shape(hits_training_values), np.shape(Y)
@@ -71,14 +82,11 @@ if __name__ == '__main__':
 	builder = ATTHitsFromFilePortBuilder()
 	#builder = ATTArduinoSerialPortBuilder()
 	
-	processor = ATTMatrixHitProcessor()
-	regressor = ATTClassicHitRegressor(processor)
-	
 	port = HITS_DATA_FILE
 	serial_reader = ATTHitsFromFilePort(port, baud)
 	#serial_reader = ATTArduinoSerialPort(port, baud)
 
-	regressor = build_regressor()
+	regressor = build_regressor_SKLearn()
 	
 	myThread = ThreadedSerialReader(1, "Thread-1", workQueue, None, builder, port, baud, serial_reader)
 	myThread.start()
@@ -132,7 +140,4 @@ if __name__ == '__main__':
 
 		
 	print "Exit..."
-	pygame.quit()	
-		
-		#pygame.display.flip()
-		#clock.tick(60)
+	pygame.quit()
