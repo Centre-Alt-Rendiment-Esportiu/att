@@ -6,8 +6,8 @@
 
 // Constants
 const int LED_PIN    = 13;
-const int SENSOR_PIN = A15;
-const int THRESHOLD  = 30;
+const int SENSOR_PIN = A8;
+const int THRESHOLD  = 5;
 
 // Variables
 long lastTime = 0;

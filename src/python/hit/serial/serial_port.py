@@ -70,8 +70,6 @@ class ATTEmulatedSerialPort (SerialPort):
 		return 0
 		
 	def readline(self):
-		#time_delay = 1*random.random()
-		#time.sleep(time_delay)
 		return self.gen_random_line()
 		
 	def gen_random_line(self):
@@ -151,13 +149,14 @@ class ATTArduinoSerialPort (SerialPort):
 	def get_baudrate(self):
 		return self.serial_port.baudrate
 		
-class ATTHitsFromFilePort1 (SerialPort):
+class ATTHitsFromFilePort (SerialPort):
 	def __init__(self, port = None, baud = None):
-		self.lines = [line.strip() for line in file("data/point.txt") if line.startswith("hit:")]
+		self.lines = [line.strip() for line in file(port) if line.startswith("hit:")]
 		self.inner_index = 0
+		self.amIclosed = 0
 	
 	def isOpen(self):
-		return True
+		return not self.amIclosed
 		
 	def close(self):
 		pass
@@ -173,54 +172,8 @@ class ATTHitsFromFilePort1 (SerialPort):
 		if self.inner_index < len(self.lines):
 			line = self.lines[self.inner_index]
 			self.inner_index += 1
-		return line
-		
-class ATTHitsFromFilePort2 (SerialPort):
-	def __init__(self, port = None, baud = None):
-		self.lines = [line.strip() for line in file("data/point3.txt") if line.startswith("hit:")]
-		self.inner_index = 0
-	
-	def isOpen(self):
-		return True
-		
-	def close(self):
-		pass
-		
-	def get_port(self):
-		return ""
-		
-	def get_baudrate(self):
-		return 0
-		
-	def readline(self):
-		line = ""
-		if self.inner_index < len(self.lines):
-			line = self.lines[self.inner_index]
-			self.inner_index += 1
-		return line
-
-class ATTHitsFromFilePort_TrainPoints (SerialPort):
-	def __init__(self, port = None, baud = None):
-		self.lines = [line.strip() for line in file("data/point.txt") if line.startswith("hit:")]
-		self.inner_index = 0
-	
-	def isOpen(self):
-		return True
-		
-	def close(self):
-		pass
-		
-	def get_port(self):
-		return ""
-		
-	def get_baudrate(self):
-		return 0
-		
-	def readline(self):
-		line = ""
-		if self.inner_index < len(self.lines):
-			line = self.lines[self.inner_index]
-			self.inner_index += 1
+		else:
+			self.amIclosed = 1
 		return line
 
 

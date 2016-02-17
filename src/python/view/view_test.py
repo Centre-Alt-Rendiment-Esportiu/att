@@ -1,9 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import sys
-sys.path.insert(0, '/home/asanso/workspace/python/att/src/python/')
+import platform
+
+PROJECT_ROOT = ""
+if platform.platform().lower().startswith("win"):
+	PROJECT_ROOT = "I:/dev/workspaces/python/att-workspace/att/"
+else:
+	if platform.platform().lower().startswith("linux"):
+		PROJECT_ROOT = "/home/asanso/workspace/att-spyder/att/"
+		
+sys.path.insert(0, PROJECT_ROOT + "/src/python/")
 
 import pygame
+from pygame.locals import *
 
 import Queue
 
@@ -18,17 +28,25 @@ from hit.train.regressor import ATTSkLearnHitRegressor
 
 import numpy as np
 
-windowWidth = 1096 
-windowHeight = 608
-tableLineWidth = 4
+TRAIN_DATA_FILE = "../data/train_points_20160129_left.txt"
+HITS_DATA_FILE = "../../arduino/data/train_20160129_left.txt"
 
-SCREEN_MULITPLIER = 14.6
-
-def build_regressor():
+def build_regressor_Classic():
 	processor = ATTMatrixHitProcessor()
 	regressor = ATTClassicHitRegressor(processor)
+
+	(hits_training_values, Y) = regressor.collect_train_hits_from_file(TRAIN_DATA_FILE)
+	print "Train Values: ", np.shape(hits_training_values), np.shape(Y)
 	
-	(hits_training_values, Y) = regressor.collect_train_hits_from_file("/home/asanso/workspace/python/att/src/python/test/data/train_points_2.txt")
+	regressor.train(hits_training_values, Y)
+
+	return regressor
+	
+def build_regressor_SKLearn():
+	processor = ATTPlainHitProcessor()
+	regressor = ATTSkLearnHitRegressor(processor)
+	
+	(hits_training_values, Y) = regressor.collect_train_hits_from_file(TRAIN_DATA_FILE)
 	print "Train Values: ", np.shape(hits_training_values), np.shape(Y)
 	
 	regressor.train(hits_training_values, Y)
@@ -41,73 +59,68 @@ class Ball:
    color = (255,255,255) 
 			
 def displayTable(windowWidth, windowHeight, tableLineWidth, ball):
-    
-    window = pygame.display.set_mode((windowWidth, windowHeight))
-    
-    pygame.draw.line(window,(255,255,255), (tableLineWidth/2,tableLineWidth/2), (tableLineWidth/2,windowHeight-tableLineWidth/2), tableLineWidth) 
-    #pygame.draw.rect(window(255,255,255), (0,0,1096,608))
-    pygame.draw.line(window,(255,255,255), (tableLineWidth/2,windowHeight-tableLineWidth/2), (windowWidth-tableLineWidth/2,windowHeight-tableLineWidth/2), tableLineWidth) 
-    #pygame.draw.line(window,(255,255,255), (2,606), (1094,606), tableLineWidth)    
-    pygame.draw.line(window,(255,255,255), (windowWidth-tableLineWidth/2,windowHeight-tableLineWidth/2), (windowWidth-tableLineWidth/2,tableLineWidth/2), tableLineWidth) 
-    pygame.draw.line(window,(255,255,255), (windowWidth-tableLineWidth/2,tableLineWidth/2), (tableLineWidth/2,tableLineWidth/2), tableLineWidth)
-    pygame.draw.line(window,(255,255,255), (tableLineWidth/2,windowHeight/2), (windowWidth,windowHeight/2), tableLineWidth)
-    pygame.draw.line(window,(255,255,255), (windowWidth/2,tableLineWidth/2), (windowWidth/2,windowHeight-tableLineWidth/2), tableLineWidth) 
-    
-    pygame.draw.circle(window, ball.color, ball.position, ball.radius, ball.radius)
-    
-    pygame.display.update()
-				
+	window = pygame.display.set_mode((windowWidth, windowHeight))
+	    
+	pygame.draw.line(window,(255,255,255), (tableLineWidth/2,tableLineWidth/2), (tableLineWidth/2,windowHeight-tableLineWidth/2), tableLineWidth) 
+	pygame.draw.line(window,(255,255,255), (tableLineWidth/2,windowHeight-tableLineWidth/2), (windowWidth-tableLineWidth/2,windowHeight-tableLineWidth/2), tableLineWidth) 
+	pygame.draw.line(window,(255,255,255), (windowWidth-tableLineWidth/2,windowHeight-tableLineWidth/2), (windowWidth-tableLineWidth/2,tableLineWidth/2), tableLineWidth) 
+	pygame.draw.line(window,(255,255,255), (windowWidth-tableLineWidth/2,tableLineWidth/2), (tableLineWidth/2,tableLineWidth/2), tableLineWidth)
+	pygame.draw.line(window,(255,255,255), (tableLineWidth/2,windowHeight/2), (windowWidth,windowHeight/2), tableLineWidth)
+	pygame.draw.line(window,(255,255,255), (windowWidth/2,tableLineWidth/2), (windowWidth/2,windowHeight-tableLineWidth/2), tableLineWidth) 
+	
+	return window
 
 if __name__ == '__main__':
-	
 	
 	connected = False
 	port = "/dev/ttyACM0"
 	baud = 115200
 	workQueue = Queue.Queue(10000)
-	
-	window = pygame.display.set_mode((windowWidth, windowHeight))
 		
 	#builder = DummySerialPortBuilder()
 	#builder = ATTEmulatedSerialPortBuilder()
-	#builder = ATTHitsFromFilePort2Builder()
-	builder = ATTArduinoSerialPortBuilder()
+	builder = ATTHitsFromFilePortBuilder()
+	#builder = ATTArduinoSerialPortBuilder()
 	
-	processor = ATTMatrixHitProcessor()
-	regressor = ATTClassicHitRegressor(processor)
-	#serial_reader = ATTHitsFromFilePort2()
-	#serial_reader = ATTHitsFromFilePort_TrainPoints()
-	serial_reader = ATTArduinoSerialPort(port, baud)
-	
-	
- -l	pygame.init()
-	regressor = build_regressor()
+	port = HITS_DATA_FILE
+	serial_reader = ATTHitsFromFilePort(port, baud)
+	#serial_reader = ATTArduinoSerialPort(port, baud)
+
+	regressor = build_regressor_SKLearn()
 	
 	myThread = ThreadedSerialReader(1, "Thread-1", workQueue, None, builder, port, baud, serial_reader)
 	myThread.start()
 		
 	ball = Ball()
 	
-	screen = pygame.display.set_mode((int(round(2 * 54 * SCREEN_MULITPLIER)), int(round(60 * SCREEN_MULITPLIER))))
+	windowWidth = 1600
+	windowHeight = 800
+	tableLineWidth = 1
+	
+	x_conversion = (windowWidth/2)/48
+	y_conversion = (windowHeight)/60
+	
+	pygame.init()
+	window = displayTable(windowWidth, windowHeight, tableLineWidth, ball)
 	clock = pygame.time.Clock()
 
 	done = False
-	
-	screen.fill((250, 250, 250))
-	displayTable(windowWidth, windowHeight, tableLineWidth, ball)
-												
-	while not done:
-		
+	while not done:	
 		if not workQueue.empty():
 			reading = workQueue.get()
-			print "> "+reading
-			(y,x) = regressor.predict(reading) # (6,6)
-			ball.position = (int(x*7.5),int(y*8))
-			print (x,y)
-			pygame.draw.circle(window, ball.color, ball.position, ball.radius, ball.radius)
-			pygame.display.update()
-		
-			
+			if reading <> "":
+				print "> "+reading
+				
+				(y,x) = regressor.predict(reading)
+				
+				translated_x = int(x*x_conversion)
+				translated_y = int(y*y_conversion)
+				
+				ball.position = (translated_x, translated_y)
+				print (translated_x, translated_y)
+				
+				pygame.draw.circle(window, ball.color, ball.position, ball.radius, ball.radius)
+						
 		for event in pygame.event.get():
 			if (event.type == pygame.QUIT):
 				done = True
@@ -117,20 +130,14 @@ if __name__ == '__main__':
 				print event.key
 				if (event.key == pygame.K_ESCAPE):
 					done = True
-					
 												
-			"""
 			if event.type == pygame.QUIT:
 				done = True
-			"""
-		"""	
-		pressed = pygame.key.get_pressed()
-		if not(pressed[pygame.K_UP]) and not(pressed[pygame.K_DOWN]) and not(pressed[pygame.K_RETURN]) and not(pressed[pygame.K_ESCAPE]):
-			isButtonUp = True
-		"""
+		
+		pygame.display.flip()	
+		clock.tick(60)
+
+
 		
 	print "Exit..."
-	pygame.quit()	
-		
-		#pygame.display.flip()
-		#clock.tick(60)
+	pygame.quit()

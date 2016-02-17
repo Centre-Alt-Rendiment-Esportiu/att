@@ -1,14 +1,29 @@
 # -*- coding: utf-8 -*-
 
-import re
-from numpy import *
+import abc
+
 from scipy import linalg
 import numpy as np
 import itertools
 
 from sklearn.linear_model import  LinearRegression
 
-class ATTSkLearnHitRegressor:
+class HitRegressor:
+	__metaclass__ = abc.ABCMeta
+
+	@abc.abstractmethod
+	def collect_train_hits_from_file(self, str_filename):
+		pass
+	
+	@abc.abstractmethod
+	def train(self, hits_training_values, Y):
+		pass
+	
+	@abc.abstractmethod
+	def predict(self, hit_reading):
+		pass
+	
+class ATTSkLearnHitRegressor (HitRegressor):
 	def __init__(self, hit_processor):
 		self.hit_processor = hit_processor
 		self.regressor = LinearRegression()
@@ -17,91 +32,76 @@ class ATTSkLearnHitRegressor:
 		hits_training_values = []
 		Y = []
 		
-		coords_pattern = "\((?P<x_coord>\d+)\,(?P<y_coord>\d+)\)"
-		coords_re = re.compile(coords_pattern)
-
 		in_lines = [line.strip() for line in open(str_filename) ]
 		for line in in_lines:
-			coord_X = -1
-			coord_Y = -1
 
-			# Split between timings and coords
-			ar_aux = line.split(":")
-			str_timings = ar_aux[0]
-			str_coords = ar_aux[1]
-
-			# Parse coords
-			the_match = coords_re.match(str_coords)
-			if the_match is not None:
-				str_X = the_match.group("x_coord")
-				str_Y = the_match.group("y_coord")
-				coord_X = int(str_X)
-				coord_Y = int(str_Y)
-				
 			# Parse timings
-			values = [int(value) for value in (str_timings.split(","))]
-			diffs = self.hit_processor.hit_diffs(values)
-			hits_training_values.append(diffs)
-			Y.append([coord_X, coord_Y])
+			values = [int(value) for value in (line.split(","))]
+			train_values = np.array(values[2:]).astype(int)
+			point = np.array(values[0:2]).astype(int)
+			
+			hits_training_values.append(train_values)
+			Y.append(point)
+		
+		
+		(hits_training_values, Y) = self.build_train_mean(hits_training_values, Y)
 		
 		return (hits_training_values, Y)
 		
 	def train(self, hits_training_values, Y):
 		self.regressor.fit(hits_training_values, Y)
 	
+	def build_train_mean(self, hits_training_values, Y):
+		
+		import pandas as pd
+		df1 = pd.DataFrame(hits_training_values)
+		df2= pd.DataFrame(Y)
+		df2.columns = ['8','9']
+		df = pd.concat([df1, df2], axis=1)
+		dfMean = df.groupby(['8','9']).mean()
+		dfYs = df2.drop_duplicates()
+	
+		return (dfMean.values, dfYs.values)
+		
 	def predict(self, hit_reading):
 		
 		hit = self.hit_processor.parse_hit(hit_reading)
-
-		diffs = self.hit_processor.hit_diffs(hit['sensor_timings'])	
-		diffs = diffs.astype(float)
 			
-		predicted_value = self.regressor.predict(diffs.tolist())
+		timings = np.array(hit['sensor_timings']).astype(int)
+		
+		predicted_value = self.regressor.predict(timings)
 		return (predicted_value[0,0], predicted_value[0,1])
 
 
-class ATTClassicHitRegressor:
+class ATTClassicHitRegressor (HitRegressor):
 	def __init__(self, hit_processor):
 		self.coeficients_x = []
 		self.coeficients_y = []
 		self.hit_processor = hit_processor
+
 	
 	def collect_train_hits_from_file(self, str_filename):
 		hits_training_values = []
 		Y = []
 		
-		coords_pattern = "\((?P<x_coord>\d+)\,(?P<y_coord>\d+)\)"
-		coords_re = re.compile(coords_pattern)
-
 		in_lines = [line.strip() for line in open(str_filename) ]
 		for line in in_lines:
-			coord_X = -1
-			coord_Y = -1
 
-			# Split between timings and coords
-			ar_aux = line.split(":")
-			str_timings = ar_aux[0]
-			str_coords = ar_aux[1]
-
-			# Parse coords
-			the_match = coords_re.match(str_coords)
-			if the_match is not None:
-				str_X = the_match.group("x_coord")
-				str_Y = the_match.group("y_coord")
-				coord_X = int(str_X)
-				coord_Y = int(str_Y)
-				
 			# Parse timings
-			values = [int(value) for value in (str_timings.split(","))]
-			diffs = self.hit_processor.hit_diffs(values)
+			values = [int(value) for value in (line.split(","))]
+			train_values = values[2:]
+			point = values[0:2]
+			
+			diffs = self.hit_processor.hit_diffs(train_values)
 			hits_training_values.append(diffs)
-			Y.append([coord_X, coord_Y])
+			
+			Y.append(point)
 		
 		return (hits_training_values, Y)
-	
+		
 	def calc_matrices(self, train_values):
 		Ms = []
-		N_SENSORS = shape(train_values)[1]
+		N_SENSORS = np.shape(train_values)[1]
 		
 		for j,mat_values in enumerate(train_values):
 			for i in range(N_SENSORS): # for each row
@@ -146,7 +146,7 @@ class ATTClassicHitRegressor:
 			MInv = linalg.pinv2(M)
 			MsInv.append(MInv)
 					
-			_Y = matrix(Y)
+			_Y = np.matrix(Y)
 
 			coef_x = MInv * _Y[:,0]
 			coef_y = MInv * _Y[:,1]
@@ -162,7 +162,19 @@ class ATTClassicHitRegressor:
 	def train(self, train_values, Y):
 		Ms = self.calc_matrices(train_values)
 		coefs = self.calc_coeficients(Ms, Y)
-		return coefs
+		#return coefs
+		
+	def build_train_mean(self, hits_training_values, Y):
+		
+		import pandas as pd
+		df1 = pd.DataFrame(hits_training_values)
+		df2= pd.DataFrame(Y)
+		df2.columns = ['8','9']
+		df = pd.concat([df1, df2], axis=1)
+		dfMean = df.groupby(['8','9']).mean()
+		dfYs = df2.drop_duplicates()
+	
+		return (dfMean.values, dfYs.values)
 		
 	def predict(self, hit_reading):
 		

@@ -44,7 +44,7 @@ class ThreadedSerialReader (threading.Thread):
 					#self.serial_port = self.serial_port_builder.build_serial_port(self.port, self.baudrate)
 					self.serial_port = self.build_serial()
 				
-				except Exception as e:
+				except Exception:
 					self.write_log("Error: Check the serial connection or cable, please.")
 
 		self.write_log("Exiting " + self.name)
