@@ -17,7 +17,7 @@ class ThreadedSerialReader (threading.Thread):
 		self.port = port
 		self.baudrate = baud
 		self.custom_serial = CustomSerial 
-		
+		self.is_stopped = False
 		self.build_serial()
 
 	def build_serial(self):
@@ -30,7 +30,7 @@ class ThreadedSerialReader (threading.Thread):
 		self.write_log("Starting " + self.name)
 		
 		iterations = 0
-		while not self.connected:
+		while not self.connected and not self.is_stopped:
 			
 			if (self.serial_port != None and self.serial_port.isOpen()):
 				while iterations < self.max_readings or self.max_readings == None:
@@ -54,7 +54,7 @@ class ThreadedSerialReader (threading.Thread):
 			reading = self.serial_port.readline()
 			self.connected = True
 			self.write_log("Reading from serial: " + reading)
-		except serial.SerialException:
+		except:
 			self.write_log("Miss!")
 			self.serial_port.close()
 			self.connected = False
@@ -68,3 +68,6 @@ class ThreadedSerialReader (threading.Thread):
 		#print str_message
 		#sys.stdout.flush()
 		#time.sleep(0.1)
+		
+	def stop(self):
+		self.is_stopped = True

@@ -1,14 +1,14 @@
 int knockSensor = 1;
 int val0 = 0;
 int val1 = 0;
-int THRESHOLD = 5;
+int THRESHOLD = 3;
 
 void setup() {
   Serial.begin(115200);
 }
 
 void loop() {
-  val0 = analogRead(A7);
+  val0 = analogRead(A0);
 
   
   if (val0 >= THRESHOLD ) {

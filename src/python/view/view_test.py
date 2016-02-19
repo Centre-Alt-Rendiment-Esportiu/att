@@ -54,12 +54,24 @@ def build_regressor_SKLearn():
 	return regressor
 	
 class Ball:
-   radius = 8
+   radius = 15
    position = (250,200)
    color = (255,255,255) 
+
+def drawBall(x,y, window):
+	ball = Ball()
+	ball.color = (255,0,0)
+	ball.radius = 20
+	
+	translated_x = int(x*x_conversion)
+	translated_y = int(y*y_conversion)
+	ball.position = (translated_x, translated_y)
+	pygame.draw.circle(window, ball.color, ball.position, ball.radius, ball.radius)
+
 			
 def displayTable(windowWidth, windowHeight, tableLineWidth, ball):
-	window = pygame.display.set_mode((windowWidth, windowHeight))
+	window = pygame.display.set_mode((windowWidth, windowHeight), pygame.FULLSCREEN)
+	#window = pygame.display.set_mode((windowWidth, windowHeight))
 	    
 	pygame.draw.line(window,(255,255,255), (tableLineWidth/2,tableLineWidth/2), (tableLineWidth/2,windowHeight-tableLineWidth/2), tableLineWidth) 
 	pygame.draw.line(window,(255,255,255), (tableLineWidth/2,windowHeight-tableLineWidth/2), (windowWidth-tableLineWidth/2,windowHeight-tableLineWidth/2), tableLineWidth) 
@@ -68,6 +80,11 @@ def displayTable(windowWidth, windowHeight, tableLineWidth, ball):
 	pygame.draw.line(window,(255,255,255), (tableLineWidth/2,windowHeight/2), (windowWidth,windowHeight/2), tableLineWidth)
 	pygame.draw.line(window,(255,255,255), (windowWidth/2,tableLineWidth/2), (windowWidth/2,windowHeight-tableLineWidth/2), tableLineWidth) 
 	
+	for i in [6,18,30,42,54]:
+		for j in [6,18,30,42]:
+			drawBall(j,i, window)
+			pygame.display.flip()	
+
 	return window
 
 if __name__ == '__main__':
@@ -79,37 +96,41 @@ if __name__ == '__main__':
 		
 	#builder = DummySerialPortBuilder()
 	#builder = ATTEmulatedSerialPortBuilder()
-	builder = ATTHitsFromFilePortBuilder()
-	#builder = ATTArduinoSerialPortBuilder()
+	#builder = ATTHitsFromFilePortBuilder()
+	builder = ATTArduinoSerialPortBuilder()
 	
-	port = HITS_DATA_FILE
-	serial_reader = ATTHitsFromFilePort(port, baud)
-	#serial_reader = ATTArduinoSerialPort(port, baud)
+	#port = HITS_DATA_FILE
+	#serial_reader = ATTHitsFromFilePort(port, baud)
+	serial_reader = ATTArduinoSerialPort(port, baud)
 
-	regressor = build_regressor_SKLearn()
+	#regressor = build_regressor_SKLearn()
+	regressor = build_regressor_Classic()
 	
 	myThread = ThreadedSerialReader(1, "Thread-1", workQueue, None, builder, port, baud, serial_reader)
 	myThread.start()
 		
 	ball = Ball()
 	
-	windowWidth = 1600
-	windowHeight = 800
+	pygame.init()
+	
+	info = pygame.display.Info()
+	
+	windowWidth = info.current_w
+	windowHeight = info.current_h
 	tableLineWidth = 1
 	
 	x_conversion = (windowWidth/2)/48
 	y_conversion = (windowHeight)/60
 	
-	pygame.init()
 	window = displayTable(windowWidth, windowHeight, tableLineWidth, ball)
-	clock = pygame.time.Clock()
+	#clock = pygame.time.Clock()
 
 	done = False
 	while not done:	
 		if not workQueue.empty():
 			reading = workQueue.get()
 			if reading <> "":
-				print "> "+reading
+				#print "> "+reading
 				
 				(y,x) = regressor.predict(reading)
 				
@@ -117,9 +138,11 @@ if __name__ == '__main__':
 				translated_y = int(y*y_conversion)
 				
 				ball.position = (translated_x, translated_y)
-				print (translated_x, translated_y)
+				#print (translated_x, translated_y)
 				
 				pygame.draw.circle(window, ball.color, ball.position, ball.radius, ball.radius)
+		else:
+			pass
 						
 		for event in pygame.event.get():
 			if (event.type == pygame.QUIT):
@@ -135,9 +158,9 @@ if __name__ == '__main__':
 				done = True
 		
 		pygame.display.flip()	
-		clock.tick(60)
-
-
-		
+		#clock.tick(100)
+	
 	print "Exit..."
 	pygame.quit()
+	myThread.stop()
+	sys.exit()
