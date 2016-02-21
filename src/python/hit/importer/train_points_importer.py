@@ -2,6 +2,7 @@
 
 import re
 
+import numpy as np
 #
 # Import points from arduino format:
 #	"hit: { [tstamp]:[level] [tstamp]:[level] ... [tstamp]:[level] [side]}"
@@ -51,7 +52,36 @@ class TrainPointsImporter:
 		f = open(str_output_file, "w")
 		f.writelines([line+"\n" for line in out_lines])
 		f.close()
+### afegit pel jordi 
+	def line_to_line(self, line):
 		
+		out_line = []
+		current_point = ""
+		
+		hit_pattern = "-?\d+:-?\d+|[lr]"
+		hit_re = re.compile(hit_pattern)
+		
+		coords_pattern = "\((?P<x_coord>\d+)\,(?P<y_coord>\d+)\)"
+		coords_re = re.compile(coords_pattern)
+		
+		#for in_line in in_lines:
+		if line.startswith("("):
+			the_match = coords_re.match(line)
+			#if the_match is not None:
+			if the_match:
+				str_X = the_match.group("x_coord")
+				str_Y = the_match.group("y_coord")
+				current_point = ""+str_X+","+str_Y+""
+		else:		
+			groups = hit_re.findall(line)
+			if groups is not None:
+				sensor_timings = [x.split(":")[0] for x in groups[:-1]]
+				#sensor_values = [x.split(":")[1] for x in groups[:-1]]
+				#out_lines.append(current_point+","+",".join(sensor_timings))
+				out_line.append(sensor_timings)
+                    
+                    
+		return np.asarray(out_line)	
 if __name__ == '__main__':
 	
 	importer = TrainPointsImporter()
