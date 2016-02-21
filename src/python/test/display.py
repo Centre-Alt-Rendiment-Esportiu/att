@@ -6,8 +6,8 @@ pygame.init()
 
 tableLineWidth = 4
 
-current_w = 720
-current_h = 480
+current_w = pygame.display.Info().current_w
+current_h = pygame.display.Info().current_h
 heightp=60
 widthp = 96
 ratioH = current_h/heightp
@@ -50,7 +50,7 @@ exit = False
 while not exit:
     displayTable(current_w, current_h, tableLineWidth)
     displayBall(ball)
-    ball.setPosition( (random.randomint(0,current_w),random.randomint(0,current_w)) )
+    ball.setPosition( (random.randint(0,current_w),random.randint(0,current_w)) )
     events = pygame.event.get()
     for event in events:
       if event.type == pygame.KEYDOWN:
