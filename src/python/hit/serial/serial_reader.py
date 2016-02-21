@@ -17,7 +17,7 @@ class ThreadedSerialReader (threading.Thread):
 		self.port = port
 		self.baudrate = baud
 		self.custom_serial = CustomSerial 
-		
+		self.is_stopped = False
 		self.build_serial()
 
 	def build_serial(self):
@@ -30,7 +30,9 @@ class ThreadedSerialReader (threading.Thread):
 		self.write_log("Starting " + self.name)
 		
 		iterations = 0
-		while not self.connected:
+		while not self.connected and not self.is_stopped:
+			
+			time.sleep(0.2)
 			
 			if (self.serial_port != None and self.serial_port.isOpen()):
 				while iterations < self.max_readings or self.max_readings == None:
@@ -41,30 +43,37 @@ class ThreadedSerialReader (threading.Thread):
 			else:
 				time.sleep(0.5)
 				try:
-					#self.serial_port = self.serial_port_builder.build_serial_port(self.port, self.baudrate)
 					self.serial_port = self.build_serial()
-				
 				except Exception:
 					self.write_log("Error: Check the serial connection or cable, please.")
 
 		self.write_log("Exiting " + self.name)
 		
 	def read_and_enqueue(self):
+		
 		try:
 			reading = self.serial_port.readline()
-			self.connected = True
-			self.write_log("Reading from serial: " + reading)
-		except serial.SerialException:
+			if reading <> "":
+				self.queue.put(reading)
+				self.connected = True
+				self.write_log("Reading from serial: " + reading)
+		except:
 			self.write_log("Miss!")
 			self.serial_port.close()
 			self.connected = False
 			return False
+			
 		
-		self.queue.put(reading)
+		#reading = self.serial_port.readline()
+		#self.queue.put(reading)
+		
 		return True
 
 	def write_log(self, str_message):
-		pass
-		#print str_message
-		#sys.stdout.flush()
+		print str_message
+		sys.stdout.flush()
 		#time.sleep(0.1)
+		pass
+		
+	def stop(self):
+		self.is_stopped = True

@@ -7,6 +7,7 @@ import numpy as np
 import itertools
 
 from sklearn.linear_model import  LinearRegression
+from sklearn.tree import DecisionTreeRegressor
 
 class HitRegressor:
 	__metaclass__ = abc.ABCMeta
@@ -26,7 +27,8 @@ class HitRegressor:
 class ATTSkLearnHitRegressor (HitRegressor):
 	def __init__(self, hit_processor):
 		self.hit_processor = hit_processor
-		self.regressor = LinearRegression()
+		#self.regressor = LinearRegression()
+		self.regressor = DecisionTreeRegressor()
 		
 	def collect_train_hits_from_file(self, str_filename):
 		hits_training_values = []
@@ -44,7 +46,7 @@ class ATTSkLearnHitRegressor (HitRegressor):
 			Y.append(point)
 		
 		
-		(hits_training_values, Y) = self.build_train_mean(hits_training_values, Y)
+		(hits_training_values, Y) = self.build_train_mean(hits_training_values, Y) 
 		
 		return (hits_training_values, Y)
 		
@@ -70,6 +72,8 @@ class ATTSkLearnHitRegressor (HitRegressor):
 		timings = np.array(hit['sensor_timings']).astype(int)
 		
 		predicted_value = self.regressor.predict(timings)
+		print predicted_value
+		print "----------"
 		return (predicted_value[0,0], predicted_value[0,1])
 
 

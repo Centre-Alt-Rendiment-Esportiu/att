@@ -25,6 +25,8 @@ struct Hit {
 //Pin mapping of Teensy
 int rightPins[] = { A8, A9, A10, A11, A12, A13, A14, A15}; // clockwise from top left
 int leftPins[] = { A0, A1, A2, A3, A4, A5, A6, A7}; // clockwise from top left
+int rightThresholds[] = {10, 4, 4, 4, 4, 4, 4, 10};
+int leftThresholds[] = {4, 4, 4, 4, 4, 4, 4, 10};
 
 const unsigned long NO_RECORD = -1;
 const unsigned long TIMEOUT_BETWEEN_HITS = 10000; // in micros
@@ -40,8 +42,8 @@ void setup() {
 
 void loop() {
   //delay(5);
-  readPins(leftPins, LEFT);
-  readPins(rightPins, RIGHT);
+  readPins(leftPins, leftThresholds, LEFT);
+  //readPins(rightPins, rightThresholds, RIGHT);
 
   //Serial.println(curHit.volumes[0]);
 
@@ -85,12 +87,12 @@ void createNewHit() {
  * For the list of one sides pins, see if any of them is detecting an analog reading above the threshold
  * and if so, report a hit with side and detection time
  */
-void readPins(int* pinList, char curSide) {
+void readPins(int* pinList, int* thresholds, char curSide) {
   for (int i = 0; i < SENSOR_COUNT; i++) {
     int pinNumber = pinList[i];
     int pinValue = analogRead(pinNumber);
     //Serial.println(pinValue);
-    if (pinValue >= THRESHOLD) {
+    if (pinValue >= thresholds[i]) {
       unsigned long detectionTime = micros();
       if (curHit.startTime == NO_RECORD) {
         curHit.startTime = detectionTime;

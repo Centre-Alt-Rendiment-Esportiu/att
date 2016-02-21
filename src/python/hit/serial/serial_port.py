@@ -10,6 +10,10 @@ class SerialPort:
 	__metaclass__ = abc.ABCMeta
 	
 	@abc.abstractmethod
+	def start(self):
+		pass
+	
+	@abc.abstractmethod
 	def isOpen(self):
 		pass
 		
@@ -31,6 +35,9 @@ class SerialPort:
 		
 class DummySerialPort (SerialPort):
 	def __init__(self, port = None, baud = None):
+		pass
+	
+	def start(self):
 		pass
 	
 	def isOpen(self):
@@ -55,6 +62,9 @@ class DummySerialPort (SerialPort):
 		
 class ATTEmulatedSerialPort (SerialPort):
 	def __init__(self, port = None, baud = None):
+		pass
+	
+	def start(self):
 		pass
 	
 	def isOpen(self):
@@ -130,8 +140,12 @@ class ATTEmulatedSerialPort (SerialPort):
 		
 class ATTArduinoSerialPort (SerialPort):
 	def __init__(self, port = None, baud = None):
-		self.serial_port = serial.Serial(port, baud)
-		pass
+		self.port = port
+		self.baud = baud
+		self.start()
+	
+	def start(self):
+		self.serial_port = serial.Serial(self.port, self.baud)
 	
 	def isOpen(self):
 		return self.serial_port.isOpen()
@@ -151,10 +165,18 @@ class ATTArduinoSerialPort (SerialPort):
 		
 class ATTHitsFromFilePort (SerialPort):
 	def __init__(self, port = None, baud = None):
-		self.lines = [line.strip() for line in file(port) if line.startswith("hit:")]
+		self.port = port
+		self.baud = baud
+		self.lines = []
 		self.inner_index = 0
 		self.amIclosed = 0
+		self.start()
 	
+	def start(self):
+		self.lines = [line.strip() for line in file(self.port) if line.startswith("hit:")]
+		self.inner_index = 0
+		self.amIclosed = 0
+		
 	def isOpen(self):
 		return not self.amIclosed
 		
