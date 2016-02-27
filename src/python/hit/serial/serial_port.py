@@ -80,6 +80,8 @@ class ATTEmulatedSerialPort (SerialPort):
 		return 0
 		
 	def readline(self):
+		time_delay = int(2*random.random())+1
+		time.sleep(time_delay)
 		return self.gen_random_line()
 		
 	def gen_random_line(self):
@@ -167,13 +169,13 @@ class ATTHitsFromFilePort (SerialPort):
 	def __init__(self, port = None, baud = None):
 		self.port = port
 		self.baud = baud
-		self.lines = []
+		self.lines = [line.strip() for line in file(self.port) if line.startswith("hit:")]
 		self.inner_index = 0
 		self.amIclosed = 0
 		self.start()
 	
 	def start(self):
-		self.lines = [line.strip() for line in file(self.port) if line.startswith("hit:")]
+		#self.lines = [line.strip() for line in file(self.port) if line.startswith("hit:")]
 		self.inner_index = 0
 		self.amIclosed = 0
 		
@@ -189,7 +191,12 @@ class ATTHitsFromFilePort (SerialPort):
 	def get_baudrate(self):
 		return 0
 		
-	def readline(self):
+	def readline(self, *isRandomAndSlow):
+		
+		if (len(isRandomAndSlow)):
+			time_delay = int(2*random.random())+1
+			time.sleep(time_delay)
+		
 		line = ""
 		if self.inner_index < len(self.lines):
 			line = self.lines[self.inner_index]

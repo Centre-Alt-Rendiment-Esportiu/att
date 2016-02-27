@@ -13,7 +13,7 @@ else:
 sys.path.insert(0, PROJECT_ROOT + "/src/python/")
 
 import pygame
-from pygame.locals import *
+#from pygame.locals import *
 
 import Queue
 
@@ -63,9 +63,9 @@ def build_regressor_SKLearn():
 	return regressor
 	
 class Ball:
-   radius = 15
-   position = (250,200)
-   color = (255,255,255) 
+	radius = 15
+	position = (250,200)
+	color = (255,255,255) 
 
 def drawBall(ball, window, fill=0):
 	pygame.draw.circle(window, ball.color, ball.position, ball.radius, fill)
@@ -117,7 +117,7 @@ def displaySensors(window):
 def displayTable(window, windowWidth, windowHeight):
 	
 	tableLineWidth = 1
-	    
+
 	pygame.draw.line(window,(255,255,255), (tableLineWidth/2,tableLineWidth/2), (tableLineWidth/2,windowHeight-tableLineWidth/2), tableLineWidth) 
 	pygame.draw.line(window,(255,255,255), (tableLineWidth/2,windowHeight-1-tableLineWidth/2), (windowWidth-tableLineWidth/2,windowHeight-1-tableLineWidth/2), tableLineWidth) 
 	pygame.draw.line(window,(255,255,255), (windowWidth-1-tableLineWidth/2,windowHeight-tableLineWidth/2), (windowWidth-1-tableLineWidth/2,tableLineWidth/2), tableLineWidth) 
@@ -152,6 +152,7 @@ if __name__ == '__main__':
 	#builder = ATTArduinoSerialPortBuilder()
 	
 	port = HITS_DATA_FILE
+	#serial_port = ATTEmulatedSerialPort(port, baud)
 	serial_port = ATTHitsFromFilePort(port, baud)
 	#serial_port = ATTArduinoSerialPort(port, baud)
 
@@ -164,9 +165,11 @@ if __name__ == '__main__':
 	pygame.init()
 	
 	info = pygame.display.Info()
+	#windowWidth = info.current_w
+	#windowHeight = info.current_h
+	windowWidth = 1024
+	windowHeight = 768
 	
-	windowWidth = info.current_w
-	windowHeight = info.current_h
 	x_conversion = (windowWidth/2)/48
 	y_conversion = (windowHeight)/60
 	
@@ -175,26 +178,20 @@ if __name__ == '__main__':
 
 	done = False
 	while not done:
-		#time.sleep(0.1)
 		
 		if not workQueue.empty():
 			reading = workQueue.get()
 			if reading <> "":
-				#print "> "+reading				
+				print "> "+reading				
 				(y,x) = regressor.predict(reading)				
 				drawHit(x, y, window)
-			else:
-				time.sleep(1)
-		else:
-			time.sleep(1)
 						
 		for event in pygame.event.get():
 			if (event.type == pygame.QUIT):
 				done = True
 				
-			if (event.type == pygame.KEYUP) or (event.type == pygame.KEYDOWN):
-				#print event
-				#print event.key
+			#if (event.type == pygame.KEYUP) or (event.type == pygame.KEYDOWN):
+			if (event.type == pygame.KEYUP):
 				if (event.key == pygame.K_ESCAPE):
 					done = True
 				if (event.key == pygame.K_c):
@@ -203,23 +200,17 @@ if __name__ == '__main__':
 				if (event.key == pygame.K_r):
 					window.fill((0,0,0))
 					window = displayScenario(windowWidth, windowHeight)
-					#workQueue.queue.clear()
 					serial_port.amIclosed = 1
 					serial_port.start()
-
 												
 			if event.type == pygame.QUIT:
 				done = True
-		
+				
 		clock.tick(60)
 		pygame.display.flip()	
 		
-	
 	print "Exit..."
 	
 	myThread.stop()
-	
-	
 	pygame.quit()
-	
-	sys.exit()
+	#sys.exit()

@@ -32,7 +32,7 @@ class ThreadedSerialReader (threading.Thread):
 		iterations = 0
 		while not self.connected and not self.is_stopped:
 			
-			time.sleep(0.2)
+			time.sleep(0.1)
 			
 			if (self.serial_port != None and self.serial_port.isOpen()):
 				while iterations < self.max_readings or self.max_readings == None:
@@ -41,7 +41,7 @@ class ThreadedSerialReader (threading.Thread):
 					else:
 						break
 			else:
-				time.sleep(0.5)
+				time.sleep(0.1)
 				try:
 					self.serial_port = self.build_serial()
 				except Exception:
@@ -52,11 +52,13 @@ class ThreadedSerialReader (threading.Thread):
 	def read_and_enqueue(self):
 		
 		try:
-			reading = self.serial_port.readline()
+			reading = self.serial_port.readline(1)
 			if reading <> "":
 				self.queue.put(reading)
 				self.connected = True
-				self.write_log("Reading from serial: " + reading)
+				#self.write_log("Reading from serial: " + reading)
+			else:
+				time.sleep(0.1)
 		except:
 			self.write_log("Miss!")
 			self.serial_port.close()
