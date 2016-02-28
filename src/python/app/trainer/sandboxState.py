@@ -6,7 +6,6 @@ from baseState import BaseState
 
 from serialLogNotifier import SerialLogNotifier
 
-from view import Ball
 from view import SurfaceView
 
 class SandboxState (BaseState):
@@ -40,14 +39,9 @@ class SandboxState (BaseState):
 		done = False
 
 		if not self.workQueue.empty():
-			reading = self.workQueue.get()
-			if reading <> "":		
-				(y,x) = self.predictor.predict(reading)
-				self.view.drawHit(x, y);
-				
-				logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+reading
-				print logReading
-				self.notifier.push(logReading)
+			hit = self.workQueue.get()
+			if hit <> "":
+				self.processHit(hit)		
 		
 		if isPressed(pygame.K_c):
 			self.clear()
@@ -60,3 +54,13 @@ class SandboxState (BaseState):
 			setState(0, self)
 
 		return done
+	
+	def processHit(self, hit):
+		(y,x) = self.predictor.predictHit(hit)
+		self.view.drawHit(x, y);
+		
+		logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+hit["raw"]
+		print logReading
+		self.notifier.push(logReading)
+
+	

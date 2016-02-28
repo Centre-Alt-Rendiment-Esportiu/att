@@ -159,7 +159,7 @@ if __name__ == '__main__':
 	#regressor = build_regressor_SKLearn()
 	regressor = build_regressor_Classic()
 	
-	myThread = ThreadedSerialReader(1, "Thread-1", workQueue, None, builder, port, baud, serial_port)
+	myThread = ThreadedSerialReader(1, "Thread-1", workQueue, None, builder, port, baud, serial_port, True)
 	myThread.start()
 		
 	pygame.init()
@@ -180,10 +180,10 @@ if __name__ == '__main__':
 	while not done:
 		
 		if not workQueue.empty():
-			reading = workQueue.get()
-			if reading <> "":
-				print "> "+reading				
-				(y,x) = regressor.predict(reading)				
+			hit = workQueue.get()
+			if hit <> "":
+				print "> "+hit["raw"]				
+				(y,x) = regressor.predictHit(hit)				
 				drawHit(x, y, window)
 						
 		for event in pygame.event.get():

@@ -6,8 +6,8 @@ from baseState import BaseState
 
 from serialLogNotifier import SerialLogNotifier
 
-from view import Ball
 from view import SurfaceView
+from protocol import ShortServiceProtocol
 
 class ShortServiceState (BaseState):
 
@@ -16,6 +16,7 @@ class ShortServiceState (BaseState):
 	predictor = None
 	font = None
 	view = None
+	protocol = None
 
 	def __init__(self, surface, predictor, workQueue, notifier):
 		self.surface = surface
@@ -24,11 +25,11 @@ class ShortServiceState (BaseState):
 		self.workQueue = workQueue
 		self.notifier = notifier
 		self.view = SurfaceView(self.surface)
+		self.protocol = ShortServiceProtocol(self.view, self.notifier, self)
 		
 	def render(self):
-		text = self.font.render("Short service", 1, (250, 250, 250))
-		self.surface.blit(text, (self.getX(10), self.getY(10)))
-		
+		self.view.displayScenario()
+				
 		self.renderSerialLog()
 		pygame.display.flip()
 	
@@ -41,12 +42,9 @@ class ShortServiceState (BaseState):
 		done = False
 
 		if not self.workQueue.empty():
-			reading = self.workQueue.get()
-			if reading <> "":		
-				(y,x) = self.predictor.predict(reading)
-				logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+reading
-				print logReading
-				self.notifier.push(logReading)
+			hit = self.workQueue.get()
+			if hit <> "":
+				self.processHit(hit)
 
 		self.render()
 				
@@ -55,3 +53,17 @@ class ShortServiceState (BaseState):
 			setState(0, self)
 
 		return done
+	
+	def processHit(self, hit):
+		(y,x) = self.predictor.predictHit(hit)
+		
+		logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+hit["raw"]
+		print logReading
+		self.notifier.push(logReading)
+		
+		self.protocol.processSate(hit)
+		
+		self.view.drawHit(x, y);
+		
+		
+

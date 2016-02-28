@@ -2,6 +2,7 @@
 
 import sys
 import pygame
+import traceback
 
 import Queue
 
@@ -86,7 +87,7 @@ def main():
 	serialBuilder = ATTHitsFromFilePortBuilder()
 	serial_port = ATTHitsFromFilePort(port, baud)
 	
-	myThread = ThreadedSerialReader(1, "Thread-1", workQueue, None, serialBuilder, port, baud, serial_port)
+	myThread = ThreadedSerialReader(1, "Thread-1", workQueue, None, serialBuilder, port, baud, serial_port, False)
 	myThread.start()
 
 	pygame.init()
@@ -130,6 +131,7 @@ def main():
 			
 	except Exception:
 		print Exception
+		traceback.print_exc(file=sys.stdout)
 				
 	finally:
 		myThread.stop()

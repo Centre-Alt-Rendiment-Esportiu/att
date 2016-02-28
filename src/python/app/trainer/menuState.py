@@ -49,10 +49,10 @@ class MenuState (BaseState):
 		done = False
 		
 		if not self.workQueue.empty():
-			reading = self.workQueue.get()
-			if reading <> "":		
-				(y,x) = self.predictor.predict(reading)
-				logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+reading
+			hit = self.workQueue.get()
+			if hit <> "":		
+				(y,x) = self.predictor.predictHit(hit)
+				logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+hit["raw"]
 				print logReading
 				self.notifier.push(logReading)
 

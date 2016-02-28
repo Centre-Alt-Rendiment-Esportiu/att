@@ -3,6 +3,7 @@
 import re
 
 import numpy as np
+import time
 import itertools
 
 class ATTMatrixHitProcessor:
@@ -18,7 +19,9 @@ class ATTMatrixHitProcessor:
 			hit = {
 				"side": groups[-1],
 				"sensor_timings": [x.split(":")[0] for x in groups[:-1]],
-				"sensor_values": [x.split(":")[1] for x in groups[:-1]]
+				"sensor_values": [x.split(":")[1] for x in groups[:-1]],
+				"tstamp": time.time(),
+				"raw": line
 			}
 			return hit
 		
@@ -48,7 +51,9 @@ class ATTPlainHitProcessor:
 			hit = {
 				"side": groups[-1],
 				"sensor_timings": [x.split(":")[0] for x in groups[:-1]],
-				"sensor_values": [x.split(":")[1] for x in groups[:-1]]
+				"sensor_values": [x.split(":")[1] for x in groups[:-1]],
+				"tstamp": time.time(),
+				"raw": line
 			}
 			return hit
 
