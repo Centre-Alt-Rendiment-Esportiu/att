@@ -78,10 +78,10 @@ class TrainPointsImporter:
 				sensor_timings = [x.split(":")[0] for x in groups[:-1]]
 				#sensor_values = [x.split(":")[1] for x in groups[:-1]]
 				#out_lines.append(current_point+","+",".join(sensor_timings))
-				out_line.append(sensor_timings)
-                    
-                    
-		return np.asarray(out_line)	
+ 				sensor_timings = [int(i) for i in sensor_timings] 
+				out_line.append(sensor_timings)           
+              	return np.asarray(out_line)	
+
 if __name__ == '__main__':
 	
 	importer = TrainPointsImporter()
