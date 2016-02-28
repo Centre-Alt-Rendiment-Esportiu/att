@@ -66,11 +66,12 @@ class ATTSkLearnHitRegressor (HitRegressor):
 		return (dfMean.values, dfYs.values)
 		
 	def predict(self, hit_reading):
-		
 		hit = self.hit_processor.parse_hit(hit_reading)
-			
+		return self.predictHit(hit)
+
+	
+	def predictHit(self, hit):
 		timings = np.array(hit['sensor_timings']).astype(int)
-		
 		predicted_value = self.regressor.predict(timings)
 		print predicted_value
 		print "----------"
@@ -180,9 +181,11 @@ class ATTClassicHitRegressor (HitRegressor):
 	
 		return (dfMean.values, dfYs.values)
 		
-	def predict(self, hit_reading):
-		
+	def predict(self, hit_reading):		
 		hit = self.hit_processor.parse_hit(hit_reading)			
+		return self.predictHit(hit)
+	
+	def predictHit(self, hit):
 		diffs = self.hit_processor.hit_diffs(hit['sensor_timings'])
 		
 		M = self.calc_matrices([diffs])

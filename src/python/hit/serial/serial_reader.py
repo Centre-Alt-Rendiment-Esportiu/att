@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import threading
-import serial
 import time
 import sys
 
+from hit.process.processor import ATTMatrixHitProcessor
+
 class ThreadedSerialReader (threading.Thread):
-	def __init__(self, threadID, name, queue, max_readings, serial_port_builder, port, baud, CustomSerial=None):
+	def __init__(self, threadID, name, queue, max_readings, serial_port_builder, port, baud, CustomSerial=None, isFast=True):
 		threading.Thread.__init__(self)
 		self.threadID = threadID
 		self.name = name
@@ -19,6 +20,8 @@ class ThreadedSerialReader (threading.Thread):
 		self.custom_serial = CustomSerial 
 		self.is_stopped = False
 		self.build_serial()
+		self.processor = ATTMatrixHitProcessor()
+		self.isFast = isFast
 
 	def build_serial(self):
 		if self.custom_serial != None:
@@ -32,7 +35,7 @@ class ThreadedSerialReader (threading.Thread):
 		iterations = 0
 		while not self.connected and not self.is_stopped:
 			
-			time.sleep(0.2)
+			time.sleep(0.1)
 			
 			if (self.serial_port != None and self.serial_port.isOpen()):
 				while iterations < self.max_readings or self.max_readings == None:
@@ -41,7 +44,7 @@ class ThreadedSerialReader (threading.Thread):
 					else:
 						break
 			else:
-				time.sleep(0.2)
+				time.sleep(0.1)
 				try:
 					self.serial_port = self.build_serial()
 				except Exception:
@@ -52,11 +55,17 @@ class ThreadedSerialReader (threading.Thread):
 	def read_and_enqueue(self):
 		
 		try:
-			reading = self.serial_port.readline()
+			if self.isFast:
+				reading = self.serial_port.readline()
+			else:
+				reading = self.serial_port.readline(1)
 			if reading <> "":
-				self.queue.put(reading)
+				hit = self.processor.parse_hit(reading)
+				self.queue.put(hit)
 				self.connected = True
 				#self.write_log("Reading from serial: " + reading)
+			else:
+				time.sleep(0.1)
 		except:
 			self.write_log("Miss!")
 			self.serial_port.close()
