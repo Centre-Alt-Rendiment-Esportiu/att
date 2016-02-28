@@ -25,6 +25,9 @@ class MultiBallState (BaseState):
 		self.notifier = notifier
 		self.view = SurfaceView(self.surface)
 			
+	def start(self):
+		pass
+	
 	def render(self):
 		text = self.font.render("Multi Ball", 1, (250, 250, 250))
 		self.surface.blit(text, (self.getX(10), self.getY(10)))

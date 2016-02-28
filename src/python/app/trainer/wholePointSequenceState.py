@@ -24,7 +24,10 @@ class WholePointSequenceState (BaseState):
 		self.workQueue = workQueue
 		self.notifier = notifier
 		self.view = SurfaceView(self.surface)
-		
+
+	def start(self):
+		pass
+	
 	def render(self):
 		text = self.font.render("Whole point sequence", 1, (250, 250, 250))
 		self.surface.blit(text, (self.getX(10), self.getY(10)))

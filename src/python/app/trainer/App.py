@@ -67,6 +67,8 @@ def setState(state, referer):
 	elif state == 4:
 		currentState = op_4_state
 	
+	currentState.start()
+	
 	if referer	!= None:
 		referer.clear()
 

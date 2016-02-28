@@ -10,6 +10,10 @@ class BaseState:
 	surface = None
 	
 	@abc.abstractmethod
+	def start(self):
+		pass
+	
+	@abc.abstractmethod
 	def loop(self, setState, isPressed):
 		pass
 	

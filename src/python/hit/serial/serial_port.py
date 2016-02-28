@@ -202,7 +202,7 @@ class ATTHitsFromFilePort (SerialPort):
 	def readline(self, *isFast):
 		
 		if (len(isFast)):
-			time_delay = 2*random.random()
+			time_delay = 5*random.random()
 			time.sleep(time_delay)
 		
 		line = ""

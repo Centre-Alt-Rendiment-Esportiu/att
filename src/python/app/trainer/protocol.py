@@ -11,11 +11,14 @@ class ShortServiceProtocol:
     currentState = None
     lastHit = None
     currentHit = None
+    timeoutThread = None
     
     def __init__(self, view, notifier, state):
         self.view = view
         self.notifier = notifier
         self.state = state
+								
+        #self.timeoutThread = TimeoutThread()
     
     def processSate(self, hit):
         
@@ -27,6 +30,9 @@ class ShortServiceProtocol:
             self.currentHit = hit
             self.lastHit = None
             self.currentState = 2
+												
+            self.timeoutThread = TimeoutThread(1, self)
+            self.timeoutThread.start()
             return
         
         if self.currentState == 2:
@@ -36,18 +42,49 @@ class ShortServiceProtocol:
             time_delta = hit["tstamp"] - self.lastHit["tstamp"]
             self.notifier.push(str(time_delta))
             self.currentState = 1
+
+            self.timeoutThread.stop()
+            self.timeoutThread = None
+												
+            self.completedService()
+
             return
             
     def notify(self):
         time_now = time.time()
         
         time_delta = time_now - self.currentHit["tstamp"]
-        if time_delta > 3 and self.currentState == 1:
+        self.notifier.push(str(time_delta))
+        if time_delta > 3 and self.currentState == 2:
+            self.timedOutService()
+            self.notifier.push("TIMEOUT !!!")
             self.currentState = 1
             self.currentHit = None
             self.lastHit = None
-        
-    
+												
+            self.timeoutThread.stop()
+            self.timeoutThread = None
+												
+    def completedService(self):					
+        service = {}
+        service['first'] = {}
+        service['first']['coords'] = self.lastHit['coords']
+        service['first']['tstamp'] = self.lastHit['tstamp']
+        service['second'] = {}
+        service['second']['coords'] = self.currentHit['coords']
+        service['second']['tstamp'] = self.currentHit['tstamp']
+        self.state.servicesList.append(service)
+							
+    def timedOutService(self):
+        service = {}
+        service['first'] = {}
+        service['first']['coords'] = self.currentHit['coords']
+        service['first']['tstamp'] = self.currentHit['tstamp']
+        service['second'] = {}
+        service['second']['coords'] = ""
+        service['second']['tstamp'] = "TIMED_OUT"
+        self.state.servicesList.append(service)
+												            
 class TimeoutThread (threading.Thread):
     
     protocol = None

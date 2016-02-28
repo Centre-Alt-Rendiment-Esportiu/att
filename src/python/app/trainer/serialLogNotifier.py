@@ -19,6 +19,9 @@ class SerialLogNotifier(BaseState):
         
         for i in range(self.LIMIT):
             self.notifications.append("")
+
+    def start(self):
+        pass
         
     def render(self):
         blue = (0, 0, 70)

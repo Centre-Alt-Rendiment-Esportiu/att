@@ -24,6 +24,9 @@ class SandboxState (BaseState):
 		self.workQueue = workQueue
 		self.notifier = notifier
 		self.view = SurfaceView(self.surface)
+
+	def start(self):
+		pass
 		
 	def render(self):		
 		self.view.displayScenario()

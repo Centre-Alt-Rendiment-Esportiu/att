@@ -28,6 +28,9 @@ class MenuState (BaseState):
 		self.workQueue= workQueue
 		self.notifier = notifier
 
+	def start(self):
+		pass
+									
 	def render(self):
 		for i in range(len(self.menuOptionsLabels)):
 			if not(i == self.currentOption):

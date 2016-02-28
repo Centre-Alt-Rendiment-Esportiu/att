@@ -17,6 +17,7 @@ class ShortServiceState (BaseState):
 	font = None
 	view = None
 	protocol = None
+	servicesList = None
 
 	def __init__(self, surface, predictor, workQueue, notifier):
 		self.surface = surface
@@ -27,6 +28,9 @@ class ShortServiceState (BaseState):
 		self.view = SurfaceView(self.surface)
 		self.protocol = ShortServiceProtocol(self.view, self.notifier, self)
 		
+	def start(self):
+		self.servicesList = []
+	
 	def render(self):
 		self.view.displayScenario()
 				
@@ -49,6 +53,7 @@ class ShortServiceState (BaseState):
 		self.render()
 				
 		if isPressed(pygame.K_ESCAPE):
+			print self.servicesList
 			self.clear()
 			setState(0, self)
 
@@ -56,6 +61,7 @@ class ShortServiceState (BaseState):
 	
 	def processHit(self, hit):
 		(y,x) = self.predictor.predictHit(hit)
+		hit['coords'] = (y,x)
 		
 		logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+hit["raw"]
 		print logReading
