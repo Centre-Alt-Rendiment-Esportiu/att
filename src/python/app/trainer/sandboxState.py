@@ -6,7 +6,7 @@ from baseState import BaseState
 
 from serialLogNotifier import SerialLogNotifier
 
-from view import SurfaceView
+from app.trainer.view import SurfaceView
 
 class SandboxState (BaseState):
 	

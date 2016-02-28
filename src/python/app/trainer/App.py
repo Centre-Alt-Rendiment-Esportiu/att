@@ -1,6 +1,18 @@
 # -*- coding: utf-8 -*-
 
 import sys
+
+import platform
+
+PROJECT_ROOT = ""
+if platform.platform().lower().startswith("win"):
+	PROJECT_ROOT = "I:/dev/workspaces/python/att-workspace/att/"
+else:
+	if platform.platform().lower().startswith("linux"):
+		PROJECT_ROOT = "/home/asanso/workspace/att-spyder/att/"
+		
+sys.path.insert(0, PROJECT_ROOT + "/src/python/")
+
 import pygame
 import traceback
 
@@ -15,7 +27,7 @@ from hit.process.processor import ATTPlainHitProcessor
 from hit.train.regressor import ATTClassicHitRegressor
 from hit.train.regressor import ATTSkLearnHitRegressor
 
-from serialLogNotifier import SerialLogNotifier
+from app.trainer.serialLogNotifier import SerialLogNotifier
 
 import menuState
 import shortServiceState

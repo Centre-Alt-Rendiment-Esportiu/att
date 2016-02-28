@@ -6,8 +6,8 @@ from baseState import BaseState
 
 from serialLogNotifier import SerialLogNotifier
 
-from view import Ball
-from view import SurfaceView
+from app.trainer.view import Ball
+from app.trainer.view import SurfaceView
 
 class MultiBallState (BaseState):
 	
