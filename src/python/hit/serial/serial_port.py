@@ -18,7 +18,7 @@ class SerialPort:
 		pass
 		
 	@abc.abstractmethod
-	def readline(self, isFast=False):
+	def readline(self, *isFast):
 		pass
 		
 	@abc.abstractmethod
@@ -52,10 +52,11 @@ class DummySerialPort (SerialPort):
 	def get_baudrate(self):
 		return 0
 		
-	def readline(self, isFast=False):
-		if not isFast:
-			time_delay = int(3*random.random())+1
+	def readline(self, *isFast):
+		if (len(isFast)):
+			time_delay = 2*random.random()
 			time.sleep(time_delay)
+		
 		return self.gen_random_line()
 		
 	def gen_random_line(self):
@@ -80,10 +81,11 @@ class ATTEmulatedSerialPort (SerialPort):
 	def get_baudrate(self):
 		return 0
 		
-	def readline(self, isFast=False):
-		if not isFast:
-			time_delay = int(2*random.random())+1
+	def readline(self, *isFast):
+		if (len(isFast)):
+			time_delay = 2*random.random()
 			time.sleep(time_delay)
+
 		return self.gen_random_line()
 		
 	def gen_random_line(self):
@@ -157,7 +159,11 @@ class ATTArduinoSerialPort (SerialPort):
 	def close(self):
 		self.serial_port.close()
 		
-	def readline(self, isFast=False):
+	def readline(self, *isFast):
+		if (len(isFast)):
+			time_delay = 2*random.random()
+			time.sleep(time_delay)
+			
 		line = self.serial_port.readline()
 		return line
 		
@@ -193,9 +199,9 @@ class ATTHitsFromFilePort (SerialPort):
 	def get_baudrate(self):
 		return 0
 		
-	def readline(self, *isRandomAndSlow):
+	def readline(self, *isFast):
 		
-		if (len(isRandomAndSlow)):
+		if (len(isFast)):
 			time_delay = 2*random.random()
 			time.sleep(time_delay)
 		

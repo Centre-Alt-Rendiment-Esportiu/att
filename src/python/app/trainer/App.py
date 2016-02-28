@@ -111,7 +111,7 @@ def main():
 	windowHeight = 768 #768
 	
 	surface = displayScenario(windowWidth, windowHeight)
-	notifier = SerialLogNotifier(surface, (55,80,98,102))
+	notifier = SerialLogNotifier(surface, (55,78,100,100))
 	
 	menu_state = menuState.MenuState(surface, predictor, workQueue, notifier)
 	op_1_state = shortServiceState.ShortServiceState(surface, predictor, workQueue, notifier)
@@ -126,8 +126,6 @@ def main():
 		clock = pygame.time.Clock()
 		
 		while not done:
-			#surface.fill((0, 0, 0))
-				
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					done = True

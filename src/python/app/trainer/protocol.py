@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+import threading
 
 class ShortServiceProtocol:
     
@@ -37,5 +38,32 @@ class ShortServiceProtocol:
             self.currentState = 1
             return
             
+    def notify(self):
+        time_now = time.time()
+        
+        time_delta = time_now - self.currentHit["tstamp"]
+        if time_delta > 3 and self.currentState == 1:
+            self.currentState = 1
+            self.currentHit = None
+            self.lastHit = None
+        
+    
+class TimeoutThread (threading.Thread):
+    
+    protocol = None
+    is_stopped = None
+    
+    def __init__(self, threadID, protocol):
+        threading.Thread.__init__(self)
+        self.protocol = protocol
+        self.is_stopped = False
 
+    def run(self):
+        
+        while not self.is_stopped:
+            time.sleep(0.001)
+            self.protocol.notify()
+    
+    def stop(self):
+        self.is_stopped = True
     
