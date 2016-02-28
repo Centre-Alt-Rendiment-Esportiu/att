@@ -41,7 +41,7 @@ class ThreadedSerialReader (threading.Thread):
 					else:
 						break
 			else:
-				time.sleep(0.5)
+				time.sleep(0.2)
 				try:
 					self.serial_port = self.build_serial()
 				except Exception:
@@ -56,7 +56,7 @@ class ThreadedSerialReader (threading.Thread):
 			if reading <> "":
 				self.queue.put(reading)
 				self.connected = True
-				self.write_log("Reading from serial: " + reading)
+				#self.write_log("Reading from serial: " + reading)
 		except:
 			self.write_log("Miss!")
 			self.serial_port.close()
