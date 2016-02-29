@@ -10,7 +10,8 @@ from app.trainer.protocol import ShortServiceProtocol
 class ATTController:
 	__metaclass__ = abc.ABCMeta
 	
-	surface = None
+	#surface = None
+	view = None
 	
 	@abc.abstractmethod
 	def start(self):
@@ -21,15 +22,15 @@ class ATTController:
 		pass
 	
 	def clear(self):
-		self.surface.fill((0, 0, 0))
+		#self.surface.fill((0, 0, 0))
+		#self.view.surface.fill((0, 0, 0))
+		self.view.clear()
 				
 	def getX(self, _x):
-		max_x = self.surface.get_size()[0];
-		return (max_x/100)*_x
+		return self.view.getX(_x)
 	
 	def getY(self, _y):
-		max_y = self.surface.get_size()[1];
-		return (max_y/100)*_y
+		return self.view.getY(_y)
 
 class MenuController (ATTController):
 	
@@ -59,8 +60,8 @@ class MenuController (ATTController):
 		"position": 4
 	}]
 	
-	def __init__(self, surface, predictor, workQueue, notifier):
-		self.surface = surface		
+	def __init__(self, view, predictor, workQueue, notifier):
+		self.view = view		
 		self.font = pygame.font.Font(None, 66)
 		self.predictor = predictor
 		self.workQueue= workQueue
@@ -83,7 +84,7 @@ class MenuController (ATTController):
 			else:
 				text = self.font.render(optionLabel['label'], 1, (250, 250, 250))
 
-			self.surface.blit(text, (self.getX(30), self.getY(10 + 6 * i)))
+			self.view.surface.blit(text, (self.getX(30), self.getY(10 + 6 * i)))
 			
 		self.renderSerialLog()
 		pygame.display.flip()
@@ -113,13 +114,11 @@ class MenuController (ATTController):
 		self.render()
 		
 		if app.isPressed(pygame.K_RETURN):
-			self.surface.fill((0, 0, 0))
 			self.clear()
 			
 			optionLabel = self.getOptionLabelByPosition(self.currentOption+1)
 			controller_id = optionLabel['id']
 			app.dispatcher.setController(controller_id)
-			#setState(self.currentOption + 1, self)
 		
 		return done
 
@@ -138,13 +137,12 @@ class ShortServiceController (ATTController):
 	
 	state = 0
 
-	def __init__(self, surface, predictor, workQueue, notifier):
-		self.surface = surface
+	def __init__(self, view, predictor, workQueue, notifier):
 		self.font = pygame.font.Font(None, 36)
 		self.predictor = predictor
 		self.workQueue = workQueue
 		self.notifier = notifier
-		self.view = SurfaceView(self.surface)
+		self.view = view
 		self.protocol = ShortServiceProtocol(self.view, self.notifier, self)
 		
 	def start(self):
@@ -180,7 +178,7 @@ class ShortServiceController (ATTController):
 				
 				myFont = pygame.font.Font(None, 20)
 				text = myFont.render(self.summary[0], 1, (70, 70, 70))
-				self.surface.blit(text, (x1+20, y1+50))
+				self.view.surface.blit(text, (x1+20, y1+50))
 			
 	def process(self, app):
 		done = False
@@ -247,20 +245,19 @@ class MultiBallController (ATTController):
 	font = None
 	view = None
 
-	def __init__(self, surface, predictor, workQueue, notifier):
-		self.surface = surface
+	def __init__(self, view, predictor, workQueue, notifier):
 		self.font = pygame.font.Font(None, 36)
 		self.predictor = predictor
 		self.workQueue = workQueue
 		self.notifier = notifier
-		self.view = SurfaceView(self.surface)
+		self.view = view
 			
 	def start(self):
 		pass
 	
 	def render(self):
 		text = self.font.render("Multi Ball", 1, (250, 250, 250))
-		self.surface.blit(text, (self.getX(10), self.getY(10)))
+		self.view.surface.blit(text, (self.getX(10), self.getY(10)))
 		
 		self.renderSerialLog()
 		pygame.display.flip()
@@ -294,19 +291,17 @@ class SandboxController (ATTController):
 	ID = "SAND_BOX"
 	
 	notifier = None
-	surface = None
 	workQueue = None
 	predictor = None
 	font = None
 	view = None
 
-	def __init__(self, surface, predictor, workQueue, notifier):
-		self.surface = surface
+	def __init__(self, view, predictor, workQueue, notifier):
 		self.font = pygame.font.Font(None, 36)
 		self.predictor = predictor
 		self.workQueue = workQueue
 		self.notifier = notifier
-		self.view = SurfaceView(self.surface)
+		self.view = view
 
 	def start(self):
 		pass
@@ -359,20 +354,19 @@ class WholePointSequenceController (ATTController):
 	font = None
 	view = None
 
-	def __init__(self, surface, predictor, workQueue, notifier):
-		self.surface = surface
+	def __init__(self, view, predictor, workQueue, notifier):
 		self.font = pygame.font.Font(None, 36)
 		self.predictor = predictor
 		self.workQueue = workQueue
 		self.notifier = notifier
-		self.view = SurfaceView(self.surface)
+		self.view = view
 
 	def start(self):
 		pass
 	
 	def render(self):
 		text = self.font.render("Whole point sequence", 1, (250, 250, 250))
-		self.surface.blit(text, (self.getX(10), self.getY(10)))
+		self.view.surface.blit(text, (self.getX(10), self.getY(10)))
 		
 		self.renderSerialLog()
 		pygame.display.flip()

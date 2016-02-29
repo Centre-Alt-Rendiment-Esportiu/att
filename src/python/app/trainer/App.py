@@ -38,6 +38,8 @@ from app.trainer.controller import WholePointSequenceController
 
 import predictorBuilder
 
+from app.trainer.view import SurfaceView
+
 class TheApp:
 	pressed = None
 	isButtonUp = True
@@ -143,14 +145,14 @@ class ATTDispatcher:
 		self.controllers = {}
 		
 	def buildControllers(self):
-		self.appendController(MenuController(self.app.surface, self.app.predictor, self.app.workQueue, self.app.notifier))
-		self.appendController(ShortServiceController(self.app.surface, self.app.predictor, self.app.workQueue, self.app.notifier))
-		self.appendController(MultiBallController(self.app.surface, self.app.predictor, self.app.workQueue, self.app.notifier))
-		self.appendController(WholePointSequenceController(self.app.surface, self.app.predictor, self.app.workQueue, self.app.notifier))
-		self.appendController(SandboxController(self.app.surface, self.app.predictor, self.app.workQueue, self.app.notifier))
+		view = SurfaceView(self.app.surface)
+		self.appendController(MenuController(view, self.app.predictor, self.app.workQueue, self.app.notifier))
+		self.appendController(ShortServiceController(view, self.app.predictor, self.app.workQueue, self.app.notifier))
+		self.appendController(MultiBallController(view, self.app.predictor, self.app.workQueue, self.app.notifier))
+		self.appendController(WholePointSequenceController(view, self.app.predictor, self.app.workQueue, self.app.notifier))
+		self.appendController(SandboxController(view, self.app.predictor, self.app.workQueue, self.app.notifier))
 	
 	def appendController(self, controller):
-		#self.controllers[controller.ID] = {}
 		self.controllers[controller.ID] = controller
 		
 	def getController(self, controller_id):

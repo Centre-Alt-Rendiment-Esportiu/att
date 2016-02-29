@@ -3,17 +3,18 @@
 import pygame
 from app.trainer.controller import ATTController
 
+from app.trainer.view import SurfaceView
+
 class SerialLogNotifier(ATTController):
 
     font = None
-    surface = None
     notifications = []
     TOP = 0
     LIMIT = 10
     area = None
     
     def __init__(self, surface, area):
-        self.surface = surface
+        self.view = SurfaceView(surface)
         self.area = area
         self.font = None
         
@@ -33,7 +34,7 @@ class SerialLogNotifier(ATTController):
         #pygame.draw.rect(self.surface, blue, (x1, y1, x2, y2))
         
         pointlist = [ (x1,y1), (x2,y1), (x2,y2), (x1,y2)]
-        pygame.draw.lines(self.surface, blue, 1, pointlist, 2)
+        pygame.draw.lines(self.view.surface, blue, 1, pointlist, 2)
         
         myFont = pygame.font.Font(None, 20)
         i=0
@@ -42,7 +43,7 @@ class SerialLogNotifier(ATTController):
             
             x1 = self.getX(self.area[0]+1)
             y1 = self.getY(self.area[1] + 2 * i + 1)
-            self.surface.blit(text, (x1, y1))
+            self.view.surface.blit(text, (x1, y1))
             i=i+1
     
     def clear(self):
@@ -52,7 +53,7 @@ class SerialLogNotifier(ATTController):
         y1 = self.getY(self.area[1])
         x2 = self.getX(self.area[2])
         y2 = self.getY(self.area[3])
-        pygame.draw.rect(self.surface, black, (x1, y1, x2, y2))
+        pygame.draw.rect(self.view.surface, black, (x1, y1, x2, y2))
         
     def process(self, setState, isPressed):
         pass
