@@ -6,6 +6,14 @@
  * Augmented Table Tennis
  * -------------
  * By Andrea Amodeo and Erik Einebrant
+ *
+ * Continued by
+ * -------------
+ * Eloi Puertas
+ * Oscar Bañó
+ * Jordi Serres
+ * Albert Sansó
+ *
  */
 
 // Constants
