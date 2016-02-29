@@ -32,9 +32,8 @@ const unsigned long NO_RECORD = -1;
 const unsigned long TIMEOUT_BETWEEN_HITS = 10000; // in micros
 const char LEFT = 'l';
 const char RIGHT = 'r';
-const char UNDEF = 'u';
-Hit curHit;
 
+Hit curHit;
 
 void setup() {
   createNewHit();
@@ -43,13 +42,8 @@ void setup() {
 
 void loop() {
   //delay(5);
-  if (curHit.side == UNDEF || curHit.side == LEFT) {
-      readPins(leftPins, leftThresholds, LEFT);
-    }
-  if (curHit.side == UNDEF || curHit.side == RIGHT){
-      readPins(rightPins, rightThresholds, RIGHT);
-    }
-}
+  readPins(leftPins, leftThresholds, LEFT);
+  //readPins(rightPins, rightThresholds, RIGHT);
 
   //Serial.println(curHit.volumes[0]);
 
@@ -82,7 +76,7 @@ void createNewHit() {
     newHit.volumes[i] = NO_RECORD;
   }
 
-  newHit.side = UNDEF;
+  newHit.side = LEFT;
   newHit.startTime = NO_RECORD;
   newHit.reported = false;
 
