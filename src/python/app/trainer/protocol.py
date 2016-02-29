@@ -18,8 +18,6 @@ class ShortServiceProtocol:
 		self.notifier = notifier
 		self.state = state
 	
-		#self.timeoutThread = TimeoutThread()
-	
 	def processSate(self, hit):
 	
 		if self.currentState == None and self.lastHit == None:
@@ -31,7 +29,7 @@ class ShortServiceProtocol:
 			self.lastHit = None
 			self.currentState = 2
 								
-			self.timeoutThread = TimeoutThread(1, self)
+			self.timeoutThread = ProtocolTimeoutThread(1, self)
 			self.timeoutThread.start()
 			return
 	
@@ -72,7 +70,7 @@ class ShortServiceProtocol:
 		service['second'] = {}
 		service['second']['coords'] = self.currentHit['coords']
 		service['second']['tstamp'] = self.currentHit['tstamp']
-		self.state.servicesList.append(service)
+		self.state.addServiceEvent(service)
 	
 	def timedOutService(self):
 		service = {}
@@ -82,9 +80,17 @@ class ShortServiceProtocol:
 		service['second'] = {}
 		service['second']['coords'] = ""
 		service['second']['tstamp'] = "TIMED_OUT"
-		self.state.servicesList.append(service)
+		self.state.addServiceEvent(service)
+		
+	def pause(self):
+		if self.timeoutThread != None:
+			self.timeoutThread.pause()
+	
+	def unpause(self):
+		if self.timeoutThread != None:
+			self.timeoutThread.unpause()
 
-class TimeoutThread (threading.Thread):
+class ProtocolTimeoutThread (threading.Thread):
 	
 	protocol = None
 	is_stopped = None
@@ -102,3 +108,9 @@ class TimeoutThread (threading.Thread):
 		
 	def stop(self):
 		self.is_stopped = True
+
+	def pause(self):
+		self.is_stopped = True		
+	
+	def unpause(self):
+		self.is_stopped = False

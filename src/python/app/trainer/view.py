@@ -97,7 +97,7 @@ class SurfaceView:
         pygame.draw.line(self.surface, (255,255,255), (tableLineWidth/2,windowHeight/2), (windowWidth,windowHeight/2), tableLineWidth)
         pygame.draw.line(self.surface, (255,255,255), (windowWidth/2,tableLineWidth/2), (windowWidth/2,windowHeight-tableLineWidth/2), tableLineWidth) 
 
-    def displayScenario(self):
+    def buildScenario(self):
                 
         self.displayTable()
         self.displayReferencePoints()

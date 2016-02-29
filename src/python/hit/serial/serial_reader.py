@@ -86,3 +86,12 @@ class ThreadedSerialReader (threading.Thread):
 		
 	def stop(self):
 		self.is_stopped = True
+		
+	def restart(self):
+		self.is_stopped = False
+
+	def pause(self):
+		self.is_stopped = True
+		
+	def unpause(self):
+		self.is_stopped = False

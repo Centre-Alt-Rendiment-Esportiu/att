@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import pygame
-from baseState import BaseState
+from app.trainer.controller import ATTController
 
-class SerialLogNotifier(BaseState):
+class SerialLogNotifier(ATTController):
 
     font = None
     surface = None
@@ -54,7 +54,7 @@ class SerialLogNotifier(BaseState):
         y2 = self.getY(self.area[3])
         pygame.draw.rect(self.surface, black, (x1, y1, x2, y2))
         
-    def loop(self, setState, isPressed):
+    def process(self, setState, isPressed):
         pass
     
     def push(self, line):
