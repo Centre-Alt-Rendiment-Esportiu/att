@@ -7,16 +7,16 @@ class ShortServiceProtocol:
 
 	notifier = None
 	view = None
-	state = None
+	controller = None
 	currentState = None
 	lastHit = None
 	currentHit = None
 	timeoutThread = None
 	
-	def __init__(self, view, notifier, state):
+	def __init__(self, view, notifier, controller):
 		self.view = view
 		self.notifier = notifier
-		self.state = state
+		self.controller = controller
 	
 	def processSate(self, hit):
 	
@@ -24,7 +24,7 @@ class ShortServiceProtocol:
 			self.currentState = 1
 			
 		if self.currentState == 1:
-			self.state.clear()
+			self.controller.clear()
 			self.currentHit = hit
 			self.lastHit = None
 			self.currentState = 2
@@ -70,7 +70,7 @@ class ShortServiceProtocol:
 		service['second'] = {}
 		service['second']['coords'] = self.currentHit['coords']
 		service['second']['tstamp'] = self.currentHit['tstamp']
-		self.state.addServiceEvent(service)
+		self.controller.addServiceEvent(service)
 	
 	def timedOutService(self):
 		service = {}
@@ -80,7 +80,7 @@ class ShortServiceProtocol:
 		service['second'] = {}
 		service['second']['coords'] = ""
 		service['second']['tstamp'] = "TIMED_OUT"
-		self.state.addServiceEvent(service)
+		self.controller.addServiceEvent(service)
 		
 	def pause(self):
 		if self.timeoutThread != None:
