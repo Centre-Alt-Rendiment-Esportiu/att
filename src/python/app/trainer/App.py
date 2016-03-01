@@ -39,6 +39,11 @@ from app.trainer.controller import WholePointSequenceController
 import predictorBuilder
 
 from app.trainer.view import SurfaceView
+from app.trainer.view import MenuView
+from app.trainer.view import ShortServiceView
+from app.trainer.view import MultiBallView
+from app.trainer.view import SandboxView
+from app.trainer.view import WholePointSequenceView
 
 class TheApp:
 	pressed = None
@@ -145,12 +150,25 @@ class ATTDispatcher:
 		self.controllers = {}
 		
 	def buildControllers(self):
-		view = SurfaceView(self.app.surface)
-		self.appendController(MenuController(view, self.app.predictor, self.app.workQueue, self.app.notifier))
-		self.appendController(ShortServiceController(view, self.app.predictor, self.app.workQueue, self.app.notifier))
-		self.appendController(MultiBallController(view, self.app.predictor, self.app.workQueue, self.app.notifier))
-		self.appendController(WholePointSequenceController(view, self.app.predictor, self.app.workQueue, self.app.notifier))
-		self.appendController(SandboxController(view, self.app.predictor, self.app.workQueue, self.app.notifier))
+		view = MenuView(self.app.surface)
+		controller = MenuController(view, self.app.predictor, self.app.workQueue, self.app.notifier)
+		self.appendController(controller)
+		
+		view = ShortServiceView(self.app.surface)
+		controller = ShortServiceController(view, self.app.predictor, self.app.workQueue, self.app.notifier)
+		self.appendController(controller)
+		
+		view = MultiBallView(self.app.surface)
+		controller = MultiBallController(view, self.app.predictor, self.app.workQueue, self.app.notifier)
+		self.appendController(controller)
+		
+		view = WholePointSequenceView(self.app.surface)
+		controller = WholePointSequenceController(view, self.app.predictor, self.app.workQueue, self.app.notifier)
+		self.appendController(controller)
+		
+		view = SandboxView(self.app.surface)
+		controller = SandboxController(view, self.app.predictor, self.app.workQueue, self.app.notifier)
+		self.appendController(controller)
 	
 	def appendController(self, controller):
 		self.controllers[controller.ID] = controller

@@ -22,16 +22,8 @@ class ATTController:
 		pass
 	
 	def clear(self):
-		#self.surface.fill((0, 0, 0))
-		#self.view.surface.fill((0, 0, 0))
 		self.view.clear()
-				
-	def getX(self, _x):
-		return self.view.getX(_x)
-	
-	def getY(self, _y):
-		return self.view.getY(_y)
-
+					
 class MenuController (ATTController):
 	
 	ID = "MENU"
@@ -78,13 +70,14 @@ class MenuController (ATTController):
 	
 	def render(self):
 		for i in range(len(self.menuOptionsLabels)):
+			
 			optionLabel = self.getOptionLabelByPosition(i+1)
+			percentCoords = (30, 10+6*i)
+			
 			if not(i == self.currentOption):
-				text = self.font.render(optionLabel['label'], 1, (100, 100, 100))
+				self.view.renderUnSelectedOption(optionLabel['label'], percentCoords)
 			else:
-				text = self.font.render(optionLabel['label'], 1, (250, 250, 250))
-
-			self.view.surface.blit(text, (self.getX(30), self.getY(10 + 6 * i)))
+				self.view.renderSelectedOption(optionLabel['label'], percentCoords)
 			
 		self.renderSerialLog()
 		pygame.display.flip()
@@ -163,22 +156,7 @@ class ShortServiceController (ATTController):
 	def renderSummary(self):
 		if self.state == 1:
 			if len(self.summary) > 0:
-				
-				blue = (0, 0, 70)
-				black = (0, 0, 0)
-				
-				x1 = self.getX(20)
-				y1 = self.getY(20)
-				x2 = self.getX(70)
-				y2 = self.getY(60)
-				
-				pointlist = [ (x1,y1), (x2,y1), (x2,y2), (x1,y2)]
-				pygame.draw.lines(self.view.surface, blue, 1, pointlist, 2)				
-				pygame.draw.rect(self.view.surface, black, (x1+1, y1+1, x2-10, y2-10))
-				
-				myFont = pygame.font.Font(None, 20)
-				text = myFont.render(self.summary[0], 1, (70, 70, 70))
-				self.view.surface.blit(text, (x1+20, y1+50))
+				self.view.renderSummary(self.summary)
 			
 	def process(self, app):
 		done = False
@@ -207,8 +185,6 @@ class ShortServiceController (ATTController):
 		return done
 	
 	def buildSummary(self):
-		print self.servicesList
-		
 		total = 0
 		done = 0
 		for service in self.servicesList:
@@ -256,9 +232,7 @@ class MultiBallController (ATTController):
 		pass
 	
 	def render(self):
-		text = self.font.render("Multi Ball", 1, (250, 250, 250))
-		self.view.surface.blit(text, (self.getX(10), self.getY(10)))
-		
+		self.view.drawMessage()
 		self.renderSerialLog()
 		pygame.display.flip()
 	
@@ -365,9 +339,7 @@ class WholePointSequenceController (ATTController):
 		pass
 	
 	def render(self):
-		text = self.font.render("Whole point sequence", 1, (250, 250, 250))
-		self.view.surface.blit(text, (self.getX(10), self.getY(10)))
-		
+		self.view.drawMessage()
 		self.renderSerialLog()
 		pygame.display.flip()
 	

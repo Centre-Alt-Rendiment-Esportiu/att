@@ -27,10 +27,10 @@ class SerialLogNotifier(ATTController):
     def render(self):
         blue = (0, 0, 70)
         
-        x1 = self.getX(self.area[0])
-        y1 = self.getY(self.area[1])
-        x2 = self.getX(self.area[2])
-        y2 = self.getY(self.area[3])
+        x1 = self.view.getX(self.area[0])
+        y1 = self.view.getY(self.area[1])
+        x2 = self.view.getX(self.area[2])
+        y2 = self.view.getY(self.area[3])
         #pygame.draw.rect(self.surface, blue, (x1, y1, x2, y2))
         
         pointlist = [ (x1,y1), (x2,y1), (x2,y2), (x1,y2)]
@@ -41,18 +41,18 @@ class SerialLogNotifier(ATTController):
         for notification in self.notifications:
             text = myFont.render(notification, 1, (70, 70, 70))
             
-            x1 = self.getX(self.area[0]+1)
-            y1 = self.getY(self.area[1] + 2 * i + 1)
+            x1 = self.view.getX(self.area[0]+1)
+            y1 = self.view.getY(self.area[1] + 2 * i + 1)
             self.view.surface.blit(text, (x1, y1))
             i=i+1
     
     def clear(self):
         black = (0, 0, 0)
         
-        x1 = self.getX(self.area[0])
-        y1 = self.getY(self.area[1])
-        x2 = self.getX(self.area[2])
-        y2 = self.getY(self.area[3])
+        x1 = self.view.getX(self.area[0])
+        y1 = self.view.getY(self.area[1])
+        x2 = self.view.getX(self.area[2])
+        y2 = self.view.getY(self.area[3])
         pygame.draw.rect(self.view.surface, black, (x1, y1, x2, y2))
         
     def process(self, setState, isPressed):

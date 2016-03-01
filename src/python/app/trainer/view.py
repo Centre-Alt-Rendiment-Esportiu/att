@@ -11,7 +11,7 @@ class Ball:
 	def __init__(self):
 		pass
 
-class SurfaceView:
+class SurfaceView (object):
 
 	surface = None
 	
@@ -54,6 +54,12 @@ class SurfaceView:
 		max_y = self.surface.get_size()[1];
 		return (max_y/100)*_y
 	
+	def getPercentCoords(self, coords):
+		return (self.getX(coords[0]), self.getY(coords[1]))
+		
+	def drawText(self, text, coords):
+		self.surface.blit(text, coords)
+		
 	def drawBall(self, ball, fill=0):
 		pygame.draw.circle(self.surface, ball.color, ball.position, ball.radius, fill)
 	
@@ -121,7 +127,70 @@ class SurfaceView:
 		self.displayReferencePoints()
 		self.displaySensors()
 
+class MenuView (SurfaceView):
+	
+	def __init__(self, surface):
+		super(self.__class__, self).__init__(surface)
+		
+	def renderSelectedOption(self, _label, coords):
+		color = (250, 250, 250)
+		self.renderOption(_label, coords, color)
 
+	def renderUnSelectedOption(self, _label, coords):
+		color = (100, 100, 100)
+		self.renderOption(_label, coords, color)
+	
+	def renderOption(self, _label, coords, _color):
+		font = pygame.font.Font(None, 66)
+		text = font.render(_label, 1, _color)
+		coords = self.getPercentCoords(coords)
+		self.drawText(text, coords)
 
+class ShortServiceView (SurfaceView):		
 
+	def __init__(self, surface):
+		super(ShortServiceView, self).__init__(surface)
+
+	def renderSummary(self, summary):
+		blue = (0, 0, 70)
+		black = (0, 0, 0)
+		
+		x1 = self.getX(20)
+		y1 = self.getY(20)
+		x2 = self.getX(70)
+		y2 = self.getY(60)
+		
+		pointlist = [ (x1,y1), (x2,y1), (x2,y2), (x1,y2)]
+		pygame.draw.lines(self.surface, blue, 1, pointlist, 2)				
+		pygame.draw.rect(self.surface, black, (x1+1, y1+1, x2-10, y2-10))
+		
+		myFont = pygame.font.Font(None, 20)
+		text = myFont.render(summary[0], 1, (70, 70, 70))
+		self.drawText(text, (x1+20, y1+50))
+
+	
+class MultiBallView (SurfaceView):		
+
+	def __init__(self, surface):
+		super(MultiBallView, self).__init__(surface)
+
+	def drawMessage(self):
+		font = pygame.font.Font(None, 36)
+		text = font.render("Multi Ball", 1, (250, 250, 250))
+		self.drawText(text, self.getPercentCoords((10,10)))
+
+class SandboxView (SurfaceView):		
+
+	def __init__(self, surface):
+		super(SandboxView, self).__init__(surface)
+
+class WholePointSequenceView (SurfaceView):		
+
+	def __init__(self, surface):
+		super(WholePointSequenceView, self).__init__(surface)
+
+	def drawMessage(self):
+		font = pygame.font.Font(None, 36)
+		text = font.render("Whole point sequence", 1, (250, 250, 250))
+		self.drawText(text, self.getPercentCoords((10,10)))
 
