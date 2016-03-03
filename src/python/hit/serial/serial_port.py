@@ -145,10 +145,16 @@ class ATTEmulatedSerialPort (SerialPort):
 		return random.choice(hits)
 		
 class ATTArduinoSerialPort (SerialPort):
+	
+	port = None
+	baud = None
+	logFile = None
+	
 	def __init__(self, port = None, baud = None):
 		self.port = port
 		self.baud = baud
 		self.start()
+		self.logFile = open("log/2016_03_03_1820.log","w")
 	
 	def start(self):
 		self.serial_port = serial.Serial(self.port, self.baud)
@@ -165,6 +171,10 @@ class ATTArduinoSerialPort (SerialPort):
 			time.sleep(time_delay)
 			
 		line = self.serial_port.readline()
+		tstamp = time.time()
+		full_line = line.splitlines()[0]+"/"+str(tstamp)+"\n"
+		self.logFile.write(full_line)
+		self.logFile.flush()
 		return line
 		
 	def get_port(self):
@@ -202,7 +212,8 @@ class ATTHitsFromFilePort (SerialPort):
 	def readline(self, *isFast):
 		
 		if (len(isFast)):
-			time_delay = 5*random.random()
+			#time_delay = random.random()
+			time_delay = 0.1
 			time.sleep(time_delay)
 		
 		line = ""

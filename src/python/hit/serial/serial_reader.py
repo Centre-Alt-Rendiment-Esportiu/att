@@ -6,6 +6,8 @@ import sys
 
 from hit.process.processor import ATTMatrixHitProcessor
 
+import traceback
+
 class ThreadedSerialReader (threading.Thread):
 	def __init__(self, threadID, name, queue, max_readings, serial_port_builder, port, baud, CustomSerial=None, isFast=True):
 		threading.Thread.__init__(self)
@@ -31,6 +33,8 @@ class ThreadedSerialReader (threading.Thread):
 
 	def run(self):
 		self.write_log("Starting " + self.name)
+		
+		#time.sleep(5)
 		
 		iterations = 0
 		while not self.connected and not self.is_stopped:
@@ -63,13 +67,14 @@ class ThreadedSerialReader (threading.Thread):
 				hit = self.processor.parse_hit(reading)
 				self.queue.put(hit)
 				self.connected = True
-				#self.write_log("Reading from serial: " + reading)
+				self.write_log("Reading from serial: " + reading)
 			else:
 				time.sleep(0.1)
 		except:
 			self.write_log("Miss!")
 			self.serial_port.close()
 			self.connected = False
+			traceback.print_exc(file=sys.stdout)
 			return False
 			
 		
@@ -95,3 +100,4 @@ class ThreadedSerialReader (threading.Thread):
 		
 	def unpause(self):
 		self.is_stopped = False
+

@@ -8,10 +8,16 @@ class ShortServiceProtocol:
 	notifier = None
 	view = None
 	controller = None
+	timeoutThread = None
+	
 	currentState = None
+	
 	lastHit = None
 	currentHit = None
-	timeoutThread = None
+	firstHit = None
+	secondHit = None
+	thirdHit = None
+	
 	
 	def __init__(self, view, notifier, controller):
 		self.view = view
@@ -35,15 +41,39 @@ class ShortServiceProtocol:
 	
 		if self.currentState == 2:
 			self.lastHit = self.currentHit
+			self.firstHit = self.lastHit
 			self.currentHit = hit
 			
 			time_delta = hit["tstamp"] - self.lastHit["tstamp"]
 			self.notifier.push(str(time_delta))
-			self.currentState = 1
+			#self.currentState = 1
+			self.currentState = 3
 			
 			self.timeoutThread.stop()
 			self.timeoutThread = None
 								
+			self.timeoutThread = ProtocolTimeoutThread(2, self)
+			self.timeoutThread.start()
+
+			#self.completedService()
+			return
+			
+		if self.currentState == 3:
+			self.lastHit = self.currentHit
+			self.secondtHit = self.lastHit
+			
+			self.currentHit = hit
+			
+			time_delta = hit["tstamp"] - self.lastHit["tstamp"]
+			self.notifier.push(str(time_delta))
+			
+			self.currentState = 1
+			
+			self.timeoutThread.stop()
+			self.timeoutThread = None
+			
+			self.thirdHit = hit
+			
 			self.completedService()
 			
 			return
@@ -65,11 +95,14 @@ class ShortServiceProtocol:
 	def completedService(self):					
 		service = {}
 		service['first'] = {}
-		service['first']['coords'] = self.lastHit['coords']
-		service['first']['tstamp'] = self.lastHit['tstamp']
+		service['first']['coords'] = self.firstHit['coords']
+		service['first']['tstamp'] = self.firstHit['tstamp']
 		service['second'] = {}
-		service['second']['coords'] = self.currentHit['coords']
-		service['second']['tstamp'] = self.currentHit['tstamp']
+		service['second']['coords'] = self.secondHit['coords']
+		service['second']['tstamp'] = self.secondHit['tstamp']
+		service['third'] = {}
+		service['third']['coords'] = self.thirdHit['coords']
+		service['third']['tstamp'] = self.thirdHit['tstamp']
 		self.controller.addServiceEvent(service)
 	
 	def timedOutService(self):

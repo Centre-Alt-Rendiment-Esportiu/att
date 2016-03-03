@@ -10,7 +10,8 @@ if platform.platform().lower().startswith("win"):
 	PROJECT_ROOT = "I:/dev/workspaces/python/att-workspace/att/"
 else:
 	if platform.platform().lower().startswith("linux"):
-		PROJECT_ROOT = "/home/asanso/workspace/att-spyder/att/"
+		#PROJECT_ROOT = "/home/asanso/workspace/att-spyder/att/"
+		PROJECT_ROOT = "/home/asanso/git/att"
 		
 sys.path.insert(0, PROJECT_ROOT + "/src/python/")
 
@@ -53,6 +54,8 @@ class TheApp:
 	
 	predBuilder = None
 	predictor = None
+	leftPredictor = None
+	rightPredictor = None
 	workQueue = None
 	notifier = None
 	surface = None
@@ -61,7 +64,7 @@ class TheApp:
 	dispatcher = None
 	
 	def __init__(self):
-		pass
+		self.workQueue = Queue.Queue(10)
 
 	def isPressed(self, key):
 		if self.pressed[key] and self.isButtonUp:
@@ -75,34 +78,43 @@ class TheApp:
 		return False
 	
 	def buildScenario(self, windowWidth, windowHeight):
-		#surface = pygame.display.set_mode((windowWidth, windowHeight), pygame.FULLSCREEN)
+		#self.surface = pygame.display.set_mode((windowWidth, windowHeight), pygame.FULLSCREEN)
 		self.surface = pygame.display.set_mode((windowWidth, windowHeight))
 		
 	def buildHitDataSource(self):
-		predBuilder = predictorBuilder.PredictorBuilder()
-		self.predictor = predBuilder.buildInstance()
 		
-		self.workQueue = Queue.Queue(10)
+		self.predictor = TableHitPredictor()		
 		
-		port = "/dev/ttyACM0"
-		HITS_DATA_FILE = "../../../arduino/data/train_20160129_left.txt"
-		port = HITS_DATA_FILE
-		baud = 115200
+		demo = False
+		if demo:
+			HITS_DATA_FILE = "../../../arduino/data/hits_reference_points_alltable_20160303.txt"
+			port = HITS_DATA_FILE
+			baud = ""
+			serialBuilder = ATTHitsFromFilePortBuilder()			
+			serial_port = ATTHitsFromFilePort(port, baud)
+		else:
+			port = "/dev/ttyACM0"
+			baud = 115200
+			serialBuilder = ATTArduinoSerialPortBuilder()
+			serial_port = ATTArduinoSerialPort(port, baud)
 		
-		serialBuilder = ATTHitsFromFilePortBuilder()
-		serial_port = ATTHitsFromFilePort(port, baud)
-		
-		self.myThread = ThreadedSerialReader(1, "Thread-1", self.workQueue, None, serialBuilder, port, baud, serial_port, False)
+		self.myThread = ThreadedSerialReader(1, "Thread-1", self.workQueue, None, serialBuilder, port, baud, serial_port, True)
 		self.myThread.start()
 		
 	def main(self):
+		
+		pygame.init()
+		
+		info = pygame.display.Info()
+		windowWidth = info.current_w
+		windowHeight = info.current_h
 
 		windowWidth = 1280 #1024
 		windowHeight = 768 #768
 
 		self.buildHitDataSource()
 		
-		pygame.init()
+		
 		
 		self.buildScenario(windowWidth, windowHeight)
 		self.notifier = SerialLogNotifier(self.surface, (55,78,100,100))
@@ -121,24 +133,30 @@ class TheApp:
 				for event in pygame.event.get():
 					if event.type == pygame.QUIT:
 						done = True
+						break
 					
 				self.pressed = pygame.key.get_pressed()
 				if not(self.pressed[pygame.K_UP]) and not(self.pressed[pygame.K_DOWN]) and not(self.pressed[pygame.K_RETURN]) and not(self.pressed[pygame.K_ESCAPE]):					
 					self.isButtonUp = True
 		
-				self.dispatcher.process(self)
-				
-				pygame.display.flip()
-				clock.tick(60)
+				done = self.dispatcher.process(self, event)
 				
 		except Exception:
 			print Exception
 			traceback.print_exc(file=sys.stdout)
 					
 		finally:
+			print "Thread STOP"
 			self.myThread.stop()
+			print "Thread STOPPED"
 			pygame.quit()
-			sys.exit()
+			print "Pygame quit"
+			try:
+				sys.exit()
+				print "SYS exit"
+			except Exception:
+				print Exception
+				traceback.print_exc(file=sys.stdout)
 			
 			
 class ATTDispatcher:
@@ -188,9 +206,26 @@ class ATTDispatcher:
 		self.currentController = self.getController(controller_id)
 		self.currentController.start()
 		
-	def process(self, app):
-		self.currentController.process(app)
+	def process(self, app, event):
+		return self.currentController.process(app, event)
 	
+class TableHitPredictor (object):
+	leftPredictor = None
+	rightPredictor= None
+	
+	def __init__(self):
+		
+		predBuilder = predictorBuilder.PredictorBuilder()
+		self.leftPredictor = predBuilder.buildInstance("../../data/train_points_20160303_left.txt")
+		self.rightPredictor = predBuilder.buildInstance("../../data/train_points_20160303_right.txt")
+		
+	def predictHit(self, hit):
+		side = hit["side"]
+		if side == 'l':
+			return self.leftPredictor.predictHit(hit)
+		else:
+			return self.rightPredictor.predictHit(hit)
+		
 	
 if __name__ == '__main__':
 	theApp = TheApp()

@@ -2,10 +2,15 @@
 
 import abc
 
-import pygame
+import pygame, pygame.font, pygame.event, pygame.draw, string
+from pygame.locals import *
+
+from session_manager import SessionManager
 
 from app.trainer.view import SurfaceView
 from app.trainer.protocol import ShortServiceProtocol
+
+import time
 
 class ATTController:
 	__metaclass__ = abc.ABCMeta
@@ -18,7 +23,7 @@ class ATTController:
 		pass
 	
 	@abc.abstractmethod
-	def process(self, app, isPressed):
+	def process(self, app, event):
 		pass
 	
 	def clear(self):
@@ -34,8 +39,77 @@ class LogonController (ATTController):
 	def start(self):
 		pass
 	
-	def process(self, app):
-		pass
+	def render(self):
+		pygame.display.flip()
+		
+	def get_key(self):
+		while 1:
+			event = pygame.event.poll()
+			if event.type == pygame.KEYDOWN:
+				return event.key
+		else:
+			pass
+	
+	def display_box(self, message):
+		screen = self.view.surface
+		"Print a message in a box in the middle of the screen"
+		fontobject = pygame.font.Font(None,18)
+		pygame.draw.rect(screen, (0,0,0),
+			((screen.get_width() / 2) - 100,
+			(screen.get_height() / 2) - 10,
+			200,20), 0)
+		pygame.draw.rect(screen, (255,255,255),
+			((screen.get_width() / 2) - 102,
+			(screen.get_height() / 2) - 12,
+			204,24), 1)
+		if len(message) != 0:
+			screen.blit(fontobject.render(message, 1, (255,255,255)),
+					((screen.get_width() / 2) - 100, (screen.get_height() / 2) - 10))
+		pygame.display.flip()
+	
+	def ask(self, question):
+		screen = self.view.surface
+		"ask(screen, question) -> answer"
+		pygame.font.init()
+		current_string = []
+		self.display_box(question + ": " + string.join(current_string,""))
+		while 1:
+			inkey = self.get_key()
+			if inkey == K_BACKSPACE:
+				current_string = current_string[0:-1]
+			elif inkey == K_RETURN:
+				break
+			elif inkey == K_MINUS:
+				current_string.append("_")
+			elif inkey <= 127:
+				current_string.append(chr(inkey))
+				self.display_box(question + ": " + string.join(current_string,""))
+		return string.join(current_string,"")
+
+	def process(self, app, event):
+		done = False
+
+		credentials = self.ask("Name")
+		pieces = credentials.split(",")
+		if len(pieces) == 2:
+			username = pieces[0]
+			password = pieces[1]
+			
+			sm = SessionManager()
+			if sm.validateCredentials(username, password):
+				app.pressed = []
+				app.isButtonUp = False
+				self.clear()
+				
+				#app.buildHitDataSource()
+				#self.myThread = ThreadedSerialReader(1, "Thread-1", self.workQueue, None, serialBuilder, port, baud, serial_port, False)
+				#self.myThread.start()
+
+				app.dispatcher.setController(MenuController.ID)
+			else:
+				time.sleep(0.1)
+		
+		return done
 	
 class MenuController (ATTController):
 	
@@ -100,9 +174,12 @@ class MenuController (ATTController):
 		self.notifier.clear()
 		self.notifier.render()
 		
-	def process(self, app):
+	def process(self, app, event):
 		done = False
 		
+		if app.isPressed(pygame.K_ESCAPE):
+			return True
+			
 		if not self.workQueue.empty():
 			hit = self.workQueue.get()
 			if hit <> "":		
@@ -157,7 +234,7 @@ class ShortServiceController (ATTController):
 	
 	def render(self):
 		self.view.buildScenario()
-		#self.renderSerialLog()
+		self.renderSerialLog()
 		self.renderSummary()
 		pygame.display.flip()
 	
@@ -171,7 +248,7 @@ class ShortServiceController (ATTController):
 			if len(self.summary) > 0:
 				self.view.renderSummary(self.summary)
 			
-	def process(self, app):
+	def process(self, app, event):
 		done = False
 
 		if not self.workQueue.empty():
@@ -219,7 +296,7 @@ class ShortServiceController (ATTController):
 		
 		self.protocol.processSate(hit)
 		
-		self.view.drawHit(x, y);
+		self.view.drawHit(x, y, hit["side"]);
 		
 	def addServiceEvent(self, selfserviceEvent):
 		self.servicesList.append(selfserviceEvent)
@@ -254,7 +331,7 @@ class MultiBallController (ATTController):
 		self.notifier.clear()
 		self.notifier.render()
 		
-	def process(self, app):
+	def process(self, app, event):
 		done = False
 
 		if not self.workQueue.empty():
@@ -296,16 +373,16 @@ class SandboxController (ATTController):
 	def render(self):		
 		self.view.buildScenario()
 		
-		self.renderSerialLog()
+		#self.renderSerialLog()
 		pygame.display.flip()
 	
 	def renderSerialLog(self):
 		self.notifier.clear()
 		self.notifier.render()
 		
-	def process(self, app):
+	def process(self, app, event):
 		done = False
-
+		
 		if not self.workQueue.empty():
 			hit = self.workQueue.get()
 			if hit <> "":
@@ -314,6 +391,10 @@ class SandboxController (ATTController):
 		if app.isPressed(pygame.K_c):
 			self.clear()
 			self.view.buildScenario()
+
+		if event.type == pygame.MOUSEMOTION:
+			#print event.pos
+			pass
 			
 		self.render()
 				
@@ -325,7 +406,8 @@ class SandboxController (ATTController):
 	
 	def processHit(self, hit):
 		(y,x) = self.predictor.predictHit(hit)
-		self.view.drawHit(x, y);
+		#print hit
+		self.view.drawHit(x, y, hit["side"]);
 		
 		logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+hit["raw"]
 		print logReading
@@ -361,7 +443,7 @@ class WholePointSequenceController (ATTController):
 		self.notifier.clear()
 		self.notifier.render()
 		
-	def process(self, app):
+	def process(self, app, event):
 		done = False
 
 		if not self.workQueue.empty():

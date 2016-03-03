@@ -74,15 +74,16 @@ class SurfaceView (object):
 		
 		self.drawBall(ball, 0)
 	
-	def drawHit(self, x, y, side='L'):
+	def drawHit(self, x, y, side):
 		ball = Ball()
 		ball.color = (255, 255, 255)
 		ball.radius = 30
 		
 		offset = 0
 		
-		if side == 'R':
-			offset = 51
+		if side == 'r':
+			offset = 51*self.get_x_conversion()
+			#pass
 			
 		translated_x = int(x*self.get_x_conversion() + offset)
 		translated_y = int(y*self.get_y_conversion())

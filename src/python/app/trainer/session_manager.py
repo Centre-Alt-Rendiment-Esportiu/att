@@ -39,13 +39,16 @@ class SessionManager (object):
 			self.users[user["username"]] = user
 	
 	def validateCredentials(self, username, plainPassword):
-		encDBPass = self.users[username]["password"]
-		encPass = AESCryptoManager.getHash(plainPassword)
 		
-		if encDBPass == encPass:
-			return True
-		else:
-			return False
+		
+		if username in self.users.keys():
+			encDBPass = self.users[username]["password"]
+			encPass = AESCryptoManager.getHash(plainPassword)
+			
+			if encDBPass == encPass:
+				return True
+
+		return False
 	
 	
 class CryptoManager (object):
