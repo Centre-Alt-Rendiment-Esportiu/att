@@ -74,12 +74,17 @@ class SurfaceView (object):
 		
 		self.drawBall(ball, 0)
 	
-	def drawHit(self, x, y):
+	def drawHit(self, x, y, side='L'):
 		ball = Ball()
 		ball.color = (255, 255, 255)
 		ball.radius = 30
 		
-		translated_x = int(x*self.get_x_conversion())
+		offset = 0
+		
+		if side == 'R':
+			offset = 51
+			
+		translated_x = int(x*self.get_x_conversion() + offset)
 		translated_y = int(y*self.get_y_conversion())
 		ball.position = (translated_x, translated_y)
 		
@@ -97,9 +102,14 @@ class SurfaceView (object):
 		self.drawBall(ball, 0)
 
 	def displayReferencePoints(self):
+		
 		for i in [6,18,30,42,54]:
 			for j in [6,18,30,42]:
 				self.drawReferencePoint(j, i)
+
+		for i in [6,18,30,42,54]:
+			for j in [6,18,30,42]:
+				self.drawReferencePoint(j+51, i)
 
 	def displaySensors(self):
 		for sensor_coord in self.sensor_coords:
@@ -126,6 +136,10 @@ class SurfaceView (object):
 		self.displayTable()
 		self.displayReferencePoints()
 		self.displaySensors()
+
+class LogonView (SurfaceView):
+	def __init__(self, surface):
+		super(self.__class__, self).__init__(surface)
 
 class MenuView (SurfaceView):
 	

@@ -23,7 +23,20 @@ class ATTController:
 	
 	def clear(self):
 		self.view.clear()
-					
+
+class LogonController (ATTController):
+	
+	ID = "LOGON"
+	
+	def __init__(self, view):
+		self.view = view
+	
+	def start(self):
+		pass
+	
+	def process(self, app):
+		pass
+	
 class MenuController (ATTController):
 	
 	ID = "MENU"
@@ -144,7 +157,7 @@ class ShortServiceController (ATTController):
 	
 	def render(self):
 		self.view.buildScenario()
-		self.renderSerialLog()
+		#self.renderSerialLog()
 		self.renderSummary()
 		pygame.display.flip()
 	

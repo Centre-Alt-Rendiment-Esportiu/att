@@ -30,6 +30,7 @@ from hit.train.regressor import ATTSkLearnHitRegressor
 
 from app.trainer.serialLogNotifier import SerialLogNotifier
 
+from app.trainer.controller import LogonController
 from app.trainer.controller import MenuController
 from app.trainer.controller import ShortServiceController
 from app.trainer.controller import MultiBallController
@@ -39,6 +40,7 @@ from app.trainer.controller import WholePointSequenceController
 import predictorBuilder
 
 from app.trainer.view import SurfaceView
+from app.trainer.view import LogonView
 from app.trainer.view import MenuView
 from app.trainer.view import ShortServiceView
 from app.trainer.view import MultiBallView
@@ -108,6 +110,7 @@ class TheApp:
 		self.dispatcher = ATTDispatcher(self)
 		
 		self.dispatcher.buildControllers()
+		#self.dispatcher.setController(LogonController.ID)
 		self.dispatcher.setController(MenuController.ID)
 		
 		try:
@@ -150,6 +153,11 @@ class ATTDispatcher:
 		self.controllers = {}
 		
 	def buildControllers(self):
+		
+		view = LogonView(self.app.surface)
+		controller = LogonController(view)
+		self.appendController(controller)
+		
 		view = MenuView(self.app.surface)
 		controller = MenuController(view, self.app.predictor, self.app.workQueue, self.app.notifier)
 		self.appendController(controller)
