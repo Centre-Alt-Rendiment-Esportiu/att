@@ -56,6 +56,11 @@ class TrainPointsImporter:
 	def line_to_line(self, line):
 		
 		out_line = []
+		out_line = line['sensor_timings']
+		out_line = [int(i) for i in out_line]
+        
+		return np.asarray(out_line)
+"""
 		current_point = ""
 		
 		hit_pattern = "-?\d+:-?\d+|[lr]"
@@ -79,8 +84,10 @@ class TrainPointsImporter:
 				#sensor_values = [x.split(":")[1] for x in groups[:-1]]
 				#out_lines.append(current_point+","+",".join(sensor_timings))
  				sensor_timings = [int(i) for i in sensor_timings] 
-				out_line.append(sensor_timings)           
-              	return np.asarray(out_line)	
+				out_line.append(sensor_timings) 
+        
+		return np.asarray(out_line)
+"""        	
 
 if __name__ == '__main__':
 	
