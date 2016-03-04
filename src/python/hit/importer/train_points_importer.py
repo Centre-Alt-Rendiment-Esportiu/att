@@ -92,23 +92,8 @@ class TrainPointsImporter:
 if __name__ == '__main__':
 	
 	importer = TrainPointsImporter()
-
-	"""
-	str_input_file = "../../../arduino/data/train_points_references.txt"
-	str_output_file = "../../../python/data/train_points_1.txt"
-	importer.from_file_to_file(str_input_file, str_output_file)
-
-	str_input_file = "../../../arduino/data/train_points_references_and_mid.txt"
-	str_output_file = "../../../python/data/train_points_2.txt"
-	importer.from_file_to_file(str_input_file, str_output_file)
-	"""
 	
-	str_input_file = "../../../arduino/data/train_20160129_left.txt"
-	str_output_file = "../../../python/data/train_points_20160129_left.txt"
-	importer.from_file_to_file(str_input_file, str_output_file)
-	
-	
-	str_input_file = "../../../arduino/data/train_20160129_right.txt"
-	str_output_file = "../../../python/data/train_points_20160129_right.txt"
+	str_input_file = "../../../arduino/data/train_20160303_left.txt"
+	str_output_file = "../../../python/data/train_points_20160303_left.txt"
 	importer.from_file_to_file(str_input_file, str_output_file)
 
