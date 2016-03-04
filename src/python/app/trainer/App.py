@@ -1,25 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import sys
-
-import platform
-from pip._vendor.cachecontrol import controller
-
-"""
-PROJECT_ROOT = ""
-if platform.platform().lower().startswith("win"):
-	PROJECT_ROOT = "I:/dev/workspaces/python/att-workspace/att/"
-else:
-	if platform.platform().lower().startswith("linux"):
-		#PROJECT_ROOT = "/home/asanso/workspace/att-spyder/att/"
-		PROJECT_ROOT = "/home/asanso/git/att"
-		
-sys.path.insert(0, PROJECT_ROOT + "/src/python/")
-"""
-
 import pygame
 import traceback
-
+import serialLogNotifier
 import Queue
 
 from hit.serial.serial_port import *
@@ -31,24 +15,11 @@ from hit.process.processor import ATTPlainHitProcessor
 from hit.train.regressor import ATTClassicHitRegressor
 from hit.train.regressor import ATTSkLearnHitRegressor
 
-from app.trainer.serialLogNotifier import SerialLogNotifier
-
-from app.trainer.controller import LogonController
-from app.trainer.controller import MenuController
-from app.trainer.controller import ShortServiceController
-from app.trainer.controller import MultiBallController
-from app.trainer.controller import SandboxController
-from app.trainer.controller import WholePointSequenceController
-
 import predictorBuilder
+from view import *
+from controller import *
 
-from app.trainer.view import SurfaceView
-from app.trainer.view import LogonView
-from app.trainer.view import MenuView
-from app.trainer.view import ShortServiceView
-from app.trainer.view import MultiBallView
-from app.trainer.view import SandboxView
-from app.trainer.view import WholePointSequenceView
+
 
 class TheApp:
 	pressed = None
@@ -120,7 +91,7 @@ class TheApp:
 		
 		
 		self.buildScenario(windowWidth, windowHeight)
-		self.notifier = SerialLogNotifier(self.surface, (55,78,100,100))
+		self.notifier = serialLogNotifier.SerialLogNotifier(self.surface, (55,78,100,100))
 		
 		self.dispatcher = ATTDispatcher(self)
 		
