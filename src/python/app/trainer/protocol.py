@@ -92,7 +92,8 @@ class ShortServiceProtocol:
 			self.timeoutThread.stop()
 			self.timeoutThread = None
 						
-	def completedService(self):					
+	def completedService(self):
+		"""
 		service = {}
 		service['first'] = {}
 		service['first']['coords'] = self.firstHit['coords']
@@ -104,8 +105,9 @@ class ShortServiceProtocol:
 		service['third']['coords'] = self.thirdHit['coords']
 		service['third']['tstamp'] = self.thirdHit['tstamp']
 		self.controller.addServiceEvent(service)
-	
+		"""
 	def timedOutService(self):
+		"""
 		service = {}
 		service['first'] = {}
 		service['first']['coords'] = self.currentHit['coords']
@@ -114,6 +116,7 @@ class ShortServiceProtocol:
 		service['second']['coords'] = ""
 		service['second']['tstamp'] = "TIMED_OUT"
 		self.controller.addServiceEvent(service)
+		"""
 		
 	def pause(self):
 		if self.timeoutThread != None:

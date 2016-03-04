@@ -234,7 +234,7 @@ class ShortServiceController (ATTController):
 	
 	def render(self):
 		self.view.buildScenario()
-		self.renderSerialLog()
+		#self.renderSerialLog()
 		self.renderSummary()
 		pygame.display.flip()
 	

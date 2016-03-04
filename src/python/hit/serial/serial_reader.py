@@ -34,7 +34,7 @@ class ThreadedSerialReader (threading.Thread):
 	def run(self):
 		self.write_log("Starting " + self.name)
 		
-		#time.sleep(5)
+		time.sleep(5)
 		
 		iterations = 0
 		while not self.connected and not self.is_stopped:

@@ -77,7 +77,7 @@ class SurfaceView (object):
 	def drawHit(self, x, y, side):
 		ball = Ball()
 		ball.color = (255, 255, 255)
-		ball.radius = 30
+		ball.radius = 10
 		
 		offset = 0
 		

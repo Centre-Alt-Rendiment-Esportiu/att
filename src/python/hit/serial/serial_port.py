@@ -213,12 +213,13 @@ class ATTHitsFromFilePort (SerialPort):
 		
 		if (len(isFast)):
 			#time_delay = random.random()
-			time_delay = 0.1
+			time_delay = 1
 			time.sleep(time_delay)
 		
 		line = ""
 		if self.inner_index < len(self.lines):
 			line = self.lines[self.inner_index]
+			line = line.split("/")[0]
 			self.inner_index += 1
 		else:
 			self.amIclosed = 1

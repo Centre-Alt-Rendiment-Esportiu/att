@@ -5,6 +5,7 @@ import sys
 import platform
 from pip._vendor.cachecontrol import controller
 
+"""
 PROJECT_ROOT = ""
 if platform.platform().lower().startswith("win"):
 	PROJECT_ROOT = "I:/dev/workspaces/python/att-workspace/att/"
@@ -14,6 +15,7 @@ else:
 		PROJECT_ROOT = "/home/asanso/git/att"
 		
 sys.path.insert(0, PROJECT_ROOT + "/src/python/")
+"""
 
 import pygame
 import traceback
@@ -85,9 +87,10 @@ class TheApp:
 		
 		self.predictor = TableHitPredictor()		
 		
-		demo = False
+		demo = True
 		if demo:
-			HITS_DATA_FILE = "../../../arduino/data/hits_reference_points_alltable_20160303.txt"
+			#HITS_DATA_FILE = "../../../arduino/data/hits_reference_points_alltable_20160303.txt"
+			HITS_DATA_FILE = "log/2016_03_03_1820_2_ss.log"
 			port = HITS_DATA_FILE
 			baud = ""
 			serialBuilder = ATTHitsFromFilePortBuilder()			
@@ -98,7 +101,7 @@ class TheApp:
 			serialBuilder = ATTArduinoSerialPortBuilder()
 			serial_port = ATTArduinoSerialPort(port, baud)
 		
-		self.myThread = ThreadedSerialReader(1, "Thread-1", self.workQueue, None, serialBuilder, port, baud, serial_port, True)
+		self.myThread = ThreadedSerialReader(1, "Thread-1", self.workQueue, None, serialBuilder, port, baud, serial_port, False)
 		self.myThread.start()
 		
 	def main(self):
