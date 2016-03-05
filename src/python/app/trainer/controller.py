@@ -6,9 +6,9 @@ import pygame, pygame.font, pygame.event, pygame.draw, string
 from pygame.locals import *
 
 from session_manager import SessionManager
+from protocol import ShortServiceProtocol
 
-from app.trainer.view import SurfaceView
-from app.trainer.protocol import ShortServiceProtocol
+
 
 import time
 
@@ -296,7 +296,7 @@ class ShortServiceController (ATTController):
 		
 		self.protocol.processSate(hit)
 		
-		self.view.drawHit(x, y, hit["side"]);
+		self.view.drawHit(x, y, hit["side"])
 		
 	def addServiceEvent(self, selfserviceEvent):
 		self.servicesList.append(selfserviceEvent)

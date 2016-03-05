@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import pygame
-from app.trainer.controller import ATTController
-
-from app.trainer.view import SurfaceView
+from  controller import ATTController
+from view import SurfaceView
 
 class SerialLogNotifier(ATTController):
 
