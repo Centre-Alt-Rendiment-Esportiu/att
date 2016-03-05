@@ -213,7 +213,7 @@ class ATTHitsFromFilePort (SerialPort):
 		
 		if (len(isFast)):
 			#time_delay = random.random()
-			time_delay = 1
+			time_delay = 0.1
 			time.sleep(time_delay)
 		
 		line = ""

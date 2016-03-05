@@ -27,8 +27,8 @@ class HitRegressor:
 class ATTSkLearnHitRegressor (HitRegressor):
 	def __init__(self, hit_processor):
 		self.hit_processor = hit_processor
-		#self.regressor = LinearRegression()
-		self.regressor = DecisionTreeRegressor()
+		self.regressor = LinearRegression()
+		#self.regressor = DecisionTreeRegressor()
 		
 	def collect_train_hits_from_file(self, str_filename):
 		hits_training_values = []
