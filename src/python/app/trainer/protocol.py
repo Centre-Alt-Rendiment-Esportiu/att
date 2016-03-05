@@ -44,17 +44,20 @@ class ShortServiceProtocol:
 			self.firstHit = self.lastHit
 			self.currentHit = hit
 			
-			time_delta = hit["tstamp"] - self.lastHit["tstamp"]
-			self.notifier.push(str(time_delta))
-			#self.currentState = 1
-			self.currentState = 3
-			
-			self.timeoutThread.stop()
-			self.timeoutThread = None
-								
-			self.timeoutThread = ProtocolTimeoutThread(2, self)
-			self.timeoutThread.start()
-
+			if self.lastHit["side"] <> self.currentHit["side"]:
+				time_delta = hit["tstamp"] - self.lastHit["tstamp"]
+				self.notifier.push(str(time_delta))
+				#self.currentState = 1
+				self.currentState = 3
+				
+				self.timeoutThread.stop()
+				self.timeoutThread = None
+									
+				self.timeoutThread = ProtocolTimeoutThread(2, self)
+				self.timeoutThread.start()
+			else:
+				#Discard
+				pass
 			#self.completedService()
 			return
 			

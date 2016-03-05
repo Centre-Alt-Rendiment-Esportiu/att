@@ -33,7 +33,7 @@ class SurfaceView (object):
 	# Convert inches to pixel X
 	def get_x_conversion(self):
 		windowWidth = self.surface.get_size()[0]
-		conversion = (windowWidth/2)/48
+		conversion = (windowWidth/2)/54
 		return conversion
 	
 	# Convert inches to pixel Y
@@ -76,20 +76,20 @@ class SurfaceView (object):
 	
 	def drawHit(self, x, y, side):
 		ball = Ball()
-		ball.color = (255, 255, 255)
-		ball.radius = 10
+		ball.color = (0, 255, 255)
+		ball.radius = 20
 		
 		offset = 0
 		
 		if side == 'r':
-			offset = 51*self.get_x_conversion()
+			offset = 65*self.get_x_conversion()
 			#pass
 			
 		translated_x = int(x*self.get_x_conversion() + offset)
 		translated_y = int(y*self.get_y_conversion())
 		ball.position = (translated_x, translated_y)
 		
-		self.drawBall(ball, 1)
+		self.drawBall(ball, 0)
 	
 	def drawSensor(self, x, y):
 		ball = Ball()
@@ -110,7 +110,7 @@ class SurfaceView (object):
 
 		for i in [6,18,30,42,54]:
 			for j in [6,18,30,42]:
-				self.drawReferencePoint(j+51, i)
+				self.drawReferencePoint(j+65, i)
 
 	def displaySensors(self):
 		for sensor_coord in self.sensor_coords:
