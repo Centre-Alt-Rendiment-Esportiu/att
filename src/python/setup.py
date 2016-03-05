@@ -6,7 +6,7 @@ setup(
     packages=['hit','hit.serial','hit.train','hit.process','hit.importer','app.trainer' ],
     url='',
     license='',
-    author='Albert Sansó, Eloi Puertas',
+    author='Albert Sanso, Eloi Puertas',
     author_email='albertsanso@gmail.com, eloipuertas@gmail.com',
     description='The Hit Package'
 )

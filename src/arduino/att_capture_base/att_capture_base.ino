@@ -10,9 +10,9 @@
  * Continued by
  * -------------
  * Eloi Puertas
- * Oscar Bañó
+ * Oscar Baï¿½ï¿½
  * Jordi Serres
- * Albert Sansó
+ * Albert Sansï¿½
  *
  */
 
@@ -31,10 +31,16 @@ struct Hit {
 };
 
 //Pin mapping of Teensy
-int rightPins[] = { A8, A9, A10, A11, A12, A13, A14, A15}; // clockwise from top left
 int leftPins[] = { A0, A1, A2, A3, A4, A5, A6, A7}; // clockwise from top left
-int rightThresholds[] = {10, 4, 4, 4, 4, 4, 4, 10};
+int rightPins[] = { A8, A9, A10, A11, A12, A13, A14, A15}; // clockwise from top left
+
+// 2016-01-29
+//int leftThresholds[] = {4, 4, 4, 4, 4, 4, 4, 10};
+//int rightThresholds[] = {10, 4, 4, 4, 4, 4, 4, 10};
+
+// 2016-03-03
 int leftThresholds[] = {4, 4, 4, 4, 4, 4, 4, 10};
+int rightThresholds[] = {15, 4, 4, 4, 5, 4, 8, 10};
 
 const unsigned long NO_RECORD = -1;
 const unsigned long TIMEOUT_BETWEEN_HITS = 10000; // in micros
