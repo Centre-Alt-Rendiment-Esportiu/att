@@ -19,8 +19,6 @@ import predictorBuilder
 from view import *
 from controller import *
 
-
-
 class TheApp:
 	pressed = None
 	isButtonUp = True
@@ -162,8 +160,8 @@ class ATTDispatcher:
 		controller = MultiBallController(view, self.app.predictor, self.app.workQueue, self.app.notifier)
 		self.appendController(controller)
 		
-		view = WholePointSequenceView(self.app.surface)
-		controller = WholePointSequenceController(view, self.app.predictor, self.app.workQueue, self.app.notifier)
+		view = RallyView(self.app.surface)
+		controller = RallyController(view, self.app.predictor, self.app.workQueue, self.app.notifier)
 		self.appendController(controller)
 		
 		view = SandboxView(self.app.surface)

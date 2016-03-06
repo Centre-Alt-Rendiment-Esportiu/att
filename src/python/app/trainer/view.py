@@ -212,10 +212,10 @@ class SandboxView (SurfaceView):
 	def __init__(self, surface):
 		super(SandboxView, self).__init__(surface)
 
-class WholePointSequenceView (SurfaceView):		
+class RallyView (SurfaceView):		
 
 	def __init__(self, surface):
-		super(WholePointSequenceView, self).__init__(surface)
+		super(RallyView, self).__init__(surface)
 
 	def drawMessage(self):
 		font = pygame.font.Font(None, 36)

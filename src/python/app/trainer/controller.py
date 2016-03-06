@@ -7,7 +7,7 @@ from pygame.locals import *
 
 from session_manager import SessionManager
 from protocol import ShortServiceProtocol
-
+from protocol import RallyProtocol
 
 
 import time
@@ -131,7 +131,7 @@ class MenuController (ATTController):
 		"position": 2
 	}, {
 		"id": "POINT_SEQUENCE",
-		"label": "Whole point sequence",
+		"label": "Rally",
 		"position": 3
 	}, {
 		"id": "SAND_BOX",
@@ -414,7 +414,7 @@ class SandboxController (ATTController):
 		print logReading
 		self.notifier.push(logReading)
 
-class WholePointSequenceController (ATTController):
+class RallyController (ATTController):
 
 	ID = "POINT_SEQUENCE"
 	
@@ -430,12 +430,15 @@ class WholePointSequenceController (ATTController):
 		self.workQueue = workQueue
 		self.notifier = notifier
 		self.view = view
+		self.protocol = RallyProtocol(self.view, self.notifier, self)
 
 	def start(self):
 		pass
 	
 	def render(self):
-		self.view.drawMessage()
+		#self.view.drawMessage()
+		self.view.buildScenario()
+		self.renderSerialLog()
 		self.renderSerialLog()
 		pygame.display.flip()
 	
@@ -444,16 +447,24 @@ class WholePointSequenceController (ATTController):
 		self.notifier.clearView()
 		self.notifier.render()
 		
+	def renderSummary(self):
+		if self.state == 1:
+			if len(self.summary) > 0:
+				self.view.renderSummary(self.summary)
+				
 	def process(self, app, event):
 		done = False
 
 		if not self.workQueue.empty():
 			hit = self.workQueue.get()
-			if hit <> "":		
+			if hit <> "":
+				self.processHit(hit)
+				"""
 				(y,x) = self.predictor.predictHit(hit)
 				logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+hit["raw"]
 				print logReading
 				self.notifier.push(logReading)
+				"""
 
 		self.render()
 		
@@ -462,3 +473,16 @@ class WholePointSequenceController (ATTController):
 			app.dispatcher.setController(MenuController.ID)
 
 		return done
+
+	def processHit(self, hit):
+		(y,x) = self.predictor.predictHit(hit)
+		hit['coords'] = (y,x)
+		
+		logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+hit["raw"]
+		print logReading
+		self.notifier.push(logReading)
+		
+		self.protocol.processSate(hit)
+		
+		self.view.drawHit(x, y, hit["side"])
+		#self.view.drawHitWithText(x, y, hit["side"], "")
