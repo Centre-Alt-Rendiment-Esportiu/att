@@ -45,7 +45,7 @@ class SerialLogNotifier(ATTController):
             self.view.surface.blit(text, (x1, y1))
             i=i+1
     
-    def clear(self):
+    def clearView(self):
         black = (0, 0, 0)
         
         x1 = self.view.getX(self.area[0])

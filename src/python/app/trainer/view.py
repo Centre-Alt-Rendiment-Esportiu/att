@@ -27,7 +27,7 @@ class SurfaceView (object):
 	def __init__(self, surface):
 		self.surface = surface
 
-	def clear(self):
+	def clearView(self):
 		self.surface.fill((0, 0, 0))
 	
 	# Convert inches to pixel X
@@ -77,7 +77,7 @@ class SurfaceView (object):
 	def drawHit(self, x, y, side):
 		ball = Ball()
 		ball.color = (0, 255, 255)
-		ball.radius = 20
+		ball.radius = 30
 		
 		offset = 0
 		
@@ -90,6 +90,19 @@ class SurfaceView (object):
 		ball.position = (translated_x, translated_y)
 		
 		self.drawBall(ball, 0)
+		ball.color = (0, 0, 0)
+		ball.radius = 25
+		self.drawBall(ball, 0)
+
+	def drawHitWithText(self, x, y, side, text):
+		self.drawHit(x, y, side)
+		
+		font = pygame.font.Font(None, 66)
+		
+		if text <> "":
+			text = font.render(text, 1, (255,255,255))
+			coords = self.getPercentCoords((x,y))
+			self.drawText(text, coords)
 	
 	def drawSensor(self, x, y):
 		ball = Ball()

@@ -26,8 +26,8 @@ class ATTController:
 	def process(self, app, event):
 		pass
 	
-	def clear(self):
-		self.view.clear()
+	def clearView(self):
+		self.view.clearView()
 
 class LogonController (ATTController):
 	
@@ -99,7 +99,7 @@ class LogonController (ATTController):
 			if sm.validateCredentials(username, password):
 				app.pressed = []
 				app.isButtonUp = False
-				self.clear()
+				self.clearView()
 				
 				#app.buildHitDataSource()
 				#self.myThread = ThreadedSerialReader(1, "Thread-1", self.workQueue, None, serialBuilder, port, baud, serial_port, False)
@@ -171,7 +171,7 @@ class MenuController (ATTController):
 		
 	def renderSerialLog(self):
 		
-		self.notifier.clear()
+		self.notifier.clearView()
 		self.notifier.render()
 		
 	def process(self, app, event):
@@ -197,7 +197,7 @@ class MenuController (ATTController):
 		self.render()
 		
 		if app.isPressed(pygame.K_RETURN):
-			self.clear()
+			self.clearView()
 			
 			optionLabel = self.getOptionLabelByPosition(self.currentOption+1)
 			controller_id = optionLabel['id']
@@ -234,13 +234,13 @@ class ShortServiceController (ATTController):
 	
 	def render(self):
 		self.view.buildScenario()
-		#self.renderSerialLog()
+		self.renderSerialLog()
 		self.renderSummary()
 		pygame.display.flip()
 	
 	def renderSerialLog(self):
 		
-		self.notifier.clear()
+		self.notifier.clearView()
 		self.notifier.render()
 		
 	def renderSummary(self):
@@ -259,7 +259,7 @@ class ShortServiceController (ATTController):
 		self.render()
 							
 		if app.isPressed(pygame.K_ESCAPE):
-			self.clear()
+			self.clearView()
 			if self.state == 0:
 				self.buildSummary()
 				self.state = 1
@@ -297,6 +297,7 @@ class ShortServiceController (ATTController):
 		self.protocol.processSate(hit)
 		
 		self.view.drawHit(x, y, hit["side"])
+		#self.view.drawHitWithText(x, y, hit["side"], "")
 		
 	def addServiceEvent(self, selfserviceEvent):
 		self.servicesList.append(selfserviceEvent)
@@ -328,7 +329,7 @@ class MultiBallController (ATTController):
 	
 	def renderSerialLog(self):
 
-		self.notifier.clear()
+		self.notifier.clearView()
 		self.notifier.render()
 		
 	def process(self, app, event):
@@ -345,7 +346,7 @@ class MultiBallController (ATTController):
 		self.render()
 
 		if app.isPressed(pygame.K_ESCAPE):
-			self.clear()
+			self.clearView()
 			app.dispatcher.setController(MenuController.ID)
 			
 		return done
@@ -377,7 +378,7 @@ class SandboxController (ATTController):
 		pygame.display.flip()
 	
 	def renderSerialLog(self):
-		self.notifier.clear()
+		self.notifier.clearView()
 		self.notifier.render()
 		
 	def process(self, app, event):
@@ -389,7 +390,7 @@ class SandboxController (ATTController):
 				self.processHit(hit)		
 		
 		if app.isPressed(pygame.K_c):
-			self.clear()
+			self.clearView()
 			self.view.buildScenario()
 
 		if event.type == pygame.MOUSEMOTION:
@@ -399,7 +400,7 @@ class SandboxController (ATTController):
 		self.render()
 				
 		if app.isPressed(pygame.K_ESCAPE):
-			self.clear()
+			self.clearView()
 			app.dispatcher.setController(MenuController.ID)
 
 		return done
@@ -440,7 +441,7 @@ class WholePointSequenceController (ATTController):
 	
 	def renderSerialLog(self):
 		
-		self.notifier.clear()
+		self.notifier.clearView()
 		self.notifier.render()
 		
 	def process(self, app, event):
@@ -457,7 +458,7 @@ class WholePointSequenceController (ATTController):
 		self.render()
 		
 		if app.isPressed(pygame.K_ESCAPE):
-			self.clear()
+			self.clearView()
 			app.dispatcher.setController(MenuController.ID)
 
 		return done

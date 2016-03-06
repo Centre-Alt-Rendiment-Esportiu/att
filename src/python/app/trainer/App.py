@@ -83,8 +83,8 @@ class TheApp:
 		windowWidth = info.current_w
 		windowHeight = info.current_h
 
-		windowWidth = 1280 #1024
-		windowHeight = 768 #768
+		#windowWidth = 1280 #1024
+		#windowHeight = 768 #768
 
 		self.buildHitDataSource()
 		

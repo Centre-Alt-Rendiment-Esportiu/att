@@ -17,6 +17,7 @@ class PredictorBuilder:
 	
 	def buildInstance(self, trainDataFile):
 		return self.build_regressor_Classic(trainDataFile)
+		#return self.build_regressor_SKLearn(trainDataFile)
 
 	def build_regressor_Classic(self, trainDataFile):
 		processor = ATTMatrixHitProcessor()
