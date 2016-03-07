@@ -16,10 +16,16 @@ class ATTMatrixHitProcessor:
 		if groups is None:
 			return None
 		else:
+			the_timings = [x.split(":")[0] for x in groups[:-1]]
+			
+			# FISTROOOO !!!!!
+			#the_timings = [the_timings[i] for i in [0,2,5,7]] 
+
+			the_values = [x.split(":")[1] for x in groups[:-1]]
 			hit = {
 				"side": groups[-1],
-				"sensor_timings": [x.split(":")[0] for x in groups[:-1]],
-				"sensor_values": [x.split(":")[1] for x in groups[:-1]],
+				"sensor_timings": the_timings,
+				"sensor_values": the_values,
 				"tstamp": time.time(),
 				"raw": line
 			}
@@ -48,10 +54,16 @@ class ATTPlainHitProcessor:
 		if groups is None:
 			return None
 		else:
+			the_timings = [x.split(":")[0] for x in groups[:-1]]
+			
+			# FISTROOOO !!!!!
+			#the_timings = [the_timings[i] for i in [0,2,5,7]] 
+
+			the_values = [x.split(":")[1] for x in groups[:-1]]
 			hit = {
 				"side": groups[-1],
-				"sensor_timings": [x.split(":")[0] for x in groups[:-1]],
-				"sensor_values": [x.split(":")[1] for x in groups[:-1]],
+				"sensor_timings": the_timings,
+				"sensor_values": the_values,
 				"tstamp": time.time(),
 				"raw": line
 			}

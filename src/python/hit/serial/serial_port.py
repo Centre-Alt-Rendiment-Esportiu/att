@@ -230,13 +230,14 @@ class ATTHitsFromFilePort (SerialPort):
 			line = self.lines[self.inner_index]
 			pieces = line.split("/")
 			line = pieces[0]
-			delta = float(pieces[1]) - self.lastTS
-			print delta
-			if self.lastTS <> float(0):
-				time.sleep(delta)
-				pass				
-				
-			self.lastTS = float(pieces[1])
+			if len(pieces)>1:
+				delta = float(pieces[1]) - self.lastTS
+				print delta
+				if self.lastTS <> float(0):
+					time.sleep(delta)
+					pass				
+					
+				self.lastTS = float(pieces[1])
 				
 			self.inner_index += 1
 		else:

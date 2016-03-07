@@ -95,6 +95,10 @@ class ATTClassicHitRegressor (HitRegressor):
 			# Parse timings
 			values = [int(value) for value in (line.split(","))]
 			train_values = values[2:]
+			
+			# FISTROOOO !!!!!
+			#train_values = [train_values[i] for i in [0,2,5,7]] 
+			
 			point = values[0:2]
 			
 			diffs = self.hit_processor.hit_diffs(train_values)

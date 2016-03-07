@@ -58,11 +58,11 @@ class SerialLogNotifier(ATTController):
         pass
     
     def push(self, line):
-        if (self.TOP >= self.LIMIT):
+        if (self.TOP == self.LIMIT):
             self.rotate(1)
-            self.TOP = self.LIMIT-1
-            self.notifications[self.TOP] = line
-            self.TOP = self.TOP + 1
+            #self.TOP = self.LIMIT-1
+            self.notifications[self.LIMIT-1] = line
+            #self.TOP = self.TOP + 1
         else:
             self.notifications[self.TOP] = line
             self.TOP = self.TOP + 1
@@ -71,6 +71,7 @@ class SerialLogNotifier(ATTController):
         for index in range(0, self.LIMIT-1):
             self.notifications[index] = self.notifications[index+1]
         self.notifications[self.LIMIT-1] = ""
+        #self.TOP =- 1
         
 
 

@@ -206,17 +206,18 @@ class RallyProtocol:
 	def notify(self):
 		time_now = time.time()
 		
-		time_delta = time_now - self.currentHit["tstamp"]
-		self.notifier.push(str(time_delta))
-		
-		if time_delta > 3:
-			self.timeoutThread.stop()
-			self.timeoutThread = None
-
-			self.currentState = 2
+		if self.currentHit <> None:
+			time_delta = time_now - self.currentHit["tstamp"]
+			self.notifier.push(str(time_delta))
 			
-			self.currentHit = None
-			self.hitsList = None
+			if time_delta > 3:
+				if self.timeoutThread <> None:
+					self.timeoutThread.stop()
+					self.timeoutThread = None
+	
+				self.currentState = None
+				self.hitsList = []
+				self.currentHit = None
 
 
 class ProtocolTimeoutThread (threading.Thread):

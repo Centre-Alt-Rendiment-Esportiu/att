@@ -58,8 +58,8 @@ class TheApp:
 		
 		demo = True
 		if demo:
-			#HITS_DATA_FILE = "../../../arduino/data/hits_reference_points_alltable_20160303.txt"
-			HITS_DATA_FILE = "log/2016_03_03_1820_2_ss.log"
+			HITS_DATA_FILE = "../../../arduino/data/hits_reference_points_alltable_20160303.txt"
+			#HITS_DATA_FILE = "log/2016_03_03_1820_3_ss.log"
 			port = HITS_DATA_FILE
 			baud = ""
 			serialBuilder = ATTHitsFromFilePortBuilder()			
@@ -81,8 +81,8 @@ class TheApp:
 		windowWidth = info.current_w
 		windowHeight = info.current_h
 
-		#windowWidth = 1280 #1024
-		#windowHeight = 768 #768
+		windowWidth = 1280 #1024
+		windowHeight = 768 #768
 
 		self.buildHitDataSource()
 		
