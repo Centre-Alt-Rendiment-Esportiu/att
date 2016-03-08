@@ -418,11 +418,15 @@ class RallyController (ATTController):
 
 	ID = "POINT_SEQUENCE"
 	
+	hitsList = None
+	
 	notifier = None	
 	workQueue = None
 	predictor = None
 	font = None
 	view = None
+	
+	currentHit = None
 
 	def __init__(self, view, predictor, workQueue, notifier):
 		self.font = pygame.font.Font(None, 36)
@@ -430,16 +434,23 @@ class RallyController (ATTController):
 		self.workQueue = workQueue
 		self.notifier = notifier
 		self.view = view
+		self.hitsList = []
+		self.currentHit = None
 		self.protocol = RallyProtocol(self.view, self.notifier, self)
 
 	def start(self):
 		pass
 	
 	def render(self):
+		
+		if self.currentHit <> None:
+			(x,y) = self.currentHit['coords']
+			hitSide = self.currentHit["side"]
+			self.view.drawHit(x, y, hitSide)
+		
 		#self.view.drawMessage()
 		self.view.buildScenario()
-		self.renderSerialLog()
-		self.renderSerialLog()
+		#self.renderSerialLog()
 		pygame.display.flip()
 	
 	def renderSerialLog(self):
@@ -456,15 +467,9 @@ class RallyController (ATTController):
 		done = False
 
 		if not self.workQueue.empty():
-			hit = self.workQueue.get()
-			if hit <> "":
-				self.processHit(hit)
-				"""
-				(y,x) = self.predictor.predictHit(hit)
-				logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+hit["raw"]
-				print logReading
-				self.notifier.push(logReading)
-				"""
+			self.currentHit = self.workQueue.get()
+			if self.currentHit <> "":
+				self.processHit()
 
 		self.render()
 		
@@ -474,15 +479,26 @@ class RallyController (ATTController):
 
 		return done
 
-	def processHit(self, hit):
-		(y,x) = self.predictor.predictHit(hit)
-		hit['coords'] = (y,x)
+	def processHit(self, ):
+		(y,x) = self.predictor.predictHit(self.currentHit)
+		self.currentHit['coords'] = (x,y)
+
+		self.hitsList.append(self.currentHit)
 		
-		logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+hit["raw"]
-		print logReading
+		logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+self.currentHit["raw"]
+		#print logReading
 		self.notifier.push(logReading)
 		
-		self.protocol.processSate(hit)
+		self.protocol.processSate(self.currentHit)
 		
-		self.view.drawHit(x, y, hit["side"])
-		#self.view.drawHitWithText(x, y, hit["side"], "")
+
+
+
+
+
+
+
+
+
+
+

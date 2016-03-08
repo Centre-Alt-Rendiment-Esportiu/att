@@ -244,7 +244,66 @@ class ATTHitsFromFilePort (SerialPort):
 			self.amIclosed = 1
 		return line
 
-
+class ATTHitsFromFileSideSidePort (SerialPort):
+	
+	port = None
+	baud = None
+	lines = None
+	inner_index = None
+	amIclosed = None
+	lastTS = None
+	
+	def __init__(self, port = None, baud = None):
+		self.port = port
+		self.baud = baud
+		self.lines = [line.strip() for line in file(self.port) if line.startswith("hit:")]
+		self.inner_index = 0
+		self.amIclosed = 0
+		self.lastTS = 0
+		self.start()
+	
+	def start(self):
+		#self.lines = [line.strip() for line in file(self.port) if line.startswith("hit:")]
+		self.inner_index = 0
+		self.amIclosed = 0
+		
+	def isOpen(self):
+		return not self.amIclosed
+		
+	def close(self):
+		pass
+		
+	def get_port(self):
+		return ""
+		
+	def get_baudrate(self):
+		return 0
+		
+	def readline(self, *isFast):
+		
+		if (len(isFast)):
+			#time_delay = random.random()
+			time_delay = 0.1
+			time.sleep(time_delay)
+		
+		line = ""
+		if self.inner_index < len(self.lines):
+			line = self.lines[self.inner_index]
+			pieces = line.split("/")
+			line = pieces[0]
+			if len(pieces)>1:
+				delta = float(pieces[1]) - self.lastTS
+				print delta
+				if self.lastTS <> float(0):
+					time.sleep(delta)
+					pass				
+					
+				self.lastTS = float(pieces[1])
+				
+			self.inner_index += 1
+		else:
+			self.amIclosed = 1
+		return line
 
 
 

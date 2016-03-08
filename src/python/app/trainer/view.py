@@ -94,6 +94,36 @@ class SurfaceView (object):
 		ball.radius = 25
 		self.drawBall(ball, 0)
 
+	def drawLines(self, hitsList):
+		
+		new_points = []
+		
+		i=0
+		for structHit in hitsList:
+			(x,y) = structHit['coords']
+			side = structHit['side']
+			i=i+1
+			#self.drawHit(x, y, side)
+			self.drawHitWithText(x, y, side, str(i))
+			
+			offset = 0		
+			if side == 'r':
+				offset = 65*self.get_x_conversion()
+				
+			translated_x = int(x*self.get_x_conversion() + offset)
+			translated_y = int(y*self.get_y_conversion())
+				
+			
+			
+			new_pos = (translated_x, translated_y)
+			new_points.append(new_pos)
+			
+		#lines(Surface, color, closed, pointlist, width=1) -> Rect
+		
+		pygame.draw.lines(self.surface, (150,255,255), 0, new_points,2)
+		pygame.display.flip()
+			
+	
 	def drawHitWithText(self, x, y, side, text):
 		self.drawHit(x, y, side)
 		
@@ -101,7 +131,16 @@ class SurfaceView (object):
 		
 		if text <> "":
 			text = font.render(text, 1, (255,255,255))
-			coords = self.getPercentCoords((x,y))
+			
+			offset = 0		
+			if side == 'r':
+				offset = 65*self.get_x_conversion()
+
+			xx = int((x * self.get_x_conversion()) + offset)-15
+			yy = int(y * self.get_y_conversion())-15
+			
+			#coords = self.getPercentCoords((x,y))
+			coords = (xx,yy)
 			self.drawText(text, coords)
 	
 	def drawSensor(self, x, y):

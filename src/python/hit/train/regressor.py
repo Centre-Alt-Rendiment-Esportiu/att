@@ -40,6 +40,10 @@ class ATTSkLearnHitRegressor (HitRegressor):
 			# Parse timings
 			values = [int(value) for value in (line.split(","))]
 			train_values = np.array(values[2:]).astype(int)
+			
+			# FISTROOOO !!!!!
+			#train_values = [train_values[i] for i in [0,2,5,7]]
+			 
 			point = np.array(values[0:2]).astype(int)
 			
 			hits_training_values.append(train_values)

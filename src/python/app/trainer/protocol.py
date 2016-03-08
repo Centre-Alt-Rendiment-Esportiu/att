@@ -164,31 +164,26 @@ class RallyProtocol:
 	controller = None
 	timeoutThread = None
 	
-	currentState = None
-	
+	currentState = None	
 	currentHit = None
-	hitsList = None
 	
 	
 	def __init__(self, view, notifier, controller):
 		self.view = view
 		self.notifier = notifier
 		self.controller = controller
-		self.hitsList = []
 		
 	def processSate(self, hit):
 	
-		if self.currentState == None and self.hitsList == []:
+		if self.currentState == None:
 			self.currentState = 1
 			self.controller.clearView()
 			
-		if self.currentState == 1:
+		if self.currentState == 1: # Rally action
 			
 			self.currentHit = hit
 			self.lastHit = None
 			self.currentState = 1
-		
-			self.hitsList.append(hit)
 
 			self.timeoutThread = ProtocolTimeoutThread(1, self)
 			self.timeoutThread.start()
@@ -196,6 +191,7 @@ class RallyProtocol:
 		
 		if self.currentState == 2:
 			pass
+			
 		
 	def completedService(self):
 		pass
@@ -211,14 +207,22 @@ class RallyProtocol:
 			self.notifier.push(str(time_delta))
 			
 			if time_delta > 3:
-				if self.timeoutThread <> None:
-					self.timeoutThread.stop()
-					self.timeoutThread = None
-	
-				self.currentState = None
-				self.hitsList = []
-				self.currentHit = None
+				self.finalizeAndSummary()
 
+	def finalizeAndSummary(self):
+		
+		if self.timeoutThread <> None:
+			self.timeoutThread.stop()
+			self.timeoutThread = None
+
+		self.currentState = None
+		self.currentHit = None
+		
+		self.controller.clearView()
+		self.view.drawLines(self.controller.hitsList)		
+		self.controller.currentHit = None
+
+		
 
 class ProtocolTimeoutThread (threading.Thread):
 	
