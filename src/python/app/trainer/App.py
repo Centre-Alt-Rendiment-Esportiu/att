@@ -48,9 +48,20 @@ class TheApp:
 			return True
 		return False
 	
-	def buildScenario(self, windowWidth, windowHeight):
+	def buildScenario(self):
+		
+		pygame.init()
+		
+		info = pygame.display.Info()
+		windowWidth = info.current_w
+		windowHeight = info.current_h
+
+		windowWidth = 1280 #1024
+		windowHeight = 768 #768
+		
 		#self.surface = pygame.display.set_mode((windowWidth, windowHeight), pygame.FULLSCREEN)
 		self.surface = pygame.display.set_mode((windowWidth, windowHeight))
+		self.notifier = serialLogNotifier.SerialLogNotifier(self.surface, (55,78,100,100))
 		
 	def buildHitDataSource(self):
 		
@@ -75,28 +86,14 @@ class TheApp:
 		self.myThread.start()
 		
 	def main(self):
-		
-		pygame.init()
-		
-		info = pygame.display.Info()
-		windowWidth = info.current_w
-		windowHeight = info.current_h
-
-		windowWidth = 1280 #1024
-		windowHeight = 768 #768
-
 		self.buildHitDataSource()
+		self.buildScenario()
 		
+		self.dispatcher = ATTDispatcher(self)		
+		self.dispatcher.init()
 		
-		
-		self.buildScenario(windowWidth, windowHeight)
-		self.notifier = serialLogNotifier.SerialLogNotifier(self.surface, (55,78,100,100))
-		
-		self.dispatcher = ATTDispatcher(self)
-		
-		self.dispatcher.buildControllers()
-		#self.dispatcher.setController(LogonController.ID)
-		self.dispatcher.setController(MenuController.ID)
+		#self.dispatcher.setCurrentController(LogonController.ID)
+		self.dispatcher.setCurrentController(MenuController.ID)
 		
 		try:
 			done = False
@@ -143,6 +140,9 @@ class ATTDispatcher:
 		self.app = app
 		self.controllers = {}
 		
+	def init(self):
+		self.buildControllers()
+		
 	def buildControllers(self):
 		
 		view = LogonView(self.app.surface)
@@ -175,7 +175,7 @@ class ATTDispatcher:
 	def getController(self, controller_id):
 		return self.controllers[controller_id]
 	
-	def setController(self, controller_id):
+	def setCurrentController(self, controller_id):
 		self.currentController = self.getController(controller_id)
 		self.currentController.start()
 		
@@ -199,7 +199,6 @@ class TableHitPredictor (object):
 		else:
 			return self.rightPredictor.predictHit(hit)
 		
-	
 if __name__ == '__main__':
 	theApp = TheApp()
 	theApp.main()

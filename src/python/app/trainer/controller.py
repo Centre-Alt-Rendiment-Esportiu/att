@@ -105,7 +105,7 @@ class LogonController (ATTController):
 				#self.myThread = ThreadedSerialReader(1, "Thread-1", self.workQueue, None, serialBuilder, port, baud, serial_port, False)
 				#self.myThread.start()
 
-				app.dispatcher.setController(MenuController.ID)
+				app.dispatcher.setCurrentController(MenuController.ID)
 			else:
 				time.sleep(0.1)
 		
@@ -201,7 +201,7 @@ class MenuController (ATTController):
 			
 			optionLabel = self.getOptionLabelByPosition(self.currentOption+1)
 			controller_id = optionLabel['id']
-			app.dispatcher.setController(controller_id)
+			app.dispatcher.setCurrentController(controller_id)
 		
 		return done
 
@@ -270,7 +270,7 @@ class ShortServiceController (ATTController):
 				self.state = 0
 				app.myThread.unpause()
 				self.protocol.unpause()
-				app.dispatcher.setController(MenuController.ID)		
+				app.dispatcher.setCurrentController(MenuController.ID)		
 		
 		return done
 	
@@ -347,7 +347,7 @@ class MultiBallController (ATTController):
 
 		if app.isPressed(pygame.K_ESCAPE):
 			self.clearView()
-			app.dispatcher.setController(MenuController.ID)
+			app.dispatcher.setCurrentController(MenuController.ID)
 			
 		return done
 
@@ -401,7 +401,7 @@ class SandboxController (ATTController):
 				
 		if app.isPressed(pygame.K_ESCAPE):
 			self.clearView()
-			app.dispatcher.setController(MenuController.ID)
+			app.dispatcher.setCurrentController(MenuController.ID)
 
 		return done
 	
@@ -475,7 +475,7 @@ class RallyController (ATTController):
 		
 		if app.isPressed(pygame.K_ESCAPE):
 			self.clearView()
-			app.dispatcher.setController(MenuController.ID)
+			app.dispatcher.setCurrentController(MenuController.ID)
 
 		return done
 
