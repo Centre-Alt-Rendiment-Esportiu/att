@@ -48,7 +48,7 @@ class ThreadedSerialReader (threading.Thread):
 					else:
 						break
 			else:
-				time.sleep(0.1)
+				#time.sleep(0.1)
 				try:
 					self.serial_port = self.build_serial()
 				except Exception:
@@ -69,7 +69,8 @@ class ThreadedSerialReader (threading.Thread):
 				self.connected = True
 				self.write_log("Reading from serial: " + reading)
 			else:
-				time.sleep(0.1)
+				#time.sleep(0.1)
+				pass
 		except:
 			self.write_log("Miss!")
 			self.serial_port.close()
@@ -77,17 +78,11 @@ class ThreadedSerialReader (threading.Thread):
 			traceback.print_exc(file=sys.stdout)
 			return False
 			
-		
-		#reading = self.serial_port.readline()
-		#self.queue.put(reading)
-		
 		return True
 
 	def write_log(self, str_message):
 		print str_message
 		sys.stdout.flush()
-		#time.sleep(0.1)
-		pass
 		
 	def stop(self):
 		self.is_stopped = True
