@@ -206,7 +206,7 @@ class RallyProtocol:
 			time_delta = time_now - self.currentHit["tstamp"]
 			self.notifier.push(str(time_delta))
 			
-			if time_delta > 3:
+			if time_delta > 0.5:
 				self.finalizeAndSummary()
 
 	def finalizeAndSummary(self):
@@ -222,7 +222,54 @@ class RallyProtocol:
 		self.view.drawLines(self.controller.hitsList)		
 		self.controller.currentHit = None
 
+class CalibrationProtocol:
+	
+	notifier = None
+	view = None
+	controller = None
+	timeoutThread = None
+	
+	currentState = None
+	currentHit = None
+	lastHit = None
+	
+	def __init__(self, view, notifier, controller):
+		self.view = view
+		self.notifier = notifier
+		self.controller = controller
 		
+	def processSate(self, hit):
+			return
+	
+	def getDelta(self, hit):
+		if self.lastHit == None:
+			return 0
+		else:
+			return hit["tstamp"] - self.lastHit["tstamp"]
+	
+	def logHitDeltaInNotifier(self, hit):
+		time_delta = self.getDelta(hit)
+		self.notifier.push(str(time_delta))
+	
+	def notify(self):
+		time_now = time.time()
+		
+		time_delta = time_now - self.currentHit["tstamp"]
+		self.notifier.push(str(time_delta))
+						
+	def completedService(self):
+		pass
+	
+	def timedOutService(self):
+		pass
+	
+	def pause(self):
+		if self.timeoutThread != None:
+			self.timeoutThread.pause()
+	
+	def unpause(self):
+		if self.timeoutThread != None:
+			self.timeoutThread.unpause()
 
 class ProtocolTimeoutThread (threading.Thread):
 	

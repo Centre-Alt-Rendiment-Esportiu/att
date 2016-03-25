@@ -48,9 +48,20 @@ class TheApp:
 			return True
 		return False
 	
-	def buildScenario(self, windowWidth, windowHeight):
-		#self.surface = pygame.display.set_mode((windowWidth, windowHeight), pygame.FULLSCREEN)
-		self.surface = pygame.display.set_mode((windowWidth, windowHeight))
+	def buildScenario(self):
+		pygame.init()
+		
+		info = pygame.display.Info()
+		windowWidth = info.current_w
+		windowHeight = info.current_h
+		
+		#windowWidth = 1280 #1024
+		#windowHeight = 768 #768
+		
+		self.surface = pygame.display.set_mode((windowWidth, windowHeight), pygame.FULLSCREEN)
+		#self.surface = pygame.display.set_mode((windowWidth, windowHeight))
+		
+		self.notifier = serialLogNotifier.SerialLogNotifier(self.surface, (55,78,100,100))
 		
 	def buildHitDataSource(self):
 		
@@ -58,11 +69,16 @@ class TheApp:
 		
 		demo = True
 		if demo:
-			#HITS_DATA_FILE = "../../../arduino/data/hits_reference_points_alltable_20160303.txt"
+			#HITS_DATA_FILE = "../../../arduino/data/hits_reference_points_alltable_20160322.txt"
+			HITS_DATA_FILE = "../../../arduino/data/train_20160322_left.txt"
 			#HITS_DATA_FILE = "log/2016_03_03_1820_2_ss.log"
-			HITS_DATA_FILE = "../../../arduino/data/rally_demo_2.txt"
+			#HITS_DATA_FILE = "../../../arduino/data/rally_demo_2.txt"
 			port = HITS_DATA_FILE
 			baud = ""
+
+			#serialBuilder = SilentSerialPortBuilder()			
+			#serial_port = SilentSerialPort(port, baud)
+			
 			serialBuilder = ATTHitsFromFilePortBuilder()			
 			serial_port = ATTHitsFromFilePort(port, baud)
 		else:
@@ -75,28 +91,15 @@ class TheApp:
 		self.myThread.start()
 		
 	def main(self):
-		
-		pygame.init()
-		
-		info = pygame.display.Info()
-		windowWidth = info.current_w
-		windowHeight = info.current_h
-
-		windowWidth = 1280 #1024
-		windowHeight = 768 #768
 
 		self.buildHitDataSource()
-		
-		
-		
-		self.buildScenario(windowWidth, windowHeight)
-		self.notifier = serialLogNotifier.SerialLogNotifier(self.surface, (55,78,100,100))
+		self.buildScenario()
 		
 		self.dispatcher = ATTDispatcher(self)
+		self.dispatcher.init()
 		
-		self.dispatcher.buildControllers()
-		#self.dispatcher.setController(LogonController.ID)
-		self.dispatcher.setController(MenuController.ID)
+		#self.dispatcher.setCurrentController(LogonController.ID)
+		self.dispatcher.setCurrentController(MenuController.ID)
 		
 		try:
 			done = False
@@ -113,6 +116,8 @@ class TheApp:
 					self.isButtonUp = True
 		
 				done = self.dispatcher.process(self, event)
+				
+				clock.tick(30)
 				
 		except Exception:
 			print Exception
@@ -143,6 +148,9 @@ class ATTDispatcher:
 		self.app = app
 		self.controllers = {}
 		
+	def init(self):
+		self.buildControllers()
+		
 	def buildControllers(self):
 		
 		view = LogonView(self.app.surface)
@@ -168,15 +176,19 @@ class ATTDispatcher:
 		view = SandboxView(self.app.surface)
 		controller = SandboxController(view, self.app.predictor, self.app.workQueue, self.app.notifier)
 		self.appendController(controller)
+		
+		view = CalibrationView(self.app.surface)
+		controller = CalibrationController(view, self.app.predictor, self.app.workQueue, self.app.notifier)
+		self.appendController(controller)
 	
 	def appendController(self, controller):
 		self.controllers[controller.ID] = controller
 		
-	def getController(self, controller_id):
+	def getCurrentController(self, controller_id):
 		return self.controllers[controller_id]
 	
-	def setController(self, controller_id):
-		self.currentController = self.getController(controller_id)
+	def setCurrentController(self, controller_id):
+		self.currentController = self.getCurrentController(controller_id)
 		self.currentController.start()
 		
 	def process(self, app, event):
@@ -189,8 +201,8 @@ class TableHitPredictor (object):
 	def __init__(self):
 		
 		predBuilder = predictorBuilder.PredictorBuilder()
-		self.leftPredictor = predBuilder.buildInstance("../../data/train_points_20160303_left.txt")
-		self.rightPredictor = predBuilder.buildInstance("../../data/train_points_20160303_right.txt")
+		self.leftPredictor = predBuilder.buildInstance("../../data/train_points_20160322_left.txt")
+		self.rightPredictor = predBuilder.buildInstance("../../data/train_points_20160322_right.txt")
 		
 	def predictHit(self, hit):
 		side = hit["side"]
@@ -198,7 +210,6 @@ class TableHitPredictor (object):
 			return self.leftPredictor.predictHit(hit)
 		else:
 			return self.rightPredictor.predictHit(hit)
-		
 	
 if __name__ == '__main__':
 	theApp = TheApp()

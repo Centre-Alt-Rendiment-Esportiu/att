@@ -16,6 +16,13 @@ class DummySerialPortBuilder (SerialPortBuilder):
 
 	def build_serial_port(self, port=None, baud=None):
 		return serial_port.DummySerialPort(port, baud)
+	
+class SilentSerialPortBuilder (SerialPortBuilder):
+	def __init__(self):
+		pass
+
+	def build_serial_port(self, port=None, baud=None):
+		return serial_port.SilentSerialPort(port, baud)
 		
 class ATTEmulatedSerialPortBuilder (SerialPortBuilder):
 	def __init__(self):

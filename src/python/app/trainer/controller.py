@@ -8,7 +8,7 @@ from pygame.locals import *
 from session_manager import SessionManager
 from protocol import ShortServiceProtocol
 from protocol import RallyProtocol
-
+from protocol import CalibrationProtocol
 
 import time
 
@@ -105,7 +105,7 @@ class LogonController (ATTController):
 				#self.myThread = ThreadedSerialReader(1, "Thread-1", self.workQueue, None, serialBuilder, port, baud, serial_port, False)
 				#self.myThread.start()
 
-				app.dispatcher.setController(MenuController.ID)
+				app.dispatcher.setCurrentController(MenuController.ID)
 			else:
 				time.sleep(0.1)
 		
@@ -137,6 +137,10 @@ class MenuController (ATTController):
 		"id": "SAND_BOX",
 		"label": "Sandbox",
 		"position": 4
+	}, {
+		"id": "CALIBRATION",
+		"label": "Calibration",
+		"position": 5
 	}]
 	
 	def __init__(self, view, predictor, workQueue, notifier):
@@ -201,7 +205,7 @@ class MenuController (ATTController):
 			
 			optionLabel = self.getOptionLabelByPosition(self.currentOption+1)
 			controller_id = optionLabel['id']
-			app.dispatcher.setController(controller_id)
+			app.dispatcher.setCurrentController(controller_id)
 		
 		return done
 
@@ -270,7 +274,7 @@ class ShortServiceController (ATTController):
 				self.state = 0
 				app.myThread.unpause()
 				self.protocol.unpause()
-				app.dispatcher.setController(MenuController.ID)		
+				app.dispatcher.setCurrentController(MenuController.ID)		
 		
 		return done
 	
@@ -347,7 +351,7 @@ class MultiBallController (ATTController):
 
 		if app.isPressed(pygame.K_ESCAPE):
 			self.clearView()
-			app.dispatcher.setController(MenuController.ID)
+			app.dispatcher.setCurrentController(MenuController.ID)
 			
 		return done
 
@@ -401,7 +405,7 @@ class SandboxController (ATTController):
 				
 		if app.isPressed(pygame.K_ESCAPE):
 			self.clearView()
-			app.dispatcher.setController(MenuController.ID)
+			app.dispatcher.setCurrentController(MenuController.ID)
 
 		return done
 	
@@ -475,7 +479,7 @@ class RallyController (ATTController):
 		
 		if app.isPressed(pygame.K_ESCAPE):
 			self.clearView()
-			app.dispatcher.setController(MenuController.ID)
+			app.dispatcher.setCurrentController(MenuController.ID)
 
 		return done
 
@@ -491,14 +495,70 @@ class RallyController (ATTController):
 		
 		self.protocol.processSate(self.currentHit)
 		
+class CalibrationController (ATTController):
+	
+	ID = "CALIBRATION"
+	
+	notifier = None
+	workQueue = None
+	predictor = None
+	font = None
+	view = None
+	
+	def __init__(self, view, predictor, workQueue, notifier):
+		self.font = pygame.font.Font(None, 36)
+		self.predictor = predictor
+		self.workQueue = workQueue
+		self.notifier = notifier
+		self.view = view
+		self.protocol = CalibrationProtocol(self.view, self.notifier, self)
 
+	def start(self):
+		pass
+	
+	def render(self):
 
+		#self.view.buildScenario()
+		self.view.displayTable()
+		self.view.displayReferencePoints()
+		self.renderSerialLog()
+		pygame.display.flip()
+	
+	def renderSerialLog(self):
+		
+		self.notifier.clearView()
+		self.notifier.render()
+		
+	def renderSummary(self):
+		if self.state == 1:
+			if len(self.summary) > 0:
+				self.view.renderSummary(self.summary)
+				
+	def process(self, app, event):
+		done = False
 
+		LEFTBUTTON = 1
+		if event.type == pygame.MOUSEBUTTONUP and event.button == LEFTBUTTON:
+			_the_x, _the_y = event.pos
+			logReading = "("+str(_the_x)+", "+str(_the_y)+")"
+			self.notifier.push(logReading)
+			
+		if not self.workQueue.empty():
+			self.currentHit = self.workQueue.get()
+			if self.currentHit <> "":
+				self.processHit()
 
+		self.render()
+		
+		if app.isPressed(pygame.K_ESCAPE):
+			self.clearView()
+			app.dispatcher.setCurrentController(MenuController.ID)
 
+		return done
 
+	def processHit(self, ):
 
-
-
-
-
+		logReading = "> "+self.currentHit["raw"]
+		#print logReading
+		self.notifier.push(logReading)
+		self.protocol.processSate(self.currentHit)

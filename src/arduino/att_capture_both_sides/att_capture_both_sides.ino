@@ -39,8 +39,12 @@ int rightPins[] = { A8, A9, A10, A11, A12, A13, A14, A15}; // clockwise from top
 //int rightThresholds[] = {10, 4, 4, 4, 4, 4, 4, 10};
 
 // 2016-03-03
+//int leftThresholds[] = {4, 4, 4, 4, 4, 4, 4, 4};
+//int rightThresholds[] = {4, 4, 4, 4, 4, 4, 4, 4};
+
+//2016-03-22
 int leftThresholds[] = {4, 4, 4, 4, 4, 4, 4, 4};
-int rightThresholds[] = {4, 4, 4, 4, 4, 4, 4, 4};
+int rightThresholds[] = {4, 4, 4, 4, 4, 4, 8, 4};
 
 const unsigned long NO_RECORD = -1;
 const unsigned long TIMEOUT_BETWEEN_HITS = 10000; // in micros
@@ -79,6 +83,7 @@ void loop() {
     Serial.println("}");
 
     curHit.reported = true;
+    //createNewHit();
   }
 
   if (hitTimedOut()) {

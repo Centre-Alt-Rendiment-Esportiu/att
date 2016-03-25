@@ -61,6 +61,31 @@ class DummySerialPort (SerialPort):
 		
 	def gen_random_line(self):
 		return "Hee"
+	
+class SilentSerialPort (SerialPort):
+	def __init__(self, port = None, baud = None):
+		pass
+	
+	def start(self):
+		pass
+	
+	def isOpen(self):
+		return True
+		
+	def close(self):
+		pass
+		
+	def get_port(self):
+		return ""
+		
+	def get_baudrate(self):
+		return 0
+		
+	def readline(self, *isFast):
+		return ""
+		
+	def gen_random_line(self):
+		return ""
 		
 class ATTEmulatedSerialPort (SerialPort):
 	def __init__(self, port = None, baud = None):

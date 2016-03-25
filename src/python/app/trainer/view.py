@@ -260,4 +260,9 @@ class RallyView (SurfaceView):
 		font = pygame.font.Font(None, 36)
 		text = font.render("Whole point sequence", 1, (250, 250, 250))
 		self.drawText(text, self.getPercentCoords((10,10)))
+		
+class CalibrationView (SurfaceView):
+
+	def __init__(self, surface):
+		super(CalibrationView, self).__init__(surface)
 

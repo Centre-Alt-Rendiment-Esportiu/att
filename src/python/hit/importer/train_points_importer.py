@@ -93,7 +93,7 @@ if __name__ == '__main__':
 	
 	importer = TrainPointsImporter()
 	
-	str_input_file = "../../../arduino/data/train_20160303_left.txt"
-	str_output_file = "../../../python/data/train_points_20160303_left.txt"
+	str_input_file = "../../../arduino/data/train_20160322_right.txt"
+	str_output_file = "../../../python/data/train_points_20160322_right.txt"
 	importer.from_file_to_file(str_input_file, str_output_file)
 
