@@ -1,0 +1,14 @@
+"configuration" : {
+	"predictor" : {
+		"train" : {
+			"dataset": {
+				"left" : "../../data/train_points_20160303_left.txt",
+				"right" : "../../data/train_points_20160303_right.txt"
+			},
+		"algorithm" : "hit.train.regressor.ATTClassicHitRegressor"
+		}
+	},
+	"datasource" : {
+		""
+	}
+}

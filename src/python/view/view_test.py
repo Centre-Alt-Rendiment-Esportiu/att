@@ -127,7 +127,7 @@ def displayTable(window, windowWidth, windowHeight):
 	
 	return window
 	
-def buildScenario(windowWidth, windowHeight):
+def buildScene(windowWidth, windowHeight):
 	
 	#window = pygame.display.set_mode((windowWidth, windowHeight), pygame.FULLSCREEN)
 	window = pygame.display.set_mode((windowWidth, windowHeight))
@@ -173,7 +173,7 @@ if __name__ == '__main__':
 	x_conversion = (windowWidth/2)/48
 	y_conversion = (windowHeight)/60
 	
-	window = buildScenario(windowWidth, windowHeight)
+	window = buildScene(windowWidth, windowHeight)
 	clock = pygame.time.Clock()
 
 	done = False
@@ -196,10 +196,10 @@ if __name__ == '__main__':
 					done = True
 				if (event.key == pygame.K_c):
 					window.fill((0,0,0))
-					window = buildScenario(windowWidth, windowHeight)
+					window = buildScene(windowWidth, windowHeight)
 				if (event.key == pygame.K_r):
 					window.fill((0,0,0))
-					window = buildScenario(windowWidth, windowHeight)
+					window = buildScene(windowWidth, windowHeight)
 					serial_port.amIclosed = 1
 					serial_port.start()
 												

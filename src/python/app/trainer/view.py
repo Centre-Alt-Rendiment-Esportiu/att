@@ -94,7 +94,7 @@ class SurfaceView (object):
 		ball.radius = 25
 		self.drawBall(ball, 0)
 
-	def drawLines(self, hitsList):
+	def drawConnectedPointsLines(self, hitsList):
 		
 		new_points = []
 		
@@ -112,9 +112,7 @@ class SurfaceView (object):
 				
 			translated_x = int(x*self.get_x_conversion() + offset)
 			translated_y = int(y*self.get_y_conversion())
-				
-			
-			
+
 			new_pos = (translated_x, translated_y)
 			new_points.append(new_pos)
 			
@@ -122,7 +120,12 @@ class SurfaceView (object):
 		
 		pygame.draw.lines(self.surface, (150,255,255), 0, new_points,2)
 		pygame.display.flip()
-			
+	
+	def drawLines(self, color, closed, pointlist, width):
+		pygame.draw.lines(self.surface, color, closed, pointlist, width)
+	
+	def drawRect(self, color, pointlist):
+		pygame.draw.rect(self.surface, color, pointlist)
 	
 	def drawHitWithText(self, x, y, side, text):
 		self.drawHit(x, y, side)
@@ -170,6 +173,23 @@ class SurfaceView (object):
 			y = sensor_coord[1]
 			self.drawSensor(y, x)
 
+	def display_box(self, message):
+		screen = self.surface
+		"Print a message in a box in the middle of the screen"
+		fontobject = pygame.font.Font(None,18)
+		pygame.draw.rect(screen, (0,0,0),
+			((screen.get_width() / 2) - 100,
+			(screen.get_height() / 2) - 10,
+			200,20), 0)
+		pygame.draw.rect(screen, (255,255,255),
+			((screen.get_width() / 2) - 102,
+			(screen.get_height() / 2) - 12,
+			204,24), 1)
+		if len(message) != 0:
+			screen.blit(fontobject.render(message, 1, (255,255,255)),
+					((screen.get_width() / 2) - 100, (screen.get_height() / 2) - 10))
+		pygame.display.flip()
+		
 	def displayTable(self):
 	
 		tableLineWidth = 1
@@ -184,7 +204,7 @@ class SurfaceView (object):
 		pygame.draw.line(self.surface, (255,255,255), (tableLineWidth/2,windowHeight/2), (windowWidth,windowHeight/2), tableLineWidth)
 		pygame.draw.line(self.surface, (255,255,255), (windowWidth/2,tableLineWidth/2), (windowWidth/2,windowHeight-tableLineWidth/2), tableLineWidth) 
 
-	def buildScenario(self):
+	def buildScene(self):
 
 		self.displayTable()
 		self.displayReferencePoints()
@@ -228,8 +248,10 @@ class ShortServiceView (SurfaceView):
 		y2 = self.getY(60)
 		
 		pointlist = [ (x1,y1), (x2,y1), (x2,y2), (x1,y2)]
-		pygame.draw.lines(self.surface, blue, 1, pointlist, 2)				
-		pygame.draw.rect(self.surface, black, (x1+1, y1+1, x2-10, y2-10))
+		self.drawLines(blue, 1, pointlist, 2)
+		#pygame.draw.lines(self.surface, blue, 1, pointlist, 2)
+		self.drawRect(black, (x1+1, y1+1, x2-10, y2-10))		
+		#pygame.draw.rect(self.surface, black, (x1+1, y1+1, x2-10, y2-10))
 		
 		myFont = pygame.font.Font(None, 20)
 		text = myFont.render(summary[0], 1, (70, 70, 70))

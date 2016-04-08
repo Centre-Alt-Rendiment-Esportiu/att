@@ -18,11 +18,15 @@ from hit.train.regressor import ATTSkLearnHitRegressor
 import predictorBuilder
 from view import *
 from controller import *
+import resource_manager
+
+import ast
 
 class TheApp:
 	pressed = None
 	isButtonUp = True
 	
+	config = None
 	predBuilder = None
 	predictor = None
 	leftPredictor = None
@@ -36,6 +40,8 @@ class TheApp:
 	
 	def __init__(self):
 		self.workQueue = Queue.Queue(10)
+		self.config = resource_manager.ConfigurationReader()
+		self.config.loadFromFile("../../resources/att.conf")
 
 	def isPressed(self, key):
 		if self.pressed[key] and self.isButtonUp:
@@ -48,52 +54,60 @@ class TheApp:
 			return True
 		return False
 	
-	def buildScenario(self):
+	def buildScene(self):
 		pygame.init()
 		
-		info = pygame.display.Info()
-		windowWidth = info.current_w
-		windowHeight = info.current_h
+		windowWidth = None
+		windowHeight = None
 		
-		#windowWidth = 1280 #1024
-		#windowHeight = 768 #768
+		if self.config.props["att.display.screen.fullscren"] == "SI":
+			info = pygame.display.Info()
+			windowWidth = info.current_w
+			windowHeight = info.current_h
+			self.surface = pygame.display.set_mode((windowWidth, windowHeight), pygame.FULLSCREEN)
+		elif self.config.props["att.display.screen.fullscren"] == "NO":
+			windowWidth = int(self.config.props["att.display.screen.width"])
+			windowHeight = int(self.config.props["att.display.screen.height"])
+			self.surface = pygame.display.set_mode((windowWidth, windowHeight))
 		
-		self.surface = pygame.display.set_mode((windowWidth, windowHeight), pygame.FULLSCREEN)
-		#self.surface = pygame.display.set_mode((windowWidth, windowHeight))
-		
-		self.notifier = serialLogNotifier.SerialLogNotifier(self.surface, (55,78,100,100))
+		strSize = self.config.props["att.display.log_notifier.size"]
+		tplSize = ast.literal_eval(strSize)
+		self.notifier = serialLogNotifier.SerialLogNotifier(self.surface, tplSize)
 		
 	def buildHitDataSource(self):
 		
-		self.predictor = TableHitPredictor()		
+		port = self.config.props["att.hit.datasource.port"]
+		baud = self.config.props["att.hit.datasource.baud"]
 		
-		demo = True
-		if demo:
-			#HITS_DATA_FILE = "../../../arduino/data/hits_reference_points_alltable_20160322.txt"
-			HITS_DATA_FILE = "../../../arduino/data/train_20160322_left.txt"
-			#HITS_DATA_FILE = "log/2016_03_03_1820_2_ss.log"
-			#HITS_DATA_FILE = "../../../arduino/data/rally_demo_2.txt"
-			port = HITS_DATA_FILE
-			baud = ""
+		serial_port = None
+		serial_builder = None
+		
+		if self.config.props["att.hit.datasource"] == "FILE":
+			serial_builder = ATTHitsFromFilePortBuilder()
+		elif self.config.props["att.hit.datasource"] == "DUMMY_RANDOM":
+			serial_builder = DummySerialPortBuilder()
+		elif self.config.props["att.hit.datasource"] == "SILENT":
+			serial_builder = SilentSerialPortBuilder();
+		elif self.config.props["att.hit.datasource"] == "RANDOM_SET":
+			serial_builder = ATTEmulatedSerialPortBuilder()
+		elif self.config.props["att.hit.datasource"] == "SERIAL":
+			serial_builder = ATTArduinoSerialPortBuilder()
 
-			#serialBuilder = SilentSerialPortBuilder()			
-			#serial_port = SilentSerialPort(port, baud)
-			
-			serialBuilder = ATTHitsFromFilePortBuilder()			
-			serial_port = ATTHitsFromFilePort(port, baud)
-		else:
-			port = "/dev/ttyACM0"
-			baud = 115200
-			serialBuilder = ATTArduinoSerialPortBuilder()
-			serial_port = ATTArduinoSerialPort(port, baud)
+		if serial_builder <> None:
+			serial_port = serial_builder.build_serial_port(port, baud)
 		
-		self.myThread = ThreadedSerialReader(1, "Thread-1", self.workQueue, None, serialBuilder, port, baud, serial_port, False)
-		self.myThread.start()
+		if self.config.props["att.hit.reader_thread"] == "DEFAULT_SERIAL_READER":
+			self.myThread = ThreadedSerialReader(1, "Thread-1", self.workQueue, None, serial_builder, port, baud, serial_port, True)
+
+		if self.myThread <> None:
+			self.myThread.start()
 		
 	def main(self):
 
+		self.predictor = TableHitPredictor()
+		
 		self.buildHitDataSource()
-		self.buildScenario()
+		self.buildScene()
 		
 		self.dispatcher = ATTDispatcher(self)
 		self.dispatcher.init()
@@ -117,7 +131,7 @@ class TheApp:
 		
 				done = self.dispatcher.process(self, event)
 				
-				clock.tick(30)
+				clock.tick(60)
 				
 		except Exception:
 			print Exception
@@ -201,8 +215,8 @@ class TableHitPredictor (object):
 	def __init__(self):
 		
 		predBuilder = predictorBuilder.PredictorBuilder()
-		self.leftPredictor = predBuilder.buildInstance("../../data/train_points_20160322_left.txt")
-		self.rightPredictor = predBuilder.buildInstance("../../data/train_points_20160322_right.txt")
+		self.leftPredictor = predBuilder.buildInstance("../../data/train_points_20160303_left.txt")
+		self.rightPredictor = predBuilder.buildInstance("../../data/train_points_20160303_right.txt")
 		
 	def predictHit(self, hit):
 		side = hit["side"]

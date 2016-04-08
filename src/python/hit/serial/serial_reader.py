@@ -24,6 +24,9 @@ class ThreadedSerialReader (threading.Thread):
 		self.build_serial()
 		self.processor = ATTMatrixHitProcessor()
 		self.isFast = isFast
+		
+		self.publisher = None
+		#self.publisher = PikaPublisher("my_queue")
 
 	def build_serial(self):
 		if self.custom_serial != None:
@@ -39,16 +42,19 @@ class ThreadedSerialReader (threading.Thread):
 		iterations = 0
 		while not self.connected and not self.is_stopped:
 			
-			time.sleep(0.1)
+			#time.sleep(0.1)
 			
 			if (self.serial_port != None and self.serial_port.isOpen()):
 				while iterations < self.max_readings or self.max_readings == None:
+					
+					#time.sleep(0.01)
+					
 					if self.read_and_enqueue() == True:
 						iterations = iterations + 1
 					else:
 						break
 			else:
-				#time.sleep(0.1)
+				time.sleep(0.1)
 				try:
 					self.serial_port = self.build_serial()
 				except Exception:
@@ -64,12 +70,20 @@ class ThreadedSerialReader (threading.Thread):
 			else:
 				reading = self.serial_port.readline(1)
 			if reading <> "":
+				
+				if self.publisher <> None:
+					the_reading = reading + "/" + str(time.time())
+					self.publisher.publish(the_reading)
+
 				hit = self.processor.parse_hit(reading)
 				self.queue.put(hit)
+				
+				
+				
 				self.connected = True
 				self.write_log("Reading from serial: " + reading)
 			else:
-				#time.sleep(0.1)
+				time.sleep(0.1)
 				pass
 		except:
 			self.write_log("Miss!")
@@ -95,4 +109,28 @@ class ThreadedSerialReader (threading.Thread):
 		
 	def unpause(self):
 		self.is_stopped = False
+
+
+import pika
+
+class PikaPublisher(object):
+	def __init__(self, queue_name):
+		self.queue_name = queue_name
+		self.connection = pika.BlockingConnection(pika.ConnectionParameters('127.0.0.1'))
+
+	def publish(self, message):  	
+		channel = self.connection.channel()
+		
+		channel.queue_declare(queue=self.queue_name, durable=True)
+		channel.basic_publish(exchange='',
+			routing_key=self.queue_name,
+			body=message,
+			properties=pika.BasicProperties(
+				delivery_mode = 2, # make message persistent
+			))
+		
+		channel.close()
+		
+	def close(self):
+		self.connection.close()
 

@@ -219,7 +219,7 @@ class RallyProtocol:
 		self.currentHit = None
 		
 		self.controller.clearView()
-		self.view.drawLines(self.controller.hitsList)		
+		self.view.drawConnectedPointsLines(self.controller.hitsList)		
 		self.controller.currentHit = None
 
 class CalibrationProtocol:

@@ -50,6 +50,7 @@ class LogonController (ATTController):
 		else:
 			pass
 	
+	"""
 	def display_box(self, message):
 		screen = self.view.surface
 		"Print a message in a box in the middle of the screen"
@@ -66,13 +67,14 @@ class LogonController (ATTController):
 			screen.blit(fontobject.render(message, 1, (255,255,255)),
 					((screen.get_width() / 2) - 100, (screen.get_height() / 2) - 10))
 		pygame.display.flip()
+	"""
 	
 	def ask(self, question):
 		screen = self.view.surface
 		"ask(screen, question) -> answer"
 		pygame.font.init()
 		current_string = []
-		self.display_box(question + ": " + string.join(current_string,""))
+		self.view.display_box(question + ": " + string.join(current_string,""))
 		while 1:
 			inkey = self.get_key()
 			if inkey == K_BACKSPACE:
@@ -83,7 +85,7 @@ class LogonController (ATTController):
 				current_string.append("_")
 			elif inkey <= 127:
 				current_string.append(chr(inkey))
-				self.display_box(question + ": " + string.join(current_string,""))
+				self.view.display_box(question + ": " + string.join(current_string,""))
 		return string.join(current_string,"")
 
 	def process(self, app, event):
@@ -237,7 +239,7 @@ class ShortServiceController (ATTController):
 		self.summary = []
 	
 	def render(self):
-		self.view.buildScenario()
+		self.view.buildScene()
 		self.renderSerialLog()
 		self.renderSummary()
 		pygame.display.flip()
@@ -376,7 +378,7 @@ class SandboxController (ATTController):
 		pass
 		
 	def render(self):		
-		self.view.buildScenario()
+		self.view.buildScene()
 		
 		#self.renderSerialLog()
 		pygame.display.flip()
@@ -395,7 +397,7 @@ class SandboxController (ATTController):
 		
 		if app.isPressed(pygame.K_c):
 			self.clearView()
-			self.view.buildScenario()
+			self.view.buildScene()
 
 		if event.type == pygame.MOUSEMOTION:
 			#print event.pos
@@ -453,7 +455,7 @@ class RallyController (ATTController):
 			self.view.drawHit(x, y, hitSide)
 		
 		#self.view.drawMessage()
-		self.view.buildScenario()
+		self.view.buildScene()
 		#self.renderSerialLog()
 		pygame.display.flip()
 	
@@ -518,7 +520,7 @@ class CalibrationController (ATTController):
 	
 	def render(self):
 
-		#self.view.buildScenario()
+		#self.view.buildScene()
 		self.view.displayTable()
 		self.view.displayReferencePoints()
 		self.renderSerialLog()
