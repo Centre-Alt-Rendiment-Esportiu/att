@@ -1,0 +1,42 @@
+import numpy as np
+import cv2
+
+def setup_trackbars(range_filter):
+    cv2.namedWindow("Trackbars", 0)
+    for i in ["MIN", "MAX"]:
+        for j in range_filter:
+            v = 0 if i == "MIN" else 255
+            cv2.createTrackbar("%s_%s" % (j, i), "Trackbars", v, 255, lambda x : None)
+
+
+
+def get_trackbar_values(range_filter):
+    values = {}
+
+    for i in ["MIN", "MAX"]:
+        for j in range_filter:
+            v = cv2.getTrackbarPos("%s_%s" % (j, i), "Trackbars")
+            values["%s_%s" % (j, i)] = v
+    return values
+
+VIDEODEV = "./test.avi"
+#VIDEODEV = 0
+
+
+camera = cv2.VideoCapture(VIDEODEV); assert camera.isOpened()
+setup_trackbars('HSV')
+while True:
+        (grabbed, frame) = camera.read()
+        frame_to_thresh = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        v = get_trackbar_values('HSV')
+        thresh = cv2.inRange(frame_to_thresh, (v['H_MIN'], v['S_MIN'], v['V_MIN']), (v['H_MAX'], v['S_MAX'], v['V_MAX']))
+        cv2.imshow("Original", frame)
+        cv2.imshow("Thresh", thresh)
+        if cv2.waitKey(1) & 0xFF is ord('q'):
+            break
+
+print "Lower = (%d,%d,%d)" % (v['H_MIN'], v['S_MIN'], v['V_MIN'])
+print "Upper = (%d,%d,%d)" % (v['H_MAX'], v['S_MAX'], v['V_MAX'])
+# cleanup the camera and close any open windows
+camera.release()
+cv2.destroyAllWindows()
