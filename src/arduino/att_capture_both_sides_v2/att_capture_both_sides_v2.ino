@@ -42,6 +42,11 @@ int rightPins[] = { A8, A9, A10, A11, A12, A13, A14, A15}; // clockwise from top
 int leftThresholds[] = {4, 4, 4, 4, 4, 4, 4, 4};
 int rightThresholds[] = {4, 4, 4, 4, 4, 4, 4, 4};
 
+// 2016-04-08
+int leftThresholds[] = {4, 4, 4, 4, 4, 4, 4, 4};
+int rightThresholds[] = {4, 4, 4, 4, 4, 4, 6, 4};
+
+
 const unsigned long NO_RECORD = -1;
 const unsigned long TIMEOUT_BETWEEN_HITS = 100000; // in micros
 const char LEFT = 'l';
