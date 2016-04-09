@@ -38,32 +38,42 @@ def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     # return the resized image
     return resized
 
-VIDEODEV = 0
+#VIDEODEV = 0
+VIDEODEV = "./partida.avi"
 
 
 camera = cv2.VideoCapture(VIDEODEV); assert camera.isOpened()
 
+colorLower = (251,251,251)
+colorUpper = (255,255,255)
 
-colorLower = (166,15,81)
-colorUpper =  (189,219,119)
-tailsize = 64
+tailsize = 10
 pts = deque(maxlen=tailsize)
-
+color = [(0, 0, 255),(0, 255, 255)]
+colorIndx = 0
 
 while True:
     # grab the current frame
     (grabbed, frame) = camera.read()
+    if  not grabbed :
+            camera.set(cv2.CAP_PROP_FRAME_COUNT, 0)
+            camera.release()
+            camera = cv2.VideoCapture(VIDEODEV)
+            pts.clear()
+
+            time.sleep(0.02)
+            continue
      # show the frame to our screen
     #frame = resize(frame, width=600)
-    blurred = cv2.GaussianBlur(frame, (11, 11), 0)
-    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+    #blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+    #hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
      # show the frame to our screen
-    mask = cv2.inRange(hsv, colorLower, colorUpper)
-    mask = cv2.erode(mask, None, iterations=2)
-    mask = cv2.dilate(mask, None, iterations=2)
+    frame = frame[130:385, 82:560]
+    mask = cv2.inRange(frame, colorLower, colorUpper)
+   # mask = cv2.erode(mask, None, iterations=2)
+   # mask = cv2.dilate(mask, None, iterations=2)
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)[-2]
     center = None
-
     # only proceed if at least one contour was found
     if len(cnts) > 0:
         # find the largest contour in the mask, then use
@@ -72,20 +82,27 @@ while True:
         cmax = max(cnts, key=cv2.contourArea)
         ((x, y), radius) = cv2.minEnclosingCircle(cmax)
         M = cv2.moments(cmax)
-        center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+        if center is not None :
+             cv2.circle(center, (int(x), int(y)), 5,(0, 255, 0), -1)
+        if M["m00"] > 0 :
+            center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
         # only proceed if the radius meets a minimum size
-        if radius > 10:
+        #if radius > 0:
             # draw the minimum enclosing circle, yellow colour in BGR format(), thickness = 2
-            cv2.circle(frame, (int(x), int(y)), int(radius),(0, 255, 255), 2)
+            cv2.circle(frame,center, 5,(0, 255, 0), -1)
             # draw the centroid,radius 5, red colour in BGR format(), thikness < 0 meaning that the circle is filled.
-            cv2.circle(frame, center, 5, (0, 0, 255), -1)
-            cv2.putText(frame, "Centroid  x: {}, y: {}".format(center[0], center[1]),(10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                        0.35, (0, 0, 255), 1)
-            cv2.putText(frame, "minEnclosing: x: {}, y: {}".format(int(x), int(y)),(10, frame.shape[0] - 30), cv2.FONT_HERSHEY_SIMPLEX,
-                        0.35, (0, 0, 255), 1)
 
+            #cv2.putText(frame, "Centroid  x: {}, y: {}".format(center[0], center[1]),(10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
+             #           0.35, (0, 0, 255), 1)
+            #cv2.putText(frame, "minEnclosing: x: {}, y: {}".format(int(x), int(y)),(10, frame.shape[0] - 30), cv2.FONT_HERSHEY_SIMPLEX,
+            #            0.35, (0, 0, 255), 1)
+            ## IF Change of sense
+            print center
+            if (len(pts)> 1) and ((pts[0][0] - center[0])< 0) :
+                pts.clear()
+                colorIndx = (colorIndx+1) % 2
+            pts.appendleft(center)
 
-    pts.appendleft(center)
 
     # loop over the set of tracked points
     for i in xrange(1, len(pts)):
@@ -96,8 +113,9 @@ while True:
 
         # otherwise, compute the thickness of the line and
         # draw the connecting lines
-        thickness = int(np.sqrt(tailsize / float(i + 1)) * 2.5)
-        cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+      #  cv2.circle(frame, pts[i], 5, (0, 0, 255), -1)
+        thickness = 3
+        cv2.line(frame,pts[i - 1], pts[i],color[colorIndx] , thickness)
 
     # show the frame to our screen
     cv2.imshow("Frame", frame)

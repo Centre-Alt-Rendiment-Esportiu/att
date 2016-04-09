@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import time
 
 def setup_trackbars(range_filter):
     cv2.namedWindow("Trackbars", 0)
@@ -19,7 +20,7 @@ def get_trackbar_values(range_filter):
             values["%s_%s" % (j, i)] = v
     return values
 
-VIDEODEV = "./test.avi"
+VIDEODEV = "./partida.avi"
 #VIDEODEV = 0
 
 
@@ -27,6 +28,12 @@ camera = cv2.VideoCapture(VIDEODEV); assert camera.isOpened()
 setup_trackbars('HSV')
 while True:
         (grabbed, frame) = camera.read()
+        if  not grabbed :
+            camera.set(cv2.CAP_PROP_FRAME_COUNT, 0)
+            camera.release()
+            camera = cv2.VideoCapture(VIDEODEV)
+            time.sleep(0.02)
+            continue
         frame_to_thresh = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         v = get_trackbar_values('HSV')
         thresh = cv2.inRange(frame_to_thresh, (v['H_MIN'], v['S_MIN'], v['V_MIN']), (v['H_MAX'], v['S_MAX'], v['V_MAX']))
