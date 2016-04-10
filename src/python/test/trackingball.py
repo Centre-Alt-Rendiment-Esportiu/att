@@ -41,7 +41,7 @@ VIDEODEV = "./partida.avi"
 
 camera = cv2.VideoCapture(VIDEODEV); assert camera.isOpened()
 
-colorLower = (251,251,251)
+colorLower = (252,252,252)
 colorUpper = (255,255,255)
 height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 width  = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -52,14 +52,9 @@ pts = deque(maxlen=tailsize)
 color = [(0, 0, 255),(0, 255, 255)]
 colorIndx = 0
 tableContours = np.array([[[ 88, 132]],
-
        [[549, 134]],
-
        [[582, 380]],
-
        [[ 57, 379]]], dtype=np.int32)
-
-
 
 maskTable = np.zeros((height,width),np.uint8)
 # 0 is table, 1 is background
@@ -76,16 +71,14 @@ while True:
             camera.release()
             camera = cv2.VideoCapture(VIDEODEV)
             pts.clear()
-
             time.sleep(0.02)
             continue
-
+    #add maskTable to frame
     frameTable = frame*maskTable
-    cv2.imshow("frameTable", frameTable)
+    #find white color mask
     mask = cv2.inRange(frameTable, colorLower, colorUpper)
     mask= cv2.dilate(mask, None, iterations=2)
-
-    cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)[-2]
+    cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)[-2]
     center = None
     # only proceed if at least one contour was found
     reset  = True
@@ -107,6 +100,7 @@ while True:
             pts.appendleft(center)
 
     # loop over the set of tracked points
+    cv2.circle(frame,pts[0], 5,(0, 255, 0), -1)
     for i in xrange(1, len(pts)):
         # if either of the tracked points are None, ignore
         # them
@@ -114,12 +108,13 @@ while True:
             continue
         thickness = 3
         cv2.line(frame,pts[i - 1], pts[i],color[colorIndx] , thickness)
+        cv2.circle(frame,pts[i], 5,(0, 255, 0), -1)
 
     # show the frame to our screen
     cv2.imshow("Frame", frame)
-    cv2.imshow("Mask", mask)
-    #cv2.imshow("AllFrame", frameWhole)
-    time.sleep(0.5)
+    #cv2.imshow("Mask", mask)
+    #cv2.imshow("frameTable", frameTable)
+    time.sleep(0.25)
     if cv2.waitKey(1) & 0xFF is ord('q'):
         break
 
