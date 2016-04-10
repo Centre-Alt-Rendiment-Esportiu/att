@@ -17,14 +17,12 @@ def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     # original image
     if width is None and height is None:
         return image
-
     # check to see if the width is None
     if width is None:
         # calculate the ratio of the height and construct the
         # dimensions
         r = height / float(h)
         dim = (int(w * r), height)
-
     # otherwise, the height is None
     else:
         # calculate the ratio of the width and construct the
@@ -34,29 +32,46 @@ def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
 
     # resize the image
     resized = cv2.resize(image, dim, interpolation=inter)
-
     # return the resized image
     return resized
 
 #VIDEODEV = 0
+#VIDEODEV =  url
 VIDEODEV = "./partida.avi"
-
 
 camera = cv2.VideoCapture(VIDEODEV); assert camera.isOpened()
 
 colorLower = (251,251,251)
 colorUpper = (255,255,255)
+height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
+width  = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
+
 
 tailsize = 16
 pts = deque(maxlen=tailsize)
 color = [(0, 0, 255),(0, 255, 255)]
 colorIndx = 0
+tableContours = np.array([[[ 88, 132]],
+
+       [[549, 134]],
+
+       [[582, 380]],
+
+       [[ 57, 379]]], dtype=np.int32)
+
+
+
+maskTable = np.zeros((height,width),np.uint8)
+# 0 is table, 1 is background
+cv2.fillConvexPoly(maskTable, tableContours, 1)
+maskTable = np.dstack(3*(maskTable,))
+
 
 while True:
     # grab the current frame
-    (grabbed, frameWhole) = camera.read()
+    (grabbed, frame) = camera.read()
 
-    if  not grabbed :
+    if not grabbed :
             camera.set(cv2.CAP_PROP_FRAME_COUNT, 0)
             camera.release()
             camera = cv2.VideoCapture(VIDEODEV)
@@ -64,11 +79,13 @@ while True:
 
             time.sleep(0.02)
             continue
-     # show the frame to our screen
-    frame = frameWhole[133:380, 85:555]
-    mask = cv2.inRange(frame, colorLower, colorUpper)
-    mask = cv2.dilate(mask, None, iterations=2)
-    cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)[-2]
+
+    frameTable = frame*maskTable
+    cv2.imshow("frameTable", frameTable)
+    mask = cv2.inRange(frameTable, colorLower, colorUpper)
+    mask= cv2.dilate(mask, None, iterations=2)
+
+    cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)[-2]
     center = None
     # only proceed if at least one contour was found
     reset  = True
@@ -101,12 +118,10 @@ while True:
     # show the frame to our screen
     cv2.imshow("Frame", frame)
     cv2.imshow("Mask", mask)
-    cv2.imshow("AllFrame", frameWhole)
+    #cv2.imshow("AllFrame", frameWhole)
     time.sleep(0.5)
     if cv2.waitKey(1) & 0xFF is ord('q'):
         break
-
-
 
 # cleanup the camera and close any open windows
 camera.release()
