@@ -38,6 +38,7 @@ def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
 #VIDEODEV = 0
 #VIDEODEV =  url
 VIDEODEV = "./partida.avi"
+LOOP = False
 
 camera = cv2.VideoCapture(VIDEODEV); assert camera.isOpened()
 
@@ -61,18 +62,24 @@ maskTable = np.zeros((height,width),np.uint8)
 cv2.fillConvexPoly(maskTable, tableContours, 1)
 maskTable = np.dstack(3*(maskTable,))
 
+fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
+writer = cv2.VideoWriter("output.avi", fourcc, 20,(int(width),int(height)), True)
+
 
 while True:
     # grab the current frame
     (grabbed, frame) = camera.read()
 
     if not grabbed :
+        if LOOP:
             camera.set(cv2.CAP_PROP_FRAME_COUNT, 0)
             camera.release()
             camera = cv2.VideoCapture(VIDEODEV)
             pts.clear()
             time.sleep(0.02)
             continue
+        else :
+            break
     #add maskTable to frame
     frameTable = frame*maskTable
     #find white color mask
@@ -112,9 +119,10 @@ while True:
 
     # show the frame to our screen
     cv2.imshow("Frame", frame)
+    writer.write(frame)
     #cv2.imshow("Mask", mask)
     #cv2.imshow("frameTable", frameTable)
-    time.sleep(0.25)
+    #time.sleep(0.25)
     if cv2.waitKey(1) & 0xFF is ord('q'):
         break
 
