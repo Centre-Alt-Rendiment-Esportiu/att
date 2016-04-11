@@ -1,7 +1,7 @@
 import cv2
 import time
 
-VIDEODEV = "./partida.avi"
+VIDEODEV = "./test2.avi"
 #VIDEODEV = 0
 
 
@@ -19,7 +19,7 @@ while True:
             continue
 
         mask = cv2.inRange(frame, colorLower, colorUpper)
-        mask = cv2.dilate(mask, None, iterations=4)
+        mask = cv2.dilate(mask, None, iterations=5)
 
         cnts = cv2.findContours(mask.copy(), cv2.RETR_CCOMP,cv2.CHAIN_APPROX_SIMPLE)[-2]
         if len(cnts) > 0:
@@ -32,7 +32,6 @@ while True:
             #cv2.polylines(frame,[approx],True,(0,0,0),10)
         cv2.imshow("Frame", frame)
         cv2.imshow("Mask", mask)
-        time.sleep(0.5)
         if cv2.waitKey(1) & 0xFF is ord('q'):
             break
 

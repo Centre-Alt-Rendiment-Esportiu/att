@@ -37,13 +37,14 @@ def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
 
 #VIDEODEV = 0
 #VIDEODEV =  url
-VIDEODEV = "./partida.avi"
+VIDEODEV = "./test2.avi"
 LOOP = False
 
 camera = cv2.VideoCapture(VIDEODEV); assert camera.isOpened()
 
-colorLower = (252,252,252)
+colorLower = (154,0,255)
 colorUpper = (255,255,255)
+
 height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 width  = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
 
@@ -52,10 +53,16 @@ tailsize = 16
 pts = deque(maxlen=tailsize)
 color = [(0, 0, 255),(0, 255, 255)]
 colorIndx = 0
-tableContours = np.array([[[ 88, 132]],
-       [[549, 134]],
-       [[582, 380]],
-       [[ 57, 379]]], dtype=np.int32)
+#tableContours = np.array([[[ 88, 132]],
+#       [[549, 134]],
+#       [[582, 380]],
+#       [[ 57, 379]]], dtype=np.int32)
+
+tableContours = np.array([[[ 85, 129]],
+       [[545, 127]],
+       [[579, 371]],
+       [[ 57, 375]]], dtype=np.int32)
+
 
 maskTable = np.zeros((height,width),np.uint8)
 # 0 is table, 1 is background
@@ -63,7 +70,7 @@ cv2.fillConvexPoly(maskTable, tableContours, 1)
 maskTable = np.dstack(3*(maskTable,))
 
 fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
-writer = cv2.VideoWriter("output.avi", fourcc, 20,(int(width),int(height)), True)
+writer = cv2.VideoWriter("output2.avi", fourcc, 20,(int(width),int(height)), True)
 
 
 while True:
@@ -83,8 +90,11 @@ while True:
     #add maskTable to frame
     frameTable = frame*maskTable
     #find white color mask
-    mask = cv2.inRange(frameTable, colorLower, colorUpper)
+    hsv = cv2.cvtColor(frameTable, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, colorLower, colorUpper)
+
     mask= cv2.dilate(mask, None, iterations=2)
+    mask= cv2.erode(mask, None, iterations=1)
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)[-2]
     center = None
     # only proceed if at least one contour was found
@@ -120,8 +130,8 @@ while True:
     # show the frame to our screen
     cv2.imshow("Frame", frame)
     writer.write(frame)
-    #cv2.imshow("Mask", mask)
-    #cv2.imshow("frameTable", frameTable)
+    cv2.imshow("Mask", mask)
+    cv2.imshow("frameTable", frameTable)
     #time.sleep(0.25)
     if cv2.waitKey(1) & 0xFF is ord('q'):
         break

@@ -20,7 +20,7 @@ def get_trackbar_values(range_filter):
             values["%s_%s" % (j, i)] = v
     return values
 
-VIDEODEV = "./partida.avi"
+VIDEODEV = "./test2.avi"
 #VIDEODEV = 0
 
 
