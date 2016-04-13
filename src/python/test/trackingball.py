@@ -7,42 +7,12 @@ import time
 import argparse
 
 
-
-#Convenience resize function
-def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
-    # initialize the dimensions of the image to be resized and
-    # grab the image size
-    dim = None
-    (h, w) = image.shape[:2]
-
-    # if both the width and height are None, then return the
-    # original image
-    if width is None and height is None:
-        return image
-    # check to see if the width is None
-    if width is None:
-        # calculate the ratio of the height and construct the
-        # dimensions
-        r = height / float(h)
-        dim = (int(w * r), height)
-    # otherwise, the height is None
-    else:
-        # calculate the ratio of the width and construct the
-        # dimensions
-        r = width / float(w)
-        dim = (width, int(h * r))
-
-    # resize the image
-    resized = cv2.resize(image, dim, interpolation=inter)
-    # return the resized image
-    return resized
-
-
-
 def tableDetector(frame):
 
     mask = cv2.inRange(frame, (131,0,255), (255,255,255))
-    mask = cv2.dilate(mask, None, iterations=5)
+    mask = cv2.dilate(mask, np.ones((5,5),np.uint8), iterations=5)
+    mask = cv2.erode(mask, None, iterations=5)
+    #mask = cv2.dilate(mask, None, iterations=5)
     cnts = cv2.findContours(mask.copy(), cv2.RETR_CCOMP,cv2.CHAIN_APPROX_SIMPLE)[-2]
     if len(cnts) > 0:
             sort = sorted(cnts, key=cv2.contourArea,reverse=True)
@@ -54,13 +24,19 @@ def tableDetector(frame):
 ap = argparse.ArgumentParser()
 
 ap.add_argument("-v", "--video",
-	help="if present, path to the input video file")
+    help="if present, path to the input video file")
 
 ap.add_argument("-o", "--output",
-	help="if present, path to the output video file")
+    help="if present, path to the output video file")
 
 ap.add_argument("-t", "--table",
-	help="if present, table points")
+    help="if present, table contour points")
+
+ap.add_argument("-f", "--frames",
+    help="if present, output video frames per second ", default=20)
+
+ap.add_argument("-s", "--size",
+    help="if present, ball tail size ", default=16)
 
 ap.add_argument('-l','--loop', dest='LOOP', action='store_true')
 ap.add_argument('--no-loop', dest='LOOP', action='store_false')
@@ -83,9 +59,9 @@ camera = cv2.VideoCapture(VIDEODEV); assert camera.isOpened()
 
 colorLower = (154,0,255)
 colorUpper = (255,255,255)
-width = camera.get(3)
-height = camera.get(4)
-tailsize = 16
+width = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
+height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
+tailsize = args["size"]
 pts = deque(maxlen=tailsize)
 color = [(0, 0, 255),(0, 255, 255)]
 colorIndx = 0
@@ -104,7 +80,7 @@ else:
 
 if OUTPUT:
         fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
-        writer = cv2.VideoWriter(OUTPUT, fourcc, 20, (int(width),int(height)),True)
+        writer = cv2.VideoWriter(OUTPUT, fourcc,  args["frames"], (int(width),int(height)),True)
 
 while True:
     # grab the current frame
