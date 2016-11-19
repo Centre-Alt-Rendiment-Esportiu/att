@@ -3,8 +3,8 @@
 import sys
 import pygame
 import traceback
-import serialLogNotifier
-import Queue
+from . import serialLogNotifier
+import queue
 
 from hit.serial.serial_port import *
 from hit.serial.serial_port_builder import *
@@ -15,10 +15,10 @@ from hit.process.processor import ATTPlainHitProcessor
 from hit.train.regressor import ATTClassicHitRegressor
 from hit.train.regressor import ATTSkLearnHitRegressor
 
-import predictorBuilder
-from view import *
-from controller import *
-import resource_manager
+from . import predictorBuilder
+from .view import *
+from .controller import *
+from . import resource_manager
 
 import ast
 
@@ -39,7 +39,7 @@ class TheApp:
 	dispatcher = None
 	
 	def __init__(self):
-		self.workQueue = Queue.Queue(10)
+		self.workQueue = queue.Queue(10)
 		self.config = resource_manager.ConfigurationReader()
 		self.config.loadFromFile("../../resources/att.conf")
 
@@ -93,13 +93,13 @@ class TheApp:
 		elif self.config.props["att.hit.datasource"] == "SERIAL":
 			serial_builder = ATTArduinoSerialPortBuilder()
 
-		if serial_builder <> None:
+		if serial_builder != None:
 			serial_port = serial_builder.build_serial_port(port, baud)
 		
 		if self.config.props["att.hit.reader_thread"] == "DEFAULT_SERIAL_READER":
 			self.myThread = ThreadedSerialReader(1, "Thread-1", self.workQueue, None, serial_builder, port, baud, serial_port, True)
 
-		if self.myThread <> None:
+		if self.myThread != None:
 			self.myThread.start()
 		
 	def main(self):
@@ -134,20 +134,20 @@ class TheApp:
 				clock.tick(60)
 				
 		except Exception:
-			print Exception
+			print(Exception)
 			traceback.print_exc(file=sys.stdout)
 					
 		finally:
-			print "Thread STOP"
+			print("Thread STOP")
 			self.myThread.stop()
-			print "Thread STOPPED"
+			print("Thread STOPPED")
 			pygame.quit()
-			print "Pygame quit"
+			print("Pygame quit")
 			try:
 				sys.exit()
-				print "SYS exit"
+				print("SYS exit")
 			except Exception:
-				print Exception
+				print(Exception)
 				traceback.print_exc(file=sys.stdout)
 			
 			

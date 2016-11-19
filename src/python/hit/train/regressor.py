@@ -9,9 +9,7 @@ import itertools
 from sklearn.linear_model import  LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 
-class HitRegressor:
-	__metaclass__ = abc.ABCMeta
-
+class HitRegressor(metaclass=abc.ABCMeta):
 	@abc.abstractmethod
 	def collect_train_hits_from_file(self, str_filename):
 		pass
@@ -77,8 +75,8 @@ class ATTSkLearnHitRegressor (HitRegressor):
 	def predictHit(self, hit):
 		timings = np.array(hit['sensor_timings']).astype(int)
 		predicted_value = self.regressor.predict(timings)
-		print predicted_value
-		print "----------"
+		print(predicted_value)
+		print("----------")
 		return (predicted_value[0,0], predicted_value[0,1])
 
 
@@ -129,7 +127,7 @@ class ATTClassicHitRegressor (HitRegressor):
 					column.append(q)
 				
 				# Product combination elements - AQUI POT ESTAR MALAMENT ...????
-				arr = range(len(current_arr_line))
+				arr = list(range(len(current_arr_line)))
 				indices_list = [ a for a in itertools.combinations(arr, 2) ]
 				for indices in indices_list:
 					the_value = current_arr_line[indices[0]]*current_arr_line[indices[1]]

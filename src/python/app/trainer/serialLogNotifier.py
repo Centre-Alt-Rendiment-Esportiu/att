@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import pygame
-from  controller import ATTController
-from view import SurfaceView
+from .controller import ATTController
+from .view import SurfaceView
 
 class SerialLogNotifier(ATTController):
 

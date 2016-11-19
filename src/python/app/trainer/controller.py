@@ -5,17 +5,14 @@ import abc
 import pygame, pygame.font, pygame.event, pygame.draw, string
 from pygame.locals import *
 
-from session_manager import SessionManager
-from protocol import ShortServiceProtocol
-from protocol import RallyProtocol
-from protocol import CalibrationProtocol
+from .session_manager import SessionManager
+from .protocol import ShortServiceProtocol
+from .protocol import RallyProtocol
+from .protocol import CalibrationProtocol
 
 import time
 
-class ATTController:
-	__metaclass__ = abc.ABCMeta
-	
-	#surface = None
+class ATTController(metaclass=abc.ABCMeta):
 	view = None
 	
 	@abc.abstractmethod
@@ -188,10 +185,10 @@ class MenuController (ATTController):
 			
 		if not self.workQueue.empty():
 			hit = self.workQueue.get()
-			if hit <> "":		
+			if hit != "":		
 				(y,x) = self.predictor.predictHit(hit)
 				logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+hit["raw"]
-				print logReading
+				print(logReading)
 				self.notifier.push(logReading)
 
 		if app.isPressed(pygame.K_DOWN):
@@ -259,7 +256,7 @@ class ShortServiceController (ATTController):
 
 		if not self.workQueue.empty():
 			hit = self.workQueue.get()
-			if hit <> "":
+			if hit != "":
 				self.processHit(hit)
 
 		self.render()
@@ -297,7 +294,7 @@ class ShortServiceController (ATTController):
 		hit['coords'] = (y,x)
 		
 		logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+hit["raw"]
-		print logReading
+		print(logReading)
 		self.notifier.push(logReading)
 		
 		self.protocol.processSate(hit)
@@ -343,10 +340,10 @@ class MultiBallController (ATTController):
 
 		if not self.workQueue.empty():
 			hit = self.workQueue.get()
-			if hit <> "":		
+			if hit != "":		
 				(y,x) = self.predictor.predictHit(hit)
 				logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+hit["raw"]
-				print logReading
+				print(logReading)
 				self.notifier.push(logReading)
 
 		self.render()
@@ -392,7 +389,7 @@ class SandboxController (ATTController):
 		
 		if not self.workQueue.empty():
 			hit = self.workQueue.get()
-			if hit <> "":
+			if hit != "":
 				self.processHit(hit)		
 		
 		if app.isPressed(pygame.K_c):
@@ -417,7 +414,7 @@ class SandboxController (ATTController):
 		self.view.drawHit(x, y, hit["side"]);
 		
 		logReading = "("+"{0:.0f}".format(y)+","+"{0:.0f}".format(x)+") - "+hit["raw"]
-		print logReading
+		print(logReading)
 		self.notifier.push(logReading)
 
 class RallyController (ATTController):
@@ -449,7 +446,7 @@ class RallyController (ATTController):
 	
 	def render(self):
 		
-		if self.currentHit <> None:
+		if self.currentHit != None:
 			(x,y) = self.currentHit['coords']
 			hitSide = self.currentHit["side"]
 			self.view.drawHit(x, y, hitSide)
@@ -474,7 +471,7 @@ class RallyController (ATTController):
 
 		if not self.workQueue.empty():
 			self.currentHit = self.workQueue.get()
-			if self.currentHit <> "":
+			if self.currentHit != "":
 				self.processHit()
 
 		self.render()
@@ -547,7 +544,7 @@ class CalibrationController (ATTController):
 			
 		if not self.workQueue.empty():
 			self.currentHit = self.workQueue.get()
-			if self.currentHit <> "":
+			if self.currentHit != "":
 				self.processHit()
 
 		self.render()

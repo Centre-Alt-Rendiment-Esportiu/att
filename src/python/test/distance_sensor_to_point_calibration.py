@@ -53,7 +53,7 @@ def dist_positions_sensor_coord(coord, sensor_coord):
 def dist_order_all_positions(positions, sensor_coord):
     for i in positions:
         dist = dist_positions_sensor_coord(i, sensor_coord)        
-        print "Els sensors més propers a la posició", i,"són: \n", dist
+        print("Els sensors més propers a la posició", i,"són: \n", dist)
 
 # print all order distance of positions to sensor_coord
 dist_order_all_positions(positions, sensor_coord)

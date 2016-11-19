@@ -132,7 +132,7 @@ class SurfaceView (object):
 		
 		font = pygame.font.Font(None, 66)
 		
-		if text <> "":
+		if text != "":
 			text = font.render(text, 1, (255,255,255))
 			
 			offset = 0		

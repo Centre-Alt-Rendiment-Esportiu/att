@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import Queue
+import queue
 import time
 
 from serial_port import *
@@ -17,7 +17,7 @@ baud = 115200
 builder = ATTEmulatedSerialPortBuilder()
 #builder = ATTArduinoSerialPortBuilder()
 
-workQueue = Queue.Queue(10000)
+workQueue = queue.Queue(10000)
 
 myThread = ThreadedSerialReader(1, "Thread-1", workQueue, 10, builder, port, baud)
 myThread.start()

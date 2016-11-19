@@ -79,7 +79,7 @@ def parse_hit(line):
     print(line)
     hit_re = re.match("hit: {(?P<sensor_one>\d+) (?P<sensor_two>\d+) (?P<sensor_three>\d+) (?P<sensor_four>\d+) (?P<sensor_five>\d+) (?P<sensor_six>\d+) (?P<sensor_seven>\d+) (?P<side>[lr])}", line)
     if hit_re is None:
-        print "none"
+        print("none")
         return None
     else:
         hit = {
@@ -91,14 +91,14 @@ def parse_hit(line):
                 "six": int(hit_re.group("sensor_six")),
                 "seven": int(hit_re.group("sensor_seven"))
         }
-        print hit
+        print(hit)
         
         return generate_diffs(hit)
         
 def generate_diffs(hit):
     """ Takes a hit location and returns diffs like ONE_TWO: upper left to upper right """
     first_sensor = None
-    for key in hit.keys():
+    for key in list(hit.keys()):
         if hit[key] == 0:
             first_sensor = key
             break
@@ -127,7 +127,7 @@ def generate_diffs(hit):
              "SIX_SEVEN" : (hit["six"] - hit["seven"]),
              "first_sensor": first_sensor
              }
-    print diffs ##afegit
+    print(diffs) ##afegit
     return diffs  
 
 def get_hits_from_file(is_right_side):
@@ -139,9 +139,9 @@ def get_hits_from_file(is_right_side):
     
     reader = open(filename, 'r')
     lines = reader.readlines()
-    print lines
-    lines = filter(lambda line: (line != "\n" and line[0] != "#"), lines)
-    print lines
+    print(lines)
+    lines = [line for line in lines if (line != "\n" and line[0] != "#")]
+    print(lines)
     return lines   
 
 def average_repetitions(repetitions):
@@ -197,7 +197,7 @@ def collect_points(arduino_serial, is_right_side):
             		side = "Right side, "
             	else:
             		side = "Left side, "
-                print(side + "drop the ping pong ball at (%d,%d): repetition %d" % (positions[point][0], positions[point][1], repetition+1))
+                print((side + "drop the ping pong ball at (%d,%d): repetition %d" % (positions[point][0], positions[point][1], repetition+1)))
                 
                 if DEBUG:
                     hit_string = lines.pop(0)
@@ -292,20 +292,20 @@ def error(xCoeff1, xCoeff2, xCoeff3, xCoeff4, xCoeff5, xCoeff6, xCoeff7, yCoeff1
         true_y = positions[point][1]
         predicted = array( (predicted_x, predicted_y) )
         true = array( ( true_x, true_y) )
-        print "Predicted: " + str(predicted)
-        print "True: " + str(true)
+        print("Predicted: " + str(predicted))
+        print("True: " + str(true))
         distance = linalg.norm(predicted - true)
-        print "Distance: " + str(distance)
+        print("Distance: " + str(distance))
         distances.append(distance)
         
         x_distances.append( fabs(true_x - predicted_x) )
         y_distances.append( fabs(true_y - predicted_y) )
 
-    print sort(distances)
+    print(sort(distances))
             
-    print "Median distance: " + str(median(distances))
-    print "Median X distance: " + str(median(x_distances))
-    print "Median Y distance: " + str(median(y_distances))
+    print("Median distance: " + str(median(distances)))
+    print("Median X distance: " + str(median(x_distances)))
+    print("Median Y distance: " + str(median(y_distances)))
     
 def predict(average, xCoeff1, xCoeff2, xCoeff3, xCoeff4, xCoeff5, xCoeff6, xCoeff7, yCoeff1, yCoeff2, yCoeff3, yCoeff4, yCoeff5, yCoeff6, yCoeff7):
         t12 = average['ONE_TWO']
@@ -349,9 +349,9 @@ def predict(average, xCoeff1, xCoeff2, xCoeff3, xCoeff4, xCoeff5, xCoeff6, xCoef
         x = zeros(7)
         y = zeros(7)
 
-        print(Poly1.shape)
-        print(xCoeff1.shape)
-        print xCoeff1
+        print((Poly1.shape))
+        print((xCoeff1.shape))
+        print(xCoeff1)
         x[0] = Poly1*xCoeff1   
         x[1] = Poly2*xCoeff2
         x[2] = Poly3*xCoeff3
@@ -385,7 +385,7 @@ training_values = []
 training_values = collect_points(arduino_serial, True)
 training_values[0]
 [M1, M2, M3, M4, M5, M6, M7] = populate_matrices(training_values)
-print M1
+print(M1)
 size(M2[0])
 
 M1inv = linalg.pinv2(M1)
@@ -404,7 +404,7 @@ xCoeff4 = M4inv * x
 xCoeff5 = M5inv * x
 xCoeff6 = M6inv * x
 xCoeff7 = M7inv * x
-print xCoeff1
+print(xCoeff1)
 
 yCoeff1 = M1inv * y
 yCoeff2 = M2inv * y
@@ -413,7 +413,7 @@ yCoeff4 = M4inv * y
 yCoeff5 = M5inv * y
 yCoeff6 = M6inv * y
 yCoeff7 = M7inv * y
-print yCoeff1    
+print(yCoeff1)    
 
 error(xCoeff1, xCoeff2, xCoeff3, xCoeff4, xCoeff5, xCoeff6, xCoeff7, yCoeff1, yCoeff2, yCoeff3, yCoeff4, yCoeff5, yCoeff6, yCoeff7, True, tots_hits, repeated_positions)
 

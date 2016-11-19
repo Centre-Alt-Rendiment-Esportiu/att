@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import abc
-import serial_port
+from . import serial_port
 
-class SerialPortBuilder:
-	__metaclass__ = abc.ABCMeta
-		
+class SerialPortBuilder(metaclass=abc.ABCMeta):
 	@abc.abstractmethod
 	def build_serial_port(self, port=None, baud=None):
 		pass

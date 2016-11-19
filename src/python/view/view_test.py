@@ -15,7 +15,7 @@ sys.path.insert(0, PROJECT_ROOT + "/src/python/")
 import pygame
 #from pygame.locals import *
 
-import Queue
+import queue
 
 from hit.serial.serial_port import *
 from hit.serial.serial_port_builder import *
@@ -45,7 +45,7 @@ def build_regressor_Classic():
 	regressor = ATTClassicHitRegressor(processor)
 
 	(hits_training_values, Y) = regressor.collect_train_hits_from_file(TRAIN_DATA_FILE)
-	print "Train Values: ", np.shape(hits_training_values), np.shape(Y)
+	print(("Train Values: ", np.shape(hits_training_values), np.shape(Y)))
 	
 	regressor.train(hits_training_values, Y)
 
@@ -56,7 +56,7 @@ def build_regressor_SKLearn():
 	regressor = ATTSkLearnHitRegressor(processor)
 	
 	(hits_training_values, Y) = regressor.collect_train_hits_from_file(TRAIN_DATA_FILE)
-	print "Train Values: ", np.shape(hits_training_values), np.shape(Y)
+	print(("Train Values: ", np.shape(hits_training_values), np.shape(Y)))
 	
 	regressor.train(hits_training_values, Y)
 	
@@ -144,7 +144,7 @@ if __name__ == '__main__':
 	connected = False
 	port = "/dev/ttyACM0"
 	baud = 115200
-	workQueue = Queue.Queue(10)
+	workQueue = queue.Queue(10)
 		
 	#builder = DummySerialPortBuilder()
 	#builder = ATTEmulatedSerialPortBuilder()
@@ -181,8 +181,8 @@ if __name__ == '__main__':
 		
 		if not workQueue.empty():
 			hit = workQueue.get()
-			if hit <> "":
-				print "> "+hit["raw"]				
+			if hit != "":
+				print(("> "+hit["raw"]))				
 				(y,x) = regressor.predictHit(hit)				
 				drawHit(x, y, window)
 						
@@ -209,7 +209,7 @@ if __name__ == '__main__':
 		clock.tick(60)
 		pygame.display.flip()	
 		
-	print "Exit..."
+	print("Exit...")
 	
 	myThread.stop()
 	pygame.quit()
