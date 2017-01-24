@@ -12,19 +12,19 @@ instance = MyPort()
 print instance.readline(1)
 """
 
+
 class Container:
-	
-	def __init__(self):
-		pass
-	
-	@staticmethod
-	def getClass(package, className):
-		return getattr(importlib.import_module(package), className)
-		
-	@staticmethod
-	def getInstance(package, className, *args):
-		myClass = Container.getClass(package, className)
-		return myClass(*args)
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def getClass(package, className):
+        return getattr(importlib.import_module(package), className)
+
+    @staticmethod
+    def getInstance(package, className, *args):
+        myClass = Container.getClass(package, className)
+        return myClass(*args)
 
 
 myPackage = "hit.serial.serial_port"
