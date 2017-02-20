@@ -47,7 +47,7 @@ class ShortServiceProtocol:
 			self.firstHit = self.lastHit
 			self.currentHit = hit
 			
-			if self.lastHit["side"] <> self.currentHit["side"]:
+			if self.lastHit["side"] != self.currentHit["side"]:
 				self.logHitDeltaInNotifier(hit)
 				
 				self.currentState = 3
@@ -202,7 +202,7 @@ class RallyProtocol:
 	def notify(self):
 		time_now = time.time()
 		
-		if self.currentHit <> None:
+		if self.currentHit != None:
 			time_delta = time_now - self.currentHit["tstamp"]
 			self.notifier.push(str(time_delta))
 			
@@ -211,7 +211,7 @@ class RallyProtocol:
 
 	def finalizeAndSummary(self):
 		
-		if self.timeoutThread <> None:
+		if self.timeoutThread != None:
 			self.timeoutThread.stop()
 			self.timeoutThread = None
 

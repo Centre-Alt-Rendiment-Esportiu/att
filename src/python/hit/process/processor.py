@@ -36,7 +36,7 @@ class ATTMatrixHitProcessor:
 		N_SENSORS = len(hit_values)
 		mat = np.zeros([N_SENSORS,N_SENSORS])
 		
-		arr = range(N_SENSORS)
+		arr = list(range(N_SENSORS))
 		for a in itertools.combinations(arr, 2):			
 			diff_value = float(hit_values[a[0]])-float(hit_values[a[1]])
 			mat[a[0], a[1]] = diff_value
@@ -73,7 +73,7 @@ class ATTPlainHitProcessor:
 		N_SENSORS = len(hit_values)
 		
 		vect = np.zeros([N_SENSORS*(N_SENSORS-1)/2])
-		arr = range(N_SENSORS)
+		arr = list(range(N_SENSORS))
 		for i,a in enumerate(itertools.combinations(arr, 2)):
 			diff_value = float(hit_values[a[0]])-float(hit_values[a[1]])
 			vect[i] = diff_value

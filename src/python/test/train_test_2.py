@@ -30,7 +30,7 @@ def build_regressor_1():
 
 	TRAIN_VALUES_FILE_LEFT = "../data/train_points_20160129_left.txt"	
 	(hits_training_values, Y) = regressor.collect_train_hits_from_file(TRAIN_VALUES_FILE_LEFT)
-	print "Train Values: ", np.shape(hits_training_values), np.shape(Y)
+	print(("Train Values: ", np.shape(hits_training_values), np.shape(Y)))
 	
 	regressor.train(hits_training_values, Y)
 
@@ -42,7 +42,7 @@ def build_regressor_2():
 	
 	TRAIN_VALUES_FILE_LEFT = "../data/train_points_20160129_left.txt"	
 	(hits_training_values, Y) = regressor.collect_train_hits_from_file(TRAIN_VALUES_FILE_LEFT)
-	print "Train Values: ", np.shape(hits_training_values), np.shape(Y)
+	print(("Train Values: ", np.shape(hits_training_values), np.shape(Y)))
 	
 	regressor.train(hits_training_values, Y)
 	
@@ -54,6 +54,6 @@ if __name__ == '__main__':
 	regressor2 = build_regressor_2()
 	
 	hit = "hit: {3190:5 2217:8 4668:4 1913:6 5985:5 0:16 975:6 2932:4 l}"
-	print '(6,6)'
-	print regressor1.predict(hit)
-	print regressor2.predict(hit)
+	print('(6,6)')
+	print((regressor1.predict(hit)))
+	print((regressor2.predict(hit)))

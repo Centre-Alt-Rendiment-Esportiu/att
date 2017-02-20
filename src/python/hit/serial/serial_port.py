@@ -6,9 +6,7 @@ import time
 import random
 import serial
 
-class SerialPort:
-	__metaclass__ = abc.ABCMeta
-	
+class SerialPort(metaclass=abc.ABCMeta):
 	@abc.abstractmethod
 	def start(self):
 		pass
@@ -257,8 +255,8 @@ class ATTHitsFromFilePort (SerialPort):
 			line = pieces[0]
 			if len(pieces)>1:
 				delta = float(pieces[1]) - self.lastTS
-				print delta
-				if self.lastTS <> float(0):
+				print(delta)
+				if self.lastTS != float(0):
 					time.sleep(delta)
 					pass				
 					

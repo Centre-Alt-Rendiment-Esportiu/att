@@ -52,8 +52,8 @@ while True:
         if cv2.waitKey(1) & 0xFF is ord('q'):
             break
 
-print "Lower = (%d,%d,%d)" % (v['H_MIN'], v['S_MIN'], v['V_MIN'])
-print "Upper = (%d,%d,%d)" % (v['H_MAX'], v['S_MAX'], v['V_MAX'])
+print("Lower = (%d,%d,%d)" % (v['H_MIN'], v['S_MIN'], v['V_MIN']))
+print("Upper = (%d,%d,%d)" % (v['H_MAX'], v['S_MAX'], v['V_MAX']))
 # cleanup the camera and close any open windows
 camera.release()
 cv2.destroyAllWindows()

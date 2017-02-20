@@ -47,7 +47,7 @@ while True:
         if cv2.waitKey(1) & 0xFF is ord('q'):
             break
 
-print approx.__repr__()
+print(approx.__repr__())
 np.save("table.npy", approx)
 camera.release()
 cv2.destroyAllWindows()

@@ -143,7 +143,7 @@ while True:
     # loop over the set of tracked points
     if len(pts)> 0:
         cv2.circle(frame,pts[0], 5,(0, 255, 0), -1)
-        for i in xrange(1, len(pts)):
+        for i in range(1, len(pts)):
         # if either of the tracked points are None, ignore
         # them
             if pts[i - 1] is None or pts[i] is None:

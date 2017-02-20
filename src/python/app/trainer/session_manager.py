@@ -41,7 +41,7 @@ class SessionManager (object):
 	def validateCredentials(self, username, plainPassword):
 		
 		
-		if username in self.users.keys():
+		if username in list(self.users.keys()):
 			encDBPass = self.users[username]["password"]
 			encPass = AESCryptoManager.getHash(plainPassword)
 			
@@ -51,9 +51,7 @@ class SessionManager (object):
 		return False
 	
 	
-class CryptoManager (object):
-	__metaclass__ = abc.ABCMeta
-
+class CryptoManager (object, metaclass=abc.ABCMeta):
 	@staticmethod
 	def _unpad(s):
 		return s[:-ord(s[len(s)-1:])]
@@ -103,4 +101,4 @@ if __name__ == '__main__':
 	"""
 	
 	sm = SessionManager()
-	print sm.validateCredentials("asanso", "asanso")
+	print(sm.validateCredentials("asanso", "asanso"))

@@ -69,9 +69,9 @@ class ThreadedSerialReader (threading.Thread):
 				reading = self.serial_port.readline()
 			else:
 				reading = self.serial_port.readline(1)
-			if reading <> "":
+			if reading != "":
 				
-				if self.publisher <> None:
+				if self.publisher != None:
 					the_reading = reading + "/" + str(time.time())
 					self.publisher.publish(the_reading)
 
@@ -95,7 +95,7 @@ class ThreadedSerialReader (threading.Thread):
 		return True
 
 	def write_log(self, str_message):
-		print str_message
+		print(str_message)
 		sys.stdout.flush()
 		
 	def stop(self):
