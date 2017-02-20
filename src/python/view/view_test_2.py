@@ -32,7 +32,7 @@ def main():
 
     # Then create a couple of balls
     balls = [Ball(350 + 100j, size=3),
-             Ball(20  + 200j, size=2),
+             Ball(20 + 200j, size=2),
              Ball(280 + 140j, size=4),
              Ball(400 + 440j, size=3)]
 
@@ -98,7 +98,7 @@ def drawBalls(differentialMethod, metaballSystem, step, screen):
             # edge tracker
             for ob in balls:
                 if (ob is not ball or loopIndex > 3) and \
-                   abs(ob.pos0 - ball.edgePos) < step:
+                                abs(ob.pos0 - ball.edgePos) < step:
                     ball.tracking = False
 
         tracking = 0
@@ -107,9 +107,11 @@ def drawBalls(differentialMethod, metaballSystem, step, screen):
                 tracking += 1
         if tracking == 0:
             break
-											
+
+
 class Ball:
     """Single metaball."""
+
     def __init__(self, pos, size):
         self.pos = pos
         self.size = size
@@ -132,11 +134,11 @@ class MetaballSystem:
         force = 0
         for ball in self.balls:
             ### Formula (1)
-            div = abs(ball.pos - pos)**self.goo
-            if div != 0: # to prevent division by zero
+            div = abs(ball.pos - pos) ** self.goo
+            if div != 0:  # to prevent division by zero
                 force += ball.size / div
             else:
-                force += 10000 #"big number"
+                force += 10000  # "big number"
         return force
 
     def calcNormal(self, pos):
@@ -144,7 +146,7 @@ class MetaballSystem:
         np = 0j
         for ball in self.balls:
             ### Formula (3)
-            div = abs(ball.pos - pos)**(2 + self.goo)
+            div = abs(ball.pos - pos) ** (2 + self.goo)
             np += -self.goo * ball.size * (ball.pos - pos) / div
         return np / abs(np)
 
@@ -161,8 +163,8 @@ class MetaballSystem:
         force = self.calcForce(pos)
         np = self.calcNormal(pos)
         ### Formula (5)
-        stepsize = (self.minSize / self.threshold)**(1 / self.goo) - \
-                   (self.minSize / force)**(1 / self.goo) + 0.01
+        stepsize = (self.minSize / self.threshold) ** (1 / self.goo) - \
+                   (self.minSize / force) ** (1 / self.goo) + 0.01
         return (pos + np * stepsize, force)
 
     def trackTheBorder(self, pos):
@@ -204,7 +206,7 @@ def rungeKutta4(pos, h, func):
     t2 = func(pos + t1 * h / 2)
     t3 = func(pos + t2 * h / 2)
     t4 = func(pos + t3 * h)
-    return pos + (h / 6) * (t1 + 2*t2 + 2*t3 + t4)
+    return pos + (h / 6) * (t1 + 2 * t2 + 2 * t3 + t4)
 
 
 if __name__ == '__main__': main()
