@@ -7,15 +7,14 @@ from serial_port import *
 from serial_port_builder import *
 from serial_reader import *
 
-
 connected = False
 port = "/dev/ttyACM0"
-#port ="COM3"
+# port ="COM3"
 baud = 115200
 
-#builder = DummySerialPortBuilder()
+# builder = DummySerialPortBuilder()
 builder = ATTEmulatedSerialPortBuilder()
-#builder = ATTArduinoSerialPortBuilder()
+# builder = ATTArduinoSerialPortBuilder()
 
 workQueue = queue.Queue(10000)
 
@@ -30,11 +29,8 @@ myThread.join()
 time.sleep(5)
 
 while True:
-	time.sleep(0.1)
-	myThread.write_log("Wait...")
-	if not workQueue.empty():
-		reading = workQueue.get()
-		myThread.write_log("Reading from queue: " + reading)
-
-
-
+    time.sleep(0.1)
+    myThread.write_log("Wait...")
+    if not workQueue.empty():
+        reading = workQueue.get()
+        myThread.write_log("Reading from queue: " + reading)
