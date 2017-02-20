@@ -15,10 +15,26 @@ def tableDetector(frame):
     cnts = cv2.findContours(mask.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)[-2]
     if len(cnts) > 0:
         sort = sorted(cnts, key=cv2.contourArea, reverse=True)
-        cmax = sort[1]
+        cmax = sort[1]  # NOTE Why is it 1 and not 0 - seems like it caused error and this is a fix for it
         epsilon = 0.1 * cv2.arcLength(cmax, True)
         approx = cv2.approxPolyDP(cmax, epsilon, True)
     return approx
+
+
+EPSILON = 0.008
+def hasBounced(lastCenters):
+    if len(lastCenters) < 3:
+        return False
+
+    # Calculate angle between consequent position vectors
+
+    v1 = np.array([lastCenters[1][0] - lastCenters[0][0], lastCenters[1][1] - lastCenters[0][1]])
+    v2 = np.array([lastCenters[1][0] - lastCenters[2][0], lastCenters[1][1] - lastCenters[2][1]])
+
+    cosAngle = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+
+    # Consider bounce if angle is bigger than a threshold
+    return 1 + cosAngle > EPSILON
 
 
 ap = argparse.ArgumentParser()
@@ -126,9 +142,12 @@ while True:
         # print cv2.contourArea(cmax)
         M = cv2.moments(cmax)
         if M["m00"] > 0:
+            # TODO Should round rather than floor - Ask first
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
             cv2.circle(frame, center, 5, (0, 255, 0), -1)
-            # calculate direction of ball, paint it ,if change clear
+            # calculate direction of ball, paint it if change clear
+            if hasBounced(pts):
+                print("Bounce!")
             if (len(pts) > 0) and ((pts[0][0] - center[0]) < 0):
                 if colorIndx != 0:
                     colorIndx = 0
