@@ -6,6 +6,8 @@ import cv2
 import time
 import argparse
 
+from test.classes.DerivativeQueue import DerivativeQueue
+
 
 def tableDetector(frame):
     mask = cv2.inRange(frame, (131, 0, 255), (255, 255, 255))
@@ -19,23 +21,6 @@ def tableDetector(frame):
         epsilon = 0.1 * cv2.arcLength(cmax, True)
         approx = cv2.approxPolyDP(cmax, epsilon, True)
     return approx
-
-
-EPSILON = 0.008
-def hasBounced(lastCenters):
-    if len(lastCenters) < 3:
-        return False
-
-    # Calculate angle between consequent position vectors
-
-    v1 = np.array([lastCenters[1][0] - lastCenters[0][0], lastCenters[1][1] - lastCenters[0][1]])
-    v2 = np.array([lastCenters[1][0] - lastCenters[2][0], lastCenters[1][1] - lastCenters[2][1]])
-
-    cosAngle = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
-
-    # Consider bounce if angle is bigger than a threshold
-    return 1 + cosAngle > EPSILON
-
 
 ap = argparse.ArgumentParser()
 
@@ -80,6 +65,7 @@ width = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 tailsize = args["size"]
 pts = deque(maxlen=tailsize)
+derivatives = DerivativeQueue(size=7)
 color = [(0, 0, 255), (0, 255, 255)]
 colorIndx = 0
 
@@ -144,18 +130,22 @@ while True:
         if M["m00"] > 0:
             # TODO Should round rather than floor - Ask first
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+            derivatives.add_point(center)
+            if derivatives.has_bounced():
+                print("Bounced")
             cv2.circle(frame, center, 5, (0, 255, 0), -1)
             # calculate direction of ball, paint it if change clear
-            if hasBounced(pts):
-                print("Bounce!")
             if (len(pts) > 0) and ((pts[0][0] - center[0]) < 0):
                 if colorIndx != 0:
                     colorIndx = 0
                     pts.clear()
+                    derivatives.clear()
             elif (len(pts) > 0) and ((pts[0][0] - center[0]) > 0):
                 if colorIndx != 1:
                     colorIndx = 1
                     pts.clear()
+                    derivatives.clear()
+
             pts.appendleft(center)
 
     # loop over the set of tracked points
