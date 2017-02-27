@@ -22,6 +22,7 @@ def tableDetector(frame):
         approx = cv2.approxPolyDP(cmax, epsilon, True)
     return approx
 
+
 ap = argparse.ArgumentParser()
 
 ap.add_argument("-v", "--video",
@@ -65,8 +66,10 @@ width = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 tailsize = args["size"]
 pts = deque(maxlen=tailsize)
+ptsColors = deque(maxlen=tailsize)
 derivatives = DerivativeQueue(size=7)
-color = [(0, 0, 255), (0, 255, 255)]
+lineColors = [(0, 0, 255), (0, 255, 255)]
+ballColors = [(0, 255, 0), (255, 0, 0)]
 colorIndx = 0
 
 if not args["table"]:
@@ -131,22 +134,20 @@ while True:
             # TODO Should round rather than floor - Ask first
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
             derivatives.add_point(center)
-            if derivatives.has_bounced():
-                print("Bounced")
+            bounced = derivatives.has_bounced()
             cv2.circle(frame, center, 5, (0, 255, 0), -1)
             # calculate direction of ball, paint it if change clear
-            if (len(pts) > 0) and ((pts[0][0] - center[0]) < 0):
-                if colorIndx != 0:
+            if len(pts) > 0:
+                if (pts[0][0] - center[0]) < 0 and colorIndx != 0:
                     colorIndx = 0
                     pts.clear()
                     derivatives.clear()
-            elif (len(pts) > 0) and ((pts[0][0] - center[0]) > 0):
-                if colorIndx != 1:
+                elif (pts[0][0] - center[0]) > 0 and colorIndx != 1:
                     colorIndx = 1
                     pts.clear()
                     derivatives.clear()
-
             pts.appendleft(center)
+            ptsColors.appendleft(1 if bounced else 0)
 
     # loop over the set of tracked points
     if len(pts) > 0:
@@ -157,8 +158,8 @@ while True:
             if pts[i - 1] is None or pts[i] is None:
                 continue
             thickness = 3
-            cv2.line(frame, pts[i - 1], pts[i], color[colorIndx], thickness)
-            cv2.circle(frame, pts[i], 5, (0, 255, 0), -1)
+            cv2.line(frame, pts[i - 1], pts[i], lineColors[colorIndx], thickness)
+            cv2.circle(frame, pts[i], 5, ballColors[ptsColors[i]], -1)
 
     # show the frame to our screen
     cv2.imshow("Frame", frame)
