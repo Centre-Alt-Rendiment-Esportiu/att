@@ -1,7 +1,7 @@
 from collections import deque
 
 from test.classes.Ball import Ball
-from test.classes.DerivativeQueue import DerivativeQueue
+from test.classes.BounceQueue import BounceQueue
 
 lineColors = ((0, 0, 255), (0, 255, 255))
 
@@ -9,7 +9,7 @@ lineColors = ((0, 0, 255), (0, 255, 255))
 class BallHistory:
     def __init__(self, tailsize):
         self.balls = deque(maxlen=tailsize)
-        self.derivQ = DerivativeQueue(size=7)
+        self.bounceQueue = BounceQueue(size=40)
         self.direction = 0
 
     def add_ball(self, center):
@@ -20,12 +20,16 @@ class BallHistory:
             elif (self.balls[0].center[0] - center[0]) > 0 and self.direction != 1:
                 self.direction = 1
                 self.clear_history()
-        self.derivQ.add_point(center)
-        self.balls.appendleft(Ball(center, colorIndx=1 if self.derivQ.has_bounced() else 0))
+        self.bounceQueue.add_point(center[1])
+        if self.bounceQueue.has_bounced():
+            self.balls.appendleft(Ball(center, colorIndx=1))
+            self.bounceQueue.clear()
+        else:
+            self.balls.appendleft(Ball(center, colorIndx=0))
 
     def clear_history(self):
         self.balls.clear()
-        self.derivQ.clear()
+        self.bounceQueue.clear()
 
     def line_color(self):
         return lineColors[self.direction]

@@ -7,7 +7,6 @@ import time
 import argparse
 
 from test.classes.BallHistory import BallHistory
-from test.classes.DerivativeQueue import DerivativeQueue
 
 
 def tableDetector(frame):
@@ -143,7 +142,7 @@ while True:
                 continue
             thickness = 3
             cv2.line(frame, prevBall.center, currBall.center, ballHistory.line_color(), thickness)
-            cv2.circle(frame, currBall.center, 5, currBall.color, -1)
+            cv2.circle(frame, currBall.center, 5, prevBall.color, -1)
 
     # show the frame to our screen
     cv2.imshow("Frame", frame)
