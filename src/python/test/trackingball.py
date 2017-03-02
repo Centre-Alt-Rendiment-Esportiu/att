@@ -120,6 +120,7 @@ while True:
     center = None
     # only proceed if at least one contour was found
     reset = True
+    # TODO buscar per forma
     if len(cnts) > 0:
         cmax = max(cnts, key=cv2.contourArea)
         # if cv2.contourArea(cmax)>20 :

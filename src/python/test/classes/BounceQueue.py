@@ -21,7 +21,7 @@ class BounceQueue(DerivativeQueue):
         if self.sign is None:
             self.sign = derivSign
             return False
-        bounced = derivSign * self.sign < 0
+        bounced = derivSign < 0 < self.sign
         self.sign = derivSign
         self.secondDerivQ.prevDerivative = currDerivative
         return bounced
