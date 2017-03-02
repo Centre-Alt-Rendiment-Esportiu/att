@@ -17,7 +17,7 @@ def tableDetector(frame):
     cnts = cv2.findContours(mask.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)[-2]
     if len(cnts) > 0:
         sort = sorted(cnts, key=cv2.contourArea, reverse=True)
-        cmax = sort[1]  # NOTE Why is it 1 and not 0 - seems like it caused error and this is a fix for it
+        cmax = sort[1]
         epsilon = 0.1 * cv2.arcLength(cmax, True)
         approx = cv2.approxPolyDP(cmax, epsilon, True)
     return approx
@@ -120,17 +120,15 @@ while True:
     center = None
     # only proceed if at least one contour was found
     reset = True
-    # TODO buscar per forma
+    # TODO search by shape the ball
     if len(cnts) > 0:
         cmax = max(cnts, key=cv2.contourArea)
         # if cv2.contourArea(cmax)>20 :
         # print cv2.contourArea(cmax)
         M = cv2.moments(cmax)
         if M["m00"] > 0:
-            # TODO Should round rather than floor - Ask first
-            center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-            # TODO Ask why is this here - maybe not necessary...?
-                # cv2.circle(frame, center, 5, (0, 255, 0), -1)
+            center = (round(M["m10"] / M["m00"]), round(M["m01"] / M["m00"]))
+            # cv2.circle(frame, center, 5, (0, 255, 0), -1)
             # calculate direction of ball, paint it if change clear
             ballHistory.add_ball(center)
     # loop over the set of tracked points
