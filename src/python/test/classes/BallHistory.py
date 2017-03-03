@@ -1,15 +1,17 @@
 from collections import deque
 
 from test.classes.Ball import Ball
-from test.classes.BounceQueue import BounceQueue
+from test.classes.BounceDetector import BounceDetector
 
 lineColors = ((0, 0, 255), (0, 255, 255))
+
+""" Class that represents the ball's position history"""
 
 
 class BallHistory:
     def __init__(self, tailsize):
         self.balls = deque(maxlen=tailsize)
-        self.bounceQueue = BounceQueue(size=40)
+        self.bounceQueue = BounceDetector(size=40)
         self.direction = 0
 
     def add_ball(self, center):

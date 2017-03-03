@@ -1,18 +1,18 @@
 from collections import deque
 import numpy as np
 
+""" Represents the queue that stores accumulated derivatives history """
+
 
 class DerivativeQueue(object):
     def __init__(self, size):
         self.pointQueue = deque(maxlen=size)
-        self.prevDerivative = None
 
     def add_point(self, elem):
         self.pointQueue.append(elem)
 
     def clear(self):
         self.pointQueue.clear()
-        self.prevDerivative = None
 
     def __getitem__(self, item):
         return self.pointQueue[item]
