@@ -6,6 +6,8 @@ import cv2
 import time
 import argparse
 
+from test.classes.BallHistory import BallHistory
+
 
 def tableDetector(frame):
     mask = cv2.inRange(frame, (131, 0, 255), (255, 255, 255))
@@ -63,9 +65,7 @@ colorUpper = (255, 255, 255)
 width = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 tailsize = args["size"]
-pts = deque(maxlen=tailsize)
-color = [(0, 0, 255), (0, 255, 255)]
-colorIndx = 0
+ballHistory = BallHistory(tailsize)
 
 if not args["table"]:
     table = True
@@ -90,7 +90,7 @@ while True:
             camera.set(cv2.CAP_PROP_FRAME_COUNT, 0)
             camera.release()
             camera = cv2.VideoCapture(VIDEODEV)
-            pts.clear()
+            ballHistory.clear_history()
             time.sleep(0.02)
             continue
         else:
@@ -120,6 +120,7 @@ while True:
     center = None
     # only proceed if at least one contour was found
     reset = True
+    # TODO search by shape the ball
     if len(cnts) > 0:
         cmax = max(cnts, key=cv2.contourArea)
         # if cv2.contourArea(cmax)>20 :
@@ -127,29 +128,20 @@ while True:
         M = cv2.moments(cmax)
         if M["m00"] > 0:
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-            cv2.circle(frame, center, 5, (0, 255, 0), -1)
-            # calculate direction of ball, paint it ,if change clear
-            if (len(pts) > 0) and ((pts[0][0] - center[0]) < 0):
-                if colorIndx != 0:
-                    colorIndx = 0
-                    pts.clear()
-            elif (len(pts) > 0) and ((pts[0][0] - center[0]) > 0):
-                if colorIndx != 1:
-                    colorIndx = 1
-                    pts.clear()
-            pts.appendleft(center)
-
+            # cv2.circle(frame, center, 5, (0, 255, 0), -1)
+            # calculate direction of ball, paint it if change clear
+            ballHistory.add_ball(center)
     # loop over the set of tracked points
-    if len(pts) > 0:
-        cv2.circle(frame, pts[0], 5, (0, 255, 0), -1)
-        for i in range(1, len(pts)):
-            # if either of the tracked points are None, ignore
-            # them
-            if pts[i - 1] is None or pts[i] is None:
+    if len(ballHistory) > 0:
+        cv2.circle(frame, ballHistory[0].center, 5, ballHistory[0].color, -1)
+        for i in range(1, len(ballHistory)):
+            prevBall, currBall = ballHistory[i - 1], ballHistory[i]
+            # if either of the tracked points are None, ignore them
+            if prevBall.center is None or currBall.center is None:
                 continue
             thickness = 3
-            cv2.line(frame, pts[i - 1], pts[i], color[colorIndx], thickness)
-            cv2.circle(frame, pts[i], 5, (0, 255, 0), -1)
+            cv2.line(frame, prevBall.center, currBall.center, ballHistory.line_color(), thickness)
+            cv2.circle(frame, currBall.center, 5, prevBall.color, -1)
 
     # show the frame to our screen
     cv2.imshow("Frame", frame)
