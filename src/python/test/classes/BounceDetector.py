@@ -21,8 +21,9 @@ class BounceDetector(object):
         if not self.secondDxQueue:
             self.secondDxQueue.add_point(currDx2)
             return False
-        bounced = np.sign(currDx2 - self.secondDxQueue[-1]) * \
-            np.sign(self.secondDxQueue[-1] - self.secondDxQueue[0]) < 0
+        currDifference = currDx2 - self.secondDxQueue[-1]
+        prevDifference = self.secondDxQueue[-1] - self.secondDxQueue[0]
+        bounced = np.sign(currDifference) < 0 < np.sign(prevDifference)
         self.secondDxQueue.add_point(currDx2)
         return bounced
 
