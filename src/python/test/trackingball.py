@@ -127,7 +127,7 @@ while True:
         # print cv2.contourArea(cmax)
         M = cv2.moments(cmax)
         if M["m00"] > 0:
-            center = (round(M["m10"] / M["m00"]), round(M["m01"] / M["m00"]))
+            center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
             # cv2.circle(frame, center, 5, (0, 255, 0), -1)
             # calculate direction of ball, paint it if change clear
             ballHistory.add_ball(center)
