@@ -8,7 +8,7 @@ class BallHistoryTest(BallHistory):
         self.bounceQueue = BounceDetectorTest(size=tailsize)
 
     def add_ball(self, center, frame):
-        self.bounceQueue.set_frame(frame=frame)
+        self.bounceQueue.curr_frame = frame
         super(BallHistoryTest, self).add_ball(center)
 
     def end_test(self):

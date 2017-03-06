@@ -16,10 +16,10 @@ class BallHistory:
 
     def add_ball(self, center):
         if len(self) > 0:
-            if (self.balls[0].center[0] - center[0]) < 0 and self.direction != 0:
+            if (self[0].center[0] - center[0]) < 0 and self.direction != 0:
                 self.direction = 0
                 self.clear_history()
-            elif (self.balls[0].center[0] - center[0]) > 0 and self.direction != 1:
+            elif (self[0].center[0] - center[0]) > 0 and self.direction != 1:
                 self.direction = 1
                 self.clear_history()
         self.bounceQueue.add_point(center[1])
