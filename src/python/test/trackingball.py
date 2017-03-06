@@ -1,15 +1,14 @@
 # import the necessary packages
 
-from collections import deque
-import numpy as np
-import cv2
-import time
 import argparse
+import time
 
+import cv2
+import numpy as np
 from test.classes.BallHistory import BallHistory
 
 
-def tableDetector(frame):
+def table_detector(frame):
     mask = cv2.inRange(frame, (131, 0, 255), (255, 255, 255))
     mask = cv2.dilate(mask, np.ones((5, 5), np.uint8), iterations=5)
     mask = cv2.erode(mask, None, iterations=5)
@@ -57,7 +56,7 @@ else:
     OUTPUT = args["output"]
 LOOP = args["LOOP"]
 
-camera = cv2.VideoCapture(VIDEODEV);
+camera = cv2.VideoCapture(VIDEODEV)
 assert camera.isOpened()
 
 colorLower = (154, 0, 255)
@@ -97,10 +96,9 @@ while True:
             break
 
     # first frame detect table
-
     if table:
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        tableContours = tableDetector(hsv)
+        tableContours = table_detector(hsv)
         maskTable = np.zeros((height, width), np.uint8)
         # 0 is table, 1 is background
         cv2.fillConvexPoly(maskTable, tableContours, 1)
@@ -119,17 +117,12 @@ while True:
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
     center = None
     # only proceed if at least one contour was found
-    reset = True
     # TODO search by shape the ball
     if len(cnts) > 0:
         cmax = max(cnts, key=cv2.contourArea)
-        # if cv2.contourArea(cmax)>20 :
-        # print cv2.contourArea(cmax)
         M = cv2.moments(cmax)
         if M["m00"] > 0:
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-            # cv2.circle(frame, center, 5, (0, 255, 0), -1)
-            # calculate direction of ball, paint it if change clear
             ballHistory.add_ball(center)
     # loop over the set of tracked points
     if len(ballHistory) > 0:
@@ -141,7 +134,7 @@ while True:
                 continue
             thickness = 3
             cv2.line(frame, prevBall.center, currBall.center, ballHistory.line_color(), thickness)
-            cv2.circle(frame, currBall.center, 5, prevBall.color, -1)
+            cv2.circle(frame, currBall.center, 5, currBall.color, -1)
 
     # show the frame to our screen
     cv2.imshow("Frame", frame)
