@@ -20,18 +20,23 @@ class BounceDetectorTest(BounceDetector):
         return bounced
 
     def end_test(self):
+        num_real = len(bounce_frames)
+        num_found = len(self.found_frames)
+
         hits = 0
         for fr1 in self.found_frames:
             for fr2 in bounce_frames:
-                if fr2-2 < fr1 < fr2+2:
+                if fr2-2 <= fr1 <= fr2+2:
                     hits += 1
+                    bounce_frames.remove(fr2)
                     break
-        false_negatives = len(bounce_frames) - hits
-        false_positives = len(self.found_frames) - hits
+
+        false_negatives = num_real - hits
+        false_positives = num_found - hits
 
         print("\n", "Test results: ")
 
-        print("\t", "HIT: ", hits * 100 / len(bounce_frames), "%")
-        print("\t", "MISS:", false_negatives * 100 / len(bounce_frames), "%")
+        print("\t", "HIT: ", hits * 100 / num_real, "%")
+        print("\t", "MISS:", false_negatives * 100 / num_real, "%")
         print("\t", "FALSE POSITIVE RATE: ", false_positives * 100 / (false_negatives + false_positives), "%")
         print("\t", "FALSE NEGATIVE RATE: ", false_negatives * 100 / (false_negatives + false_positives), "%")
