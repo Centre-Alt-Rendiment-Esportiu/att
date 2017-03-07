@@ -6,8 +6,8 @@ max_color = (255, 255, 255)
 
 class BallDetector:
     @staticmethod
-    def create_ball_mask(frameTable):
-        hsv = cv2.cvtColor(frameTable, cv2.COLOR_BGR2HSV)
+    def create_ball_mask(frame):
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         # find white color maskBall
         mask = cv2.inRange(hsv, min_color, max_color)
         mask = cv2.dilate(mask, None, iterations=2)
@@ -20,7 +20,7 @@ class BallDetector:
         center = None
         # only proceed if at least one contour was found
         # TODO search by shape the ball
-        cnts = list(filter(lambda x: 10 < cv2.contourArea(x) < 40, cnts))
+        cnts = list(filter(lambda x: 20 < cv2.contourArea(x) < 40, cnts))
         if len(cnts) > 0:
             cmax = max(cnts, key=cv2.contourArea)
             M = cv2.moments(cmax)

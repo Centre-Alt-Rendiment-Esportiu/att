@@ -1,92 +1,41 @@
 # import the necessary packages
 
-import time
-
 import cv2
 
-from test.classes.BallDetector import BallDetector
-from test.classes.BallHistory import BallHistory
-from test.classes.TableDetector import TableDetector
+from test.classes.detectors.BallDetector import BallDetector
+from test.classes.detectors.TableDetector import TableDetector
 
 
 class BallTracker(object):
-    def __init__(self, args):
-        self.VIDEODEV = 0 if not args.get("video", False) else args["video"]
+    def __init__(self, height, width):
+        self.first_frame = True
+        self.fgbg = cv2.createBackgroundSubtractorMOG2(detectShadows=True)
+        self.maskTable = None
+        self.frameHeight = height
+        self.frameWidth = width
 
-        self.camera = cv2.VideoCapture(self.VIDEODEV)
-        assert self.camera.isOpened()
+    def track(self, frame):
+        # first frame detect table
+        if self.first_frame:
+            tableContours = TableDetector.detect(frame)
+            self.maskTable = TableDetector.create_table_mask(tableContours, self.frameHeight, self.frameWidth)
+            self.first_frame = False
 
-        if not args.get("output", False):
-            fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-            width, height = int(self.camera.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
-            self.writer = cv2.VideoWriter(args["output"], fourcc, args["frames"],(width, height), True)
-        
-        self.ballHistory = BallHistory(args["size"])
-        self.loop = args["LOOP"]
+        background_filter = self.fgbg.apply(frame)
+        # background_filter[background_filter > 0] = 255
 
-    def track(self):
-        firstFrame = True
-        fgbg = cv2.createBackgroundSubtractorMOG2(history=5000, detectShadows=False)
-        while True:
-            # grab the current frame
-            (grabbed, frame) = self.camera.read()
+        # add maskTable to frame
+        frame_background_sub = cv2.bitwise_and(frame, frame, mask=background_filter)
+        frame_background_sub = frame_background_sub # * self.maskTable
 
-            if not grabbed:
-                if self.loop:
-                    self.camera.set(cv2.CAP_PROP_FRAME_COUNT, 0)
-                    self.camera.release()
-                    self.camera = cv2.VideoCapture(self.VIDEODEV)
-                    self.ballHistory.clear_history()
-                    time.sleep(0.02)
-                    continue
-                else:
-                    break
+        # Remove salt and pepper noise
+        frame_background_sub = cv2.medianBlur(frame_background_sub, 5)
 
-            # first frame detect table
-            if firstFrame:
-                tableContours = TableDetector.detect(frame)
-                width, height = int(self.camera.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                maskTable = TableDetector.create_table_mask(tableContours, height, width)
-                firstFrame = False
+        # cv2.imshow("Background-Subtract Mask", frame_background_sub)
 
-            background_filter = fgbg.apply(frame)
-            #frame_background_sub[frame_background_sub > 0] = 255
+        maskBall = BallDetector.create_ball_mask(frame_background_sub)
+        center = BallDetector.detect(maskBall)
 
-            # add maskTable to frame
-            frame_background_sub = cv2.bitwise_and(frame, frame, mask=background_filter)
-            # frameTable = fgmask * maskTable
+        # cv2.imshow("Ball Mask", maskBall)
 
-            # Remove salt and pepper noise
-            frame_background_sub = cv2.medianBlur(frame_background_sub, 5)
-
-            cv2.imshow("Mask2", frame_background_sub)
-
-            maskBall = BallDetector.create_ball_mask(frame_background_sub)
-            center = BallDetector.detect(maskBall)
-            if center:
-                self.ballHistory.add_ball(center)
-
-            # loop over the set of tracked points
-            if len(self.ballHistory) > 0:
-                cv2.circle(frame, self.ballHistory[0].center, 5, self.ballHistory[0].color, -1)
-                for i in range(1, len(self.ballHistory)):
-                    prevBall, currBall = self.ballHistory[i - 1], self.ballHistory[i]
-                    # if either of the tracked points are None, ignore them
-                    if prevBall.center is None or currBall.center is None:
-                        continue
-                    thickness = 3
-                    cv2.line(frame, prevBall.center, currBall.center, self.ballHistory.line_color(), thickness)
-                    cv2.circle(frame, currBall.center, 5, currBall.color, -1)
-
-            # show the frame to our screen
-            cv2.imshow("Frame", frame)
-            if self.writer:
-                self.writer.write(frame)
-            cv2.imshow("Mask", maskBall)
-            # cv2.imshow("frameTable", frameTable)
-            if cv2.waitKey(1) & 0xFF is ord('q'):
-                break
-
-        # cleanup the camera and close any open windows
-        self.camera.release()
-        cv2.destroyAllWindows()
+        return center
