@@ -19,6 +19,7 @@ class BallTrackerTest(BallTracker):
 
         max_frames = int(self.camera.get(cv2.CAP_PROP_FRAME_COUNT))
         bar = progressbar.ProgressBar(max_value=max_frames)
+        fgbg = cv2.createBackgroundSubtractorMOG2(detectShadows=False)
 
         firstFrame = True
         while True:
@@ -48,6 +49,7 @@ class BallTrackerTest(BallTracker):
                 firstFrame = False
 
             # add maskTable to frame
+            fgmask = fgbg.apply(frame)
             frameTable = frame * maskTable
 
 

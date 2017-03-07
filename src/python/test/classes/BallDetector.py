@@ -11,7 +11,7 @@ class BallDetector:
         # find white color maskBall
         mask = cv2.inRange(hsv, min_color, max_color)
         mask = cv2.dilate(mask, None, iterations=2)
-        # maskBall= cv2.erode(maskBall, None, iterations=1)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, (10, 10))
         return mask
 
     @staticmethod
@@ -20,6 +20,7 @@ class BallDetector:
         center = None
         # only proceed if at least one contour was found
         # TODO search by shape the ball
+        cnts = list(filter(lambda x: 10 < cv2.contourArea(x) < 40, cnts))
         if len(cnts) > 0:
             cmax = max(cnts, key=cv2.contourArea)
             M = cv2.moments(cmax)

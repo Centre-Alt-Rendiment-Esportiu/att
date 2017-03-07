@@ -18,15 +18,15 @@ class BallTracker(object):
 
         if not args.get("output", False):
             fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-            self.writer = cv2.VideoWriter(args["output"], fourcc, args["frames"],
-                                          (int(self.camera.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                                           int(self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))), True)
+            width, height = int(self.camera.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            self.writer = cv2.VideoWriter(args["output"], fourcc, args["frames"],(width, height), True)
         
         self.ballHistory = BallHistory(args["size"])
         self.loop = args["LOOP"]
 
     def track(self):
         firstFrame = True
+        fgbg = cv2.createBackgroundSubtractorMOG2(history=5000, detectShadows=False)
         while True:
             # grab the current frame
             (grabbed, frame) = self.camera.read()
@@ -45,15 +45,23 @@ class BallTracker(object):
             # first frame detect table
             if firstFrame:
                 tableContours = TableDetector.detect(frame)
-                maskTable = TableDetector.create_table_mask(tableContours,
-                                                            int(self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT)),
-                                                            int(self.camera.get(cv2.CAP_PROP_FRAME_WIDTH)))
+                width, height = int(self.camera.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                maskTable = TableDetector.create_table_mask(tableContours, height, width)
                 firstFrame = False
 
-            # add maskTable to frame
-            frameTable = frame * maskTable
+            background_filter = fgbg.apply(frame)
+            #frame_background_sub[frame_background_sub > 0] = 255
 
-            maskBall = BallDetector.create_ball_mask(frameTable)
+            # add maskTable to frame
+            frame_background_sub = cv2.bitwise_and(frame, frame, mask=background_filter)
+            # frameTable = fgmask * maskTable
+
+            # Remove salt and pepper noise
+            frame_background_sub = cv2.medianBlur(frame_background_sub, 5)
+
+            cv2.imshow("Mask2", frame_background_sub)
+
+            maskBall = BallDetector.create_ball_mask(frame_background_sub)
             center = BallDetector.detect(maskBall)
             if center:
                 self.ballHistory.add_ball(center)
@@ -75,7 +83,7 @@ class BallTracker(object):
             if self.writer:
                 self.writer.write(frame)
             cv2.imshow("Mask", maskBall)
-            cv2.imshow("frameTable", frameTable)
+            # cv2.imshow("frameTable", frameTable)
             if cv2.waitKey(1) & 0xFF is ord('q'):
                 break
 
