@@ -11,7 +11,7 @@ lineColors = ((0, 0, 255), (0, 255, 255))
 class BallHistory:
     def __init__(self, tailsize):
         self.balls = deque(maxlen=tailsize)
-        self.bounceQueue = BounceDetector(size=40)
+        self.bounceQueue = BounceDetector(size=7)
         self.direction = 0
 
     def add_ball(self, center):
@@ -22,7 +22,7 @@ class BallHistory:
             elif (self[0].center[0] - center[0]) > 0 and self.direction != 1:
                 self.direction = 1
                 self.clear_history()
-        self.bounceQueue.add_point(center[1])
+        self.bounceQueue.add_point(center)
         if self.bounceQueue.has_bounced():
             self.balls.appendleft(Ball(center, colorIndx=1))
             self.bounceQueue.clear()
