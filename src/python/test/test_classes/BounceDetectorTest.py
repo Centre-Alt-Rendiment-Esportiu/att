@@ -1,4 +1,4 @@
-from test.classes.BounceDetector import BounceDetector
+from test.classes.detectors.BounceDetector import BounceDetector
 
 bounce_frames = [22, 48, 65, 72, 88, 102, 117, 131, 291, 441, 462, 491, 508, 648, 675, 812, 836, 865, 901, 1107, 1136,
                  1343, 1376, 1414, 1493, 1515, 1616, 1644, 1670, 1707, 1718, 1730, 1849, 1872, 1898, 2409, 2440, 2585,

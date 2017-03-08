@@ -1,7 +1,7 @@
 import argparse
 
-from test.classes.BallTracker import BallTracker
-from test.test_classes.BallTrackerTest import BallTrackerTest
+from test.classes.PingPongApp import PingPongApp
+from test.test_classes.PingPongAppMock import PingPongAppMock
 
 ap = argparse.ArgumentParser()
 
@@ -30,5 +30,8 @@ ap.set_defaults(TEST=False)
 
 args = vars(ap.parse_args())
 
-tracker = BallTracker(args) if not args["TEST"] else BallTrackerTest(args)
-tracker.track()
+if args["TEST"]:
+    ping_pong_app = PingPongAppMock(args)
+else:
+    ping_pong_app = PingPongApp(args)
+ping_pong_app.run()

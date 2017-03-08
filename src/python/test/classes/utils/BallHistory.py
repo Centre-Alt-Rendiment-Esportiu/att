@@ -1,7 +1,7 @@
 from collections import deque
 
-from test.classes.Ball import Ball
-from test.classes.BounceDetector import BounceDetector
+from test.classes.detectors.BounceDetector import BounceDetector
+from test.classes.utils.Ball import Ball
 
 lineColors = ((0, 0, 255), (0, 255, 255))
 
