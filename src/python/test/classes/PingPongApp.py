@@ -12,7 +12,7 @@ class PingPongApp(object):
         self.camera = Camera(args)
 
         self.writer = None
-        if not args.get("output", False):
+        if args.get("output", True):
             fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
             height = self.camera.height
             width = self.camera.width

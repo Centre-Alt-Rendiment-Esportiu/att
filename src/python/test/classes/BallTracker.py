@@ -9,7 +9,7 @@ from test.classes.detectors.TableDetector import TableDetector
 class BallTracker(object):
     def __init__(self, height, width):
         self.first_frame = True
-        self.fgbg = cv2.createBackgroundSubtractorMOG2(detectShadows=True)
+        self.fgbg = cv2.createBackgroundSubtractorMOG2(history=15, varThreshold=4000, detectShadows=False)
         self.maskTable = None
         self.frameHeight = height
         self.frameWidth = width
@@ -17,8 +17,7 @@ class BallTracker(object):
     def track(self, frame):
         # first frame detect table
         if self.first_frame:
-            tableContours = TableDetector.detect(frame)
-            self.maskTable = TableDetector.create_table_mask(tableContours, self.frameHeight, self.frameWidth)
+            self.maskTable = TableDetector.create_table_mask(frame, self.frameHeight, self.frameWidth)
             self.first_frame = False
 
         background_filter = self.fgbg.apply(frame)
@@ -26,16 +25,14 @@ class BallTracker(object):
 
         # add maskTable to frame
         frame_background_sub = cv2.bitwise_and(frame, frame, mask=background_filter)
-        frame_background_sub = frame_background_sub # * self.maskTable
+
+        # Reduce vision to table
+        # frame_background_sub *= self.maskTable
 
         # Remove salt and pepper noise
         frame_background_sub = cv2.medianBlur(frame_background_sub, 5)
 
-        # cv2.imshow("Background-Subtract Mask", frame_background_sub)
+        cv2.imshow("Background-Subtract Mask", frame_background_sub)
 
-        maskBall = BallDetector.create_ball_mask(frame_background_sub)
-        center = BallDetector.detect(maskBall)
-
-        # cv2.imshow("Ball Mask", maskBall)
-
+        center = BallDetector.detect(frame_background_sub)
         return center

@@ -31,7 +31,7 @@ ap.set_defaults(TEST=False)
 args = vars(ap.parse_args())
 
 if args["TEST"]:
-    app = PingPongAppMock(args)
+    ping_pong_app = PingPongAppMock(args)
 else:
-    app = PingPongApp(args)
-app.run()
+    ping_pong_app = PingPongApp(args)
+ping_pong_app.run()
