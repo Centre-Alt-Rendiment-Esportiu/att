@@ -11,14 +11,15 @@ class PingPongApp(object):
     def __init__(self, args):
         self.camera = Camera(args)
 
+        height = self.camera.height
+        width = self.camera.width
+
         self.writer = None
         if args.get("output", True):
             fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-            height = self.camera.height
-            width = self.camera.width
             self.writer = cv2.VideoWriter(args["output"], fourcc, args["frames"], (width, height), True)
 
-        self.ballTracker = BallTracker(self.camera.height, self.camera.width)
+        self.ballTracker = BallTracker(height, width)
         self.ballHistory = BallHistory(args["size"])
         self.loop = args["LOOP"]
 
