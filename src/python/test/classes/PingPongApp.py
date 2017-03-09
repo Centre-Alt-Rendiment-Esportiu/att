@@ -49,7 +49,7 @@ class PingPongApp(object):
             if self.writer is not None:
                 self.writer.write(processed_frame)
 
-            if self.camera.get_curr_frame_number() == 8660 or cv2.waitKey(1) & 0xFF is ord('q'):
+            if cv2.waitKey(1) & 0xFF is ord('q'):
                 break
 
         # Clean up the camera and close any open windows
