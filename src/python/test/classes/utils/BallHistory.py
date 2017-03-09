@@ -23,11 +23,11 @@ class BallHistory:
                 self.direction = 1
                 self.clear_history()
         self.bounceQueue.add_point(center)
-        if self.bounceQueue.has_bounced():
-            self.balls.appendleft(Ball(center, colorIndx=1))
+        bounce_point = self.bounceQueue.bounce_point()
+        if bounce_point:
+            self.balls.appendleft(Ball(bounce_point, colorIndx=1))
             self.bounceQueue.clear()
-        else:
-            self.balls.appendleft(Ball(center, colorIndx=0))
+        self.balls.appendleft(Ball(center, colorIndx=0))
 
     def clear_history(self):
         self.balls.clear()

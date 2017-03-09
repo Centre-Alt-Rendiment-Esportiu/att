@@ -39,17 +39,22 @@ class PingPongApp(object):
                 self.ballHistory.add_ball(center)
 
             # Paint calculated info
-            self.paint_info(frame)
+            processed_frame = self.paint_info(frame)
+
+            # show the frame to our screen
+            # cv2.imshow("Processed Frame", processed_frame)
 
             # Write to file if necessary
             if self.writer is not None:
-                self.writer.write(frame)
+                self.writer.write(processed_frame)
 
-            if cv2.waitKey(1) & 0xFF is ord('q'):
+            if self.camera.get_curr_frame_number() == 8660 or cv2.waitKey(1) & 0xFF is ord('q'):
                 break
 
         # Clean up the camera and close any open windows
         self.camera.release()
+        if self.writer:
+            self.writer.release()
         cv2.destroyAllWindows()
 
     def paint_info(self, frame):
@@ -64,6 +69,4 @@ class PingPongApp(object):
                 thickness = 3
                 cv2.line(frame, prevBall.center, currBall.center, self.ballHistory.line_color(), thickness)
                 cv2.circle(frame, currBall.center, currBall.size, currBall.color, -1)
-
-        # show the frame to our screen
-        cv2.imshow("Processed Frame", frame)
+        return frame
