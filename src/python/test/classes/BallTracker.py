@@ -30,9 +30,9 @@ class BallTracker(object):
         # frame_background_sub *= self.maskTable
 
         # Remove salt and pepper noise
-        frame_background_sub = cv2.medianBlur(frame_background_sub, 5)
+        frame_background_sub = cv2.medianBlur(frame_background_sub, 3)
 
-        cv2.imshow("Background-Subtract Mask", frame_background_sub)
+        # cv2.imshow("Background-Subtract Mask", frame_background_sub)
 
         center = BallDetector.detect(frame_background_sub)
         return center

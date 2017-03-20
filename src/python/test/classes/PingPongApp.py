@@ -11,14 +11,15 @@ class PingPongApp(object):
     def __init__(self, args):
         self.camera = Camera(args)
 
+        height = self.camera.height
+        width = self.camera.width
+
         self.writer = None
         if args.get("output", True):
             fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-            height = self.camera.height
-            width = self.camera.width
             self.writer = cv2.VideoWriter(args["output"], fourcc, args["frames"], (width, height), True)
 
-        self.ballTracker = BallTracker(self.camera.height, self.camera.width)
+        self.ballTracker = BallTracker(height, width)
         self.ballHistory = BallHistory(args["size"])
         self.loop = args["LOOP"]
 
@@ -39,17 +40,22 @@ class PingPongApp(object):
                 self.ballHistory.add_ball(center)
 
             # Paint calculated info
-            self.paint_info(frame)
+            processed_frame = self.paint_info(frame)
+
+            # show the frame to our screen
+            # cv2.imshow("Processed Frame", processed_frame)
 
             # Write to file if necessary
             if self.writer is not None:
-                self.writer.write(frame)
+                self.writer.write(processed_frame)
 
             if cv2.waitKey(1) & 0xFF is ord('q'):
                 break
 
         # Clean up the camera and close any open windows
         self.camera.release()
+        if self.writer:
+            self.writer.release()
         cv2.destroyAllWindows()
 
     def paint_info(self, frame):
@@ -64,6 +70,4 @@ class PingPongApp(object):
                 thickness = 3
                 cv2.line(frame, prevBall.center, currBall.center, self.ballHistory.line_color(), thickness)
                 cv2.circle(frame, currBall.center, currBall.size, currBall.color, -1)
-
-        # show the frame to our screen
-        cv2.imshow("Processed Frame", frame)
+        return frame
