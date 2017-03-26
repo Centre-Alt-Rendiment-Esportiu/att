@@ -9,7 +9,7 @@ from test.classes.detectors.TableDetector import TableDetector
 class BallTracker(object):
     def __init__(self, height, width):
         self.first_frame = True
-        self.fgbg = cv2.createBackgroundSubtractorMOG2(history=15, varThreshold=4000, detectShadows=False)
+        self.fgbg = cv2.createBackgroundSubtractorMOG2(history=15, varThreshold=2000, detectShadows=False)
         self.maskTable = None
         self.frameHeight = height
         self.frameWidth = width
@@ -32,7 +32,7 @@ class BallTracker(object):
         # Remove salt and pepper noise
         frame_background_sub = cv2.medianBlur(frame_background_sub, 3)
 
-        # cv2.imshow("Background-Subtract Mask", frame_background_sub)
+        cv2.imshow("Background-Subtract Mask", frame_background_sub)
 
         center = BallDetector.detect(frame_background_sub)
         return center
