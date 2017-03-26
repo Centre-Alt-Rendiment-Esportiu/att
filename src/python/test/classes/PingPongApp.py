@@ -2,6 +2,7 @@
 
 import cv2
 
+from test.classes.detectors.TableDetector import TableDetector
 from test.classes.game.Game import Game
 from test.classes.utils.BallTracker import BallTracker
 from test.classes.utils.Camera import Camera
@@ -11,19 +12,20 @@ class PingPongApp(object):
     def __init__(self, args):
         self.camera = Camera(args)
 
-        height = self.camera.height
-        width = self.camera.width
+        self.height = self.camera.height
+        self.width = self.camera.width
 
         self.writer = None
         if args.get("output", True):
             fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-            self.writer = cv2.VideoWriter(args["output"], fourcc, args["frames"], (width, height), True)
+            self.writer = cv2.VideoWriter(args["output"], fourcc, args["frames"], (self.width, self.height), True)
 
-        self.ballTracker = BallTracker(height, width)
+        self.ballTracker = None
         self.game = Game(args)
         self.loop = args["LOOP"]
 
     def run(self):
+        first_frame = True
         while True:
             # grab the current frame
             frame = self.camera.get_next_frame(self.loop)
@@ -33,6 +35,10 @@ class PingPongApp(object):
                     continue
                 else:
                     break
+
+            if first_frame:
+                self.first_frame_extract(frame=frame)
+                first_frame = False
 
             # Get next tracked center
             center = self.ballTracker.track(frame)
@@ -57,10 +63,17 @@ class PingPongApp(object):
             self.writer.release()
         cv2.destroyAllWindows()
 
+    def first_frame_extract(self, frame):
+        table_points = TableDetector.detect_contours(frame)
+        self.game.set_table(table_points)
+        mask_table = TableDetector.create_table_mask(frame, self.height, self.width)
+        self.ballTracker = BallTracker(mask_table=mask_table)
+
     def paint_info(self, frame):
-        # loop over the set of tracked points
         text = 'Points: ' + str(self.game.players[0].score) + ' - ' + str(self.game.players[1].score)
         cv2.putText(frame, text, (10, 500), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
+
+        # loop over the set of tracked points
         ball_history = self.game.ball_history
         if len(ball_history) > 0:
             cv2.circle(frame, ball_history[0].center, ball_history[0].size, ball_history[0].color, -1)

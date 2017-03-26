@@ -8,6 +8,10 @@ class Game:
         self.current_player = 0
         self.bounces = 0
         self.ball_history = BallHistory(args["size"])
+        self.table_points = None
+
+    def set_table(self, table_points):
+        self.table_points = table_points
 
     def update_history(self, center):
         if center:

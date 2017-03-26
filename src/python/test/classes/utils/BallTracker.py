@@ -3,31 +3,22 @@
 import cv2
 
 from test.classes.detectors.BallDetector import BallDetector
-from test.classes.detectors.TableDetector import TableDetector
 
 
 class BallTracker(object):
-    def __init__(self, height, width):
+    def __init__(self, mask_table):
         self.first_frame = True
         self.fgbg = cv2.createBackgroundSubtractorMOG2(history=15, varThreshold=2000, detectShadows=False)
-        self.maskTable = None
-        self.frameHeight = height
-        self.frameWidth = width
+        self.mask_table = mask_table
 
     def track(self, frame):
-        # first frame detect table
-        if self.first_frame:
-            self.maskTable = TableDetector.create_table_mask(frame, self.frameHeight, self.frameWidth)
-            self.first_frame = False
-
         background_filter = self.fgbg.apply(frame)
-        # background_filter[background_filter > 0] = 255
 
         # add maskTable to frame
         frame_background_sub = cv2.bitwise_and(frame, frame, mask=background_filter)
 
         # Reduce vision to table
-        # frame_background_sub *= self.maskTable
+        # frame_background_sub *= self.mask_table
 
         # Remove salt and pepper noise
         frame_background_sub = cv2.medianBlur(frame_background_sub, 3)
