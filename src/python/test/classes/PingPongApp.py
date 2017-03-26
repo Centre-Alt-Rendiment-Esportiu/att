@@ -59,6 +59,8 @@ class PingPongApp(object):
 
     def paint_info(self, frame):
         # loop over the set of tracked points
+        text = 'Points: ' + str(self.game.players[0].score) + ' - ' + str(self.game.players[1].score)
+        cv2.putText(frame, text, (10, 500), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
         ball_history = self.game.ball_history
         if len(ball_history) > 0:
             cv2.circle(frame, ball_history[0].center, ball_history[0].size, ball_history[0].color, -1)
