@@ -26,5 +26,5 @@ class BallDetector:
         # find white color maskBall
         mask = cv2.inRange(hsv, min_color, max_color)
         #mask = cv2.dilate(hsv, None, iterations=2)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, (10, 10))
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, (20, 20))
         return frame
