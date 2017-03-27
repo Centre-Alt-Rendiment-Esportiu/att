@@ -29,8 +29,6 @@ class Game:
         if not center:
             return
 
-        self.ball_history.update_history(center)
-
         if self.ball_history.check_direction_change(center):
             self.check_point()
             self.change_player()
@@ -44,6 +42,8 @@ class Game:
                 in_right = cv2.pointPolygonTest(self.right_table, bounce_point, False)
                 if in_right >= 0:
                     self.bounces[1] += 1
+
+        self.ball_history.update_history(center)
 
     # TODO Should take into account servings
     def check_point(self):
