@@ -34,8 +34,8 @@ class BallHistory:
         if bounce_point:
             self.balls.appendleft(Ball(bounce_point, colorIndx=1))
             self.bounceQueue.clear()
-            return True
-        return False
+            return bounce_point
+        return None
 
     def update_history(self, center):
         self.balls.appendleft(Ball(center, colorIndx=0))
