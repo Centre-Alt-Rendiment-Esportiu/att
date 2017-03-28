@@ -39,6 +39,7 @@ class PingPongApp(object):
             if first_frame:
                 self.first_frame_extract(frame=frame)
                 first_frame = False
+                continue
 
             # Get next tracked center
             center = self.ballTracker.track(frame)
@@ -68,6 +69,7 @@ class PingPongApp(object):
         self.game.set_table(table_points)
         mask_table = TableDetector.create_table_mask(frame, self.height, self.width)
         self.ballTracker = BallTracker(mask_table=mask_table)
+        self.ballTracker.fgbg.apply(frame)  # Initialize background subtractor
 
     def paint_info(self, frame):
         text = 'Points: ' + str(self.game.players[0].score) + ' - ' + str(self.game.players[1].score)
