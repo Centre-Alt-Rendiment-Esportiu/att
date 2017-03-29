@@ -65,11 +65,12 @@ class PingPongApp(object):
         cv2.destroyAllWindows()
 
     def first_frame_extract(self, frame):
-        table_points = TableDetector.detect_contours(frame)
+        table_points = TableDetector.detect(frame)
         self.game.set_table(table_points)
+
         mask_table = TableDetector.create_table_mask(frame, self.height, self.width)
         self.ballTracker = BallTracker(mask_table=mask_table)
-        self.ballTracker.fgbg.apply(frame)  # Initialize background subtractor
+        self.ballTracker.background.update(frame)  # Initialize background subtraction
 
     def paint_info(self, frame):
         text = 'Points: ' + str(self.game.players[0].score) + ' - ' + str(self.game.players[1].score)

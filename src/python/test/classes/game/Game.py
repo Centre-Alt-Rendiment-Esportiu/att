@@ -54,13 +54,13 @@ class Game:
         if self.bounces[1 - self.current_player] > 1:
             self.players[self.current_player].add_score()
 
+    def change_player(self):
+        self.current_player = 1 - self.current_player
+        self.bounces = [0, 0]
+
     def clear_history(self):
         self.ball_history.clear_history()
         for player in self.players:
             player.reset_score()
         self.current_player = 0
-        self.bounces = [0, 0]
-
-    def change_player(self):
-        self.current_player = 1 - self.current_player
         self.bounces = [0, 0]

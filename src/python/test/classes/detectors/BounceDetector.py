@@ -16,7 +16,7 @@ class BounceDetector(object):
         self.pointQueue_x.append(elem[0])
         self.pointQueue_y.append(elem[1])
 
-    def bounce_point(self):
+    def detect(self):
         if len(self.pointQueue_x) < self.max_size:
             return None
         p, res, rank, sing, rcond = np.polyfit(np.asarray(self.pointQueue_x), np.asarray(self.pointQueue_y), 2, full=True)

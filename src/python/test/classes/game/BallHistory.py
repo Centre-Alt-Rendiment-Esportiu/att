@@ -30,7 +30,7 @@ class BallHistory:
 
     def has_bounced(self, center):
         self.bounceQueue.add_point(center)
-        bounce_point = self.bounceQueue.bounce_point()
+        bounce_point = self.bounceQueue.detect()
         if bounce_point:
             self.balls.appendleft(Ball(bounce_point, colorIndx=1))
             self.bounceQueue.clear()
