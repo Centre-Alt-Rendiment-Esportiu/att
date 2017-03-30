@@ -10,7 +10,6 @@ class BallTracker(object):
     def __init__(self, mask_table):
         self.background = BackgroundDetector()
         self.mask_table = mask_table
-        self.is_filled = False
 
     def track(self, frame):
         # Update background subtraction

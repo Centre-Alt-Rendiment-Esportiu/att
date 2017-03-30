@@ -36,6 +36,9 @@ class PingPongApp(object):
                 else:
                     break
 
+            height, width = frame.shape[:2]
+            frame = cv2.resize(frame, (int(width / 1.20), int(height / 1.20)), interpolation=cv2.INTER_AREA)
+
             if first_frame:
                 self.first_frame_extract(frame=frame)
                 first_frame = False
@@ -68,7 +71,8 @@ class PingPongApp(object):
         table_points = TableDetector.detect(frame)
         self.game.set_table(table_points)
 
-        mask_table = TableDetector.create_table_mask(frame, self.height, self.width)
+        height, width = frame.shape[:2]
+        mask_table = TableDetector.create_table_mask(frame, height, width)
         self.ballTracker = BallTracker(mask_table=mask_table)
         self.ballTracker.background.update(frame)  # Initialize background subtraction
 
