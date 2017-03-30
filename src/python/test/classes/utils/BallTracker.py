@@ -17,12 +17,10 @@ class BallTracker(object):
         self.background.update(frame)
 
         # Search for ball inside table
-        """
         frame_table = frame * self.mask_table
         center = BallDetector.simple_detect(frame_table)
         if center:
             return center
-        """
 
         # If not found, search outside table
         frame_background_sub = self.background.detect(frame)
