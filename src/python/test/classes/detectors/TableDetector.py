@@ -22,7 +22,6 @@ class TableDetector:
         mask = cv2.inRange(frame_hsv, min_color, max_color)
         mask = cv2.dilate(mask, np.ones((5, 5), np.uint8), iterations=5)
         mask = cv2.erode(mask, None, iterations=5)
-        # mask = cv2.dilate(mask, None, iterations=5)
         cnts = cv2.findContours(mask.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)[-2]
         if len(cnts) > 0:
             sort = sorted(cnts, key=cv2.contourArea, reverse=True)

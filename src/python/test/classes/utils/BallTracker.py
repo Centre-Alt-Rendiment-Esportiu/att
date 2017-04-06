@@ -1,15 +1,18 @@
-# import the necessary packages
-
 import cv2
-
+from test.classes.detectors.TableDetector import TableDetector
 from test.classes.detectors.BackgroundDetector import BackgroundDetector
 from test.classes.detectors.BallDetector import BallDetector
 
 
 class BallTracker(object):
-    def __init__(self, mask_table):
+    def __init__(self):
         self.background = BackgroundDetector()
-        self.mask_table = mask_table
+        self.mask_table = None
+
+    def first_frame(self, frame):
+        height, width = frame.shape[:2]
+        self.mask_table = TableDetector.create_table_mask(frame, height, width)
+        self.background.update(frame)
 
     def track(self, frame):
         # Update background subtraction

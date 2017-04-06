@@ -17,7 +17,7 @@ params.blobColor = 255
 
 # Filter by Area.
 params.filterByArea = True
-params.minArea = 25
+params.minArea = 100
 # params.maxArea = 2000
 
 # Filter by Circularity
@@ -30,7 +30,7 @@ params.minConvexity = 0.9
 
 # Filter by Inertia
 params.filterByInertia = True
-params.minInertiaRatio = 0.07
+params.minInertiaRatio = 0.08
 
 detector = cv2.SimpleBlobDetector_create(params)
 
@@ -39,19 +39,13 @@ class BallDetector:
     @staticmethod
     def create_ball_mask(frame):
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        # find white color maskBall
-        # mask = cv2.dilate(hsv, None, iterations=0)
-        morph = cv2.morphologyEx(hsv, cv2.MORPH_CLOSE, (10, 10))
-        mask = cv2.inRange(morph, lower_white, upper_white)
+        mask = cv2.inRange(hsv, lower_white, upper_white)
         return mask
-
 
     @staticmethod
     def simple_detect(frame):
         mask = BallDetector.create_ball_mask(frame)
-        # gray_mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-        gray_mask = mask
-        cnts = cv2.findContours(gray_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
+        cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
         center = None
         # only proceed if at least one contour was found
         if len(cnts) > 0:
@@ -64,15 +58,6 @@ class BallDetector:
     @staticmethod
     def complex_detect(frame):
         keypoints = detector.detect(frame)
-
-        # Draw detected blobs as red circles.
-        # cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
-        im_with_keypoints = cv2.drawKeypoints(frame, keypoints, np.array([]), (0, 0, 255),
-                                               cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-        # Show keypoints
-        cv2.imshow("Keypoints", im_with_keypoints)
-
         if keypoints:
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             # Search for the whitest of all blobs

@@ -12,15 +12,14 @@ class PingPongApp(object):
     def __init__(self, args):
         self.camera = Camera(args)
 
-        self.height = self.camera.height
-        self.width = self.camera.width
-
         self.writer = None
         if args.get("output", True):
+            height = self.camera.height
+            width = self.camera.width
             fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-            self.writer = cv2.VideoWriter(args["output"], fourcc, args["frames"], (self.width, self.height), True)
+            self.writer = cv2.VideoWriter(args["output"], fourcc, args["frames"], (width, height), True)
 
-        self.ballTracker = None
+        self.ballTracker = BallTracker()
         self.game = Game(args)
         self.loop = args["LOOP"]
 
@@ -36,11 +35,10 @@ class PingPongApp(object):
                 else:
                     break
 
-            height, width = frame.shape[:2]
-            frame = cv2.resize(frame, (int(width / 1.20), int(height / 1.20)), interpolation=cv2.INTER_AREA)
-
             if first_frame:
-                self.first_frame_extract(frame=frame)
+                table_points = TableDetector.detect(frame)
+                self.game.set_table(table_points)
+                self.ballTracker.first_frame(frame)
                 first_frame = False
                 continue
 
@@ -67,16 +65,8 @@ class PingPongApp(object):
             self.writer.release()
         cv2.destroyAllWindows()
 
-    def first_frame_extract(self, frame):
-        table_points = TableDetector.detect(frame)
-        self.game.set_table(table_points)
-
-        height, width = frame.shape[:2]
-        mask_table = TableDetector.create_table_mask(frame, height, width)
-        self.ballTracker = BallTracker(mask_table=mask_table)
-        self.ballTracker.background.update(frame)  # Initialize background subtraction
-
     def paint_info(self, frame):
+        # Paint scoreboard
         text = 'Points: ' + str(self.game.players[0].score) + ' - ' + str(self.game.players[1].score)
         cv2.putText(frame, text, (10, 500), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
 

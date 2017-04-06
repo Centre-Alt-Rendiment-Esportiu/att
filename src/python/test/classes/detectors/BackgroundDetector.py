@@ -12,11 +12,7 @@ class BackgroundDetector:
     def detect(self, frame):
         # Remove salt and pepper noise
         median_filter = cv2.medianBlur(self.background_filter, 5)
-        # kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-
-        final_filter = cv2.morphologyEx(median_filter, cv2.MORPH_CLOSE, (2, 2))
-
         # Apply background subtracted frame
-        extracted_frame = cv2.bitwise_and(frame, frame, mask=final_filter)
+        extracted_frame = cv2.bitwise_and(frame, frame, mask=median_filter)
 
         return extracted_frame
