@@ -32,10 +32,10 @@ class BallTracker(object):
 
         # If not found, search outside table
 
-        frame_out_table = frame - frame * self.mask_outer_table
+        frame_out_table = frame - frame * self.mask_inner_table
         background_sub = self.background.detect(frame_out_table)
 
-        # cv2.imshow("Background-Subtract Mask", background_sub)
+        cv2.imshow("Background-Subtract Mask", background_sub)
 
         center = BallDetector.outside_detect(background_sub)
         if center:
