@@ -42,9 +42,9 @@ class PingPongApp(object):
                 first_frame = False
                 continue
 
-            # Get next tracked center
-            center = self.ballTracker.track(frame)
-            self.game.update_history(center)
+            # Get next tracked ball
+            detected_ball = self.ballTracker.track(frame)
+            self.game.update_history(detected_ball)
 
             # Paint calculated info
             processed_frame = self.paint_info(frame)

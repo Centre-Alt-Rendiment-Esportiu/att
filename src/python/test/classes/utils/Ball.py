@@ -4,9 +4,9 @@ ballColors = ((0, 255, 0), (255, 0, 0))
 
 
 class Ball:
-    def __init__(self, center, is_bounce):
+    def __init__(self, center):
         self.center = center
-        self.is_bounce = is_bounce
+        self.is_bounce = False
         self.position_state = PositionState.UNKNOWN
 
     def get_color(self):
@@ -14,6 +14,3 @@ class Ball:
 
     def get_size(self):
         return 10 if self.is_bounce else 5
-
-    def set_position_state(self, pos_state):
-        self.position_state = pos_state

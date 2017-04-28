@@ -2,6 +2,8 @@ import cv2
 from test.classes.detectors.TableDetector import TableDetector
 from test.classes.detectors.BackgroundDetector import BackgroundDetector
 from test.classes.detectors.BallDetector import BallDetector
+from test.classes.utils.Ball import Ball
+from test.classes.utils.BallState import PositionState
 
 
 class BallTracker(object):
@@ -22,12 +24,18 @@ class BallTracker(object):
         frame_table = frame * self.mask_table
         center = BallDetector.simple_detect(frame_table)
         if center:
-            return center
+            detected_ball = Ball(center)
+            detected_ball.position_state = PositionState.IN
+            return detected_ball
 
         # If not found, search outside table
         frame_background_sub = self.background.detect(frame)
 
-        cv2.imshow("Background-Subtract Mask", frame_background_sub)
+        # cv2.imshow("Background-Subtract Mask", frame_background_sub)
 
         center = BallDetector.complex_detect(frame_background_sub)
-        return center
+        if center:
+            detected_ball = Ball(center)
+            detected_ball.position_state = PositionState.OUT
+            return detected_ball
+        return None
