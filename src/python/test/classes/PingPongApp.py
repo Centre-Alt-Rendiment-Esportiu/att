@@ -66,14 +66,15 @@ class PingPongApp(object):
         cv2.destroyAllWindows()
 
     def paint_info(self, frame):
-        # Paint scoreboard
-        text = 'Points: ' + str(self.game.players[0].score) + ' - ' + str(self.game.players[1].score)
-        cv2.putText(frame, text, (10, 500), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
+        # TODO : Paint scoreboard
+        # text = 'Points: ' + str(self.game.players[0].score) + ' - ' + str(self.game.players[1].score)
+        # cv2.putText(frame, text, (10, 500), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
 
         # loop over the set of tracked points
+        # And paint them on the frame
         ball_history = self.game.ball_history
         if len(ball_history) > 0:
-            cv2.circle(frame, ball_history[0].center, ball_history[0].size, ball_history[0].color, -1)
+            cv2.circle(frame, ball_history[0].center, ball_history[0].get_size(), ball_history[0].get_color(), -1)
             for i in range(1, len(ball_history)):
                 prevBall, currBall = ball_history[i - 1], ball_history[i]
                 # if either of the tracked points are None, ignore them
@@ -81,5 +82,5 @@ class PingPongApp(object):
                     continue
                 thickness = 3
                 cv2.line(frame, prevBall.center, currBall.center, ball_history.line_color(), thickness)
-                cv2.circle(frame, currBall.center, currBall.size, currBall.color, -1)
+                cv2.circle(frame, currBall.center, currBall.get_size(), currBall.get_color(), -1)
         return frame
