@@ -22,7 +22,7 @@ class BallTracker(object):
 
         # Search for ball inside table
         frame_table = frame * self.mask_table
-        center = BallDetector.simple_detect(frame_table)
+        center = BallDetector.inside_detect(frame_table)
         if center:
             detected_ball = Ball(center)
             detected_ball.position_state = PositionState.IN
@@ -33,7 +33,7 @@ class BallTracker(object):
 
         # cv2.imshow("Background-Subtract Mask", frame_background_sub)
 
-        center = BallDetector.complex_detect(frame_background_sub)
+        center = BallDetector.outside_detect(frame_background_sub)
         if center:
             detected_ball = Ball(center)
             detected_ball.position_state = PositionState.OUT
