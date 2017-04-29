@@ -4,7 +4,7 @@ import cv2
 
 class Neighborhood:
     @staticmethod
-    def apply_neighbor_mask(frame, p1, p2):
+    def apply_mask(frame, p1, p2):
         if p1 is None or p2 is None:
             return frame
         height, width = frame.shape[:2]

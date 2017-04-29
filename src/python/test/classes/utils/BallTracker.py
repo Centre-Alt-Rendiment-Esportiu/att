@@ -24,7 +24,7 @@ class BallTracker(object):
         # CREATE NEIGHBORHOOD FRAME
         # Circle centered in prev1, with radius 2 * norm(prev2-prev1)
             # if prev1 and prev2 exist, otherwise it leaves frame as it is
-        frame_neighborhood = Neighborhood.apply_neighbor_mask(frame, prev1, prev2)
+        frame_neighborhood = Neighborhood.apply_mask(frame, prev1, prev2)
 
         # SEARCH INSIDE TABLE
 

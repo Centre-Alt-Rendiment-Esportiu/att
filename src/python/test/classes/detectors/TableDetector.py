@@ -11,7 +11,7 @@ class TableDetector:
         height, width = first_frame.shape[:2]
         table_mask = np.zeros((height, width), np.uint8)
         # 0 is table, 1 is background
-        table_contours = TableDetector.detect_inner_table(first_frame)
+        table_contours = TableDetector.detect(first_frame)
         cv2.fillConvexPoly(table_mask, table_contours, 1)
         self.table_mask = np.dstack(3 * (table_mask,))
 
@@ -19,7 +19,7 @@ class TableDetector:
         return frame * self.table_mask
 
     @staticmethod
-    def detect_inner_table(frame):
+    def detect(frame):
         frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(frame_hsv, min_color, max_color)
         mask = cv2.dilate(mask, np.ones((5, 5), np.uint8), iterations=5)

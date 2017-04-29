@@ -43,7 +43,7 @@ class PingPongApp(object):
                     break
 
             if first_frame:
-                table_points = TableDetector.detect_inner_table(frame)
+                table_points = TableDetector.detect(frame)
                 self.game.set_table(table_points)
                 self.ballTracker.first_frame(frame)
                 first_frame = False
