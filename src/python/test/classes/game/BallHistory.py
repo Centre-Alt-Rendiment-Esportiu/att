@@ -11,7 +11,7 @@ lineColors = ((0, 0, 255), (0, 255, 255))
 class BallHistory:
     def __init__(self):
         self.balls = deque(maxlen=16)
-        self.bounce_queue = BounceDetector(size=8)
+        self.bounce_queue = BounceDetector(size=40)
         self.direction = 0
 
     def check_direction_change(self, ball):
@@ -42,7 +42,6 @@ class BallHistory:
         if ball is None:
             return
         ball.is_bounce = False
-        self.check_direction_change(ball)
         self.has_bounced(ball)
         self.balls.appendleft(ball)
 

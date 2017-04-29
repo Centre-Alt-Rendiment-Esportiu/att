@@ -2,12 +2,12 @@ import cv2
 
 from test.classes.detectors.BallDetector import BallDetector
 from test.classes.game.BallHistory import BallHistory
-from test.classes.utils.SplineTracker import SplineTracker
+from test.classes.utils.PolyFitTracker import PolyFitTracker
 
 
 class BallTracker(object):
     def __init__(self):
-        self.spline_tracker = SplineTracker()
+        self.polyfit_tracker = PolyFitTracker()
         self.ball_history = BallHistory()
         self.ball_detector = None
 
@@ -17,7 +17,19 @@ class BallTracker(object):
     def track(self, frame):
         detected_ball = self.ball_detector.detect(frame)
         if detected_ball:
+            if self.ball_history.check_direction_change(detected_ball):
+                self.polyfit_tracker.clear()
+
+            self.polyfit_tracker.add_point(detected_ball)
+            bounce_point = self.polyfit_tracker.find_bounce()
             self.ball_history.update_history(detected_ball)
+        else:
+            extrapol_ball = self.polyfit_tracker.extrapolate()
+            if extrapol_ball is not None:
+                extrapol_ball.is_extrapolate = True
+                self.polyfit_tracker.add_point(extrapol_ball)
+                self.ball_history.update_history(extrapol_ball)
+
         tracked_frame = self.paint_info(frame)
         return tracked_frame
 

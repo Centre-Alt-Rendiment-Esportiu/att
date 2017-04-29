@@ -7,6 +7,7 @@ class Ball:
     def __init__(self, center):
         self.center = center
         self.is_bounce = False
+        self.is_extrapolate = False
         self.position_state = PositionState.UNKNOWN
 
     def get_color(self):
