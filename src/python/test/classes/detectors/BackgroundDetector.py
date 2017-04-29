@@ -9,7 +9,7 @@ class BackgroundDetector:
     def update(self, frame):
         self.background_filter = self.fgbg.apply(frame)
 
-    def detect(self, frame):
+    def apply(self, frame):
         # Remove salt and pepper noise
         median_filter = cv2.medianBlur(self.background_filter, 5)
         # Apply background subtracted frame

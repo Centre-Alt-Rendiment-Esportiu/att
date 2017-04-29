@@ -25,7 +25,7 @@ class PingPongAppMock(PingPongApp):
                     break
 
             # Get next tracked center
-            center = self.ballTracker.track(frame)
+            center = self.ball_tracker.track(frame)
             if center:
                 self.ballHistory.add_ball(center, self.camera.get_curr_frame_number())
 

@@ -9,9 +9,9 @@ lineColors = ((0, 0, 255), (0, 255, 255))
 
 
 class BallHistory:
-    def __init__(self, tailsize):
-        self.balls = deque(maxlen=tailsize)
-        self.bounceQueue = BounceDetector(size=8)
+    def __init__(self):
+        self.balls = deque(maxlen=16)
+        self.bounce_queue = BounceDetector(size=8)
         self.direction = 0
 
     def check_direction_change(self, ball):
@@ -30,23 +30,25 @@ class BallHistory:
         self.clear_history()
 
     def has_bounced(self, ball):
-        self.bounceQueue.add_point(ball.center)
-        bounce_point = self.bounceQueue.detect()
+        self.bounce_queue.add_point(ball.center)
+        bounce_point = self.bounce_queue.detect()
         if bounce_point:
             bounce = Ball(bounce_point)
             bounce.is_bounce = True
             self.balls.appendleft(bounce)
-            self.bounceQueue.clear()
-            return bounce_point
-        return None
+            self.bounce_queue.clear()
 
     def update_history(self, ball):
+        if ball is None:
+            return
         ball.is_bounce = False
+        self.check_direction_change(ball)
+        self.has_bounced(ball)
         self.balls.appendleft(ball)
 
     def clear_history(self):
         self.balls.clear()
-        self.bounceQueue.clear()
+        self.bounce_queue.clear()
 
     def line_color(self):
         return lineColors[self.direction]
