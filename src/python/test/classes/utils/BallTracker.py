@@ -22,7 +22,8 @@ class BallTracker(object):
         # Update background subtraction
         self.background.update(frame)
 
-        # Search for ball inside table
+        # SEARCH INSIDE TABLE
+
         frame_in_table = frame * self.mask_inner_table
         center = BallDetector.inside_detect(frame_in_table)
         if center:
@@ -30,7 +31,8 @@ class BallTracker(object):
             detected_ball.position_state = PositionState.IN
             return detected_ball
 
-        # If not found, search outside table
+        # If not found
+        # SEARCH OUTSIDE TABLE
 
         frame_out_table = frame - frame * self.mask_inner_table
         background_sub = self.background.detect(frame_out_table)
