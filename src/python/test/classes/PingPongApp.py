@@ -1,6 +1,7 @@
 # import the necessary packages
 
 import cv2
+import progressbar
 
 from test.classes.detectors.TableDetector import TableDetector
 from test.classes.game.Game import Game
@@ -25,6 +26,12 @@ class PingPongApp(object):
 
     def run(self):
         first_frame = True
+        prev1 = None
+        prev2 = None
+
+        print("Processing video....")
+        bar = progressbar.ProgressBar(max_value=self.camera.num_frames)
+
         while True:
             # grab the current frame
             frame = self.camera.get_next_frame(self.loop)
@@ -36,15 +43,18 @@ class PingPongApp(object):
                     break
 
             if first_frame:
-                table_points = TableDetector.detect_inner(frame)
+                table_points = TableDetector.detect(frame)
                 self.game.set_table(table_points)
                 self.ballTracker.first_frame(frame)
                 first_frame = False
                 continue
 
-            # Get next tracked ball
-            detected_ball = self.ballTracker.track(frame)
+            detected_ball = self.ballTracker.track(frame, prev1, prev2)
             self.game.update_history(detected_ball)
+
+            # Update previous balls
+            prev2 = prev1
+            prev1 = detected_ball
 
             # Paint calculated info
             processed_frame = self.paint_info(frame)
@@ -58,6 +68,8 @@ class PingPongApp(object):
 
             if cv2.waitKey(1) & 0xFF is ord('q'):
                 break
+
+            bar.update(self.camera.get_curr_frame_number())
 
         # Clean up the camera and close any open windows
         self.camera.release()

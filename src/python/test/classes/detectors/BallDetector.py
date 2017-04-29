@@ -37,12 +37,6 @@ detector = cv2.SimpleBlobDetector_create(params)
 
 class BallDetector:
     @staticmethod
-    def create_ball_mask(frame):
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, lower_white, upper_white)
-        return mask
-
-    @staticmethod
     def inside_detect(frame):
         mask = BallDetector.create_ball_mask(frame)
         cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
@@ -64,3 +58,9 @@ class BallDetector:
             whitest_point = max(keypoints, key=lambda x: hsv[int(x.pt[1])][int(x.pt[0])][2])
             return tuple([int(whitest_point.pt[0]), int(whitest_point.pt[1])])
         return None
+
+    @staticmethod
+    def create_ball_mask(frame):
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(hsv, lower_white, upper_white)
+        return mask
