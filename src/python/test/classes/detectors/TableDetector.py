@@ -15,7 +15,7 @@ class TableDetector:
         cv2.fillConvexPoly(table_mask, table_contours, 1)
         self.table_mask = np.dstack(3 * (table_mask,))
 
-    def apply_mask(self, frame):
+    def apply(self, frame):
         return frame * self.table_mask
 
     @staticmethod

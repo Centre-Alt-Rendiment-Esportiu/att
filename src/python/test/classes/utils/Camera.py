@@ -10,12 +10,13 @@ class Camera:
         self.height = int(self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.width = int(self.camera.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.num_frames = int(self.camera.get(cv2.CAP_PROP_FRAME_COUNT))
+        self.loop = args["LOOP"]
 
-    def get_next_frame(self, loop=False):
+    def get_next_frame(self):
         (grabbed, frame) = self.camera.read()
 
         if not grabbed:
-            if loop:
+            if self.loop:
                 self.camera.set(cv2.CAP_PROP_FRAME_COUNT, 0)
                 self.camera.release()
                 self.camera = cv2.VideoCapture(self.VIDEODEV)

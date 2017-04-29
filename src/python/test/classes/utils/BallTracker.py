@@ -1,56 +1,45 @@
 import cv2
 
-from test.classes.detectors.BackgroundDetector import BackgroundDetector
 from test.classes.detectors.BallDetector import BallDetector
-from test.classes.detectors.TableDetector import TableDetector
-from test.classes.utils.Ball import Ball
-from test.classes.utils.BallState import PositionState
-from test.classes.utils.Neighborhood import Neighborhood
+from test.classes.game.BallHistory import BallHistory
+from test.classes.utils.SplineTracker import SplineTracker
 
 
 class BallTracker(object):
     def __init__(self):
-        self.background = BackgroundDetector()
-        self.table = None
+        self.spline_tracker = SplineTracker()
+        self.ball_history = BallHistory()
+        self.ball_detector = None
 
     def first_frame(self, frame):
-        self.table = TableDetector(frame)
-        self.background.update(frame)
+        self.ball_detector = BallDetector(frame)
 
-    def track(self, frame, prev1, prev2):
-        # Update background subtraction
-        self.background.update(frame)
+    def track(self, frame):
+        detected_ball = self.ball_detector.detect(frame)
+        if detected_ball:
+            self.ball_history.update_history(detected_ball)
+        tracked_frame = self.paint_info(frame)
+        return tracked_frame
 
-        # CREATE NEIGHBORHOOD FRAME
-        # Circle centered in prev1, with radius 2 * norm(prev2-prev1)
-            # if prev1 and prev2 exist, otherwise it leaves frame as it is
-        frame_neighborhood = Neighborhood.apply_mask(frame, prev1, prev2)
+    def clear_history(self):
+        self.ball_history.clear_history()
 
-        # SEARCH INSIDE TABLE
+    def paint_info(self, frame):
+        # TODO : Paint scoreboard
+        # text = 'Points: ' + str(self.game.players[0].score) + ' - ' + str(self.game.players[1].score)
+        # cv2.putText(frame, text, (10, 500), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
 
-        frame_in_table = self.table.apply_mask(frame_neighborhood)
-
-        cv2.imshow("Background-Subtract Mask", frame_in_table)
-
-        center = BallDetector.inside_detect(frame_in_table)
-        if center:
-            detected_ball = Ball(center)
-            detected_ball.position_state = PositionState.IN
-            return detected_ball
-
-        # If not found inside table,
-        # SEARCH OUTSIDE TABLE
-
-        frame_out_table = frame_neighborhood
-        background_sub = self.background.detect(frame_out_table)
-
-        cv2.imshow("Background-Subtract Mask", frame_out_table)
-
-        center = BallDetector.outside_detect(background_sub)
-        if center:
-            detected_ball = Ball(center)
-            detected_ball.position_state = PositionState.OUT
-            return detected_ball
-
-        # If not found anywhere
-        return None
+        # loop over the set of tracked points
+        # And paint them on the frame
+        b_h = self.ball_history
+        if len(b_h) > 0:
+            cv2.circle(frame, b_h[0].center, b_h[0].get_size(), b_h[0].get_color(), -1)
+            for i in range(1, len(b_h)):
+                prev_b, curr_b = b_h[i - 1], b_h[i]
+                # if either of the tracked balls are None, ignore them
+                if prev_b.center is None or curr_b.center is None:
+                    continue
+                thickness = 3
+                cv2.line(frame, prev_b.center, curr_b.center, b_h.line_color(), thickness)
+                cv2.circle(frame, curr_b.center, curr_b.get_size(), curr_b.get_color(), -1)
+        return frame

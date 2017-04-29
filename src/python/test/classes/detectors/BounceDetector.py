@@ -19,7 +19,8 @@ class BounceDetector(object):
     def detect(self):
         if len(self.pointQueue_x) < self.max_size:
             return None
-        p, res, rank, sing, rcond = np.polyfit(np.asarray(self.pointQueue_x), np.asarray(self.pointQueue_y), 2, full=True)
+        p, res, rank, sing, rcond = np.polyfit(np.asarray(self.pointQueue_x),
+                                               np.asarray(self.pointQueue_y), 2, full=True)
         if res < 7:
             return None
         center_x = int(np.rint(self.pointQueue_x[-1] + self.pointQueue_x[-2])/2)
