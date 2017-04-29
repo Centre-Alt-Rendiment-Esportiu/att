@@ -43,7 +43,7 @@ class BallDetector:
         return mask
 
     @staticmethod
-    def simple_detect(frame):
+    def inside_detect(frame):
         mask = BallDetector.create_ball_mask(frame)
         cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
         center = None
@@ -56,7 +56,7 @@ class BallDetector:
         return center
 
     @staticmethod
-    def complex_detect(frame):
+    def outside_detect(frame):
         keypoints = detector.detect(frame)
         if keypoints:
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)

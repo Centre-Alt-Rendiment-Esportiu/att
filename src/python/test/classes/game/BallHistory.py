@@ -14,7 +14,8 @@ class BallHistory:
         self.bounceQueue = BounceDetector(size=8)
         self.direction = 0
 
-    def check_direction_change(self, center):
+    def check_direction_change(self, ball):
+        center = ball.center
         if len(self) > 0:
             if (self[0].center[0] - center[0]) < 0 and self.direction != 0:
                 self.change_direction()
@@ -28,17 +29,20 @@ class BallHistory:
         self.direction = 1 - self.direction
         self.clear_history()
 
-    def has_bounced(self, center):
-        self.bounceQueue.add_point(center)
+    def has_bounced(self, ball):
+        self.bounceQueue.add_point(ball.center)
         bounce_point = self.bounceQueue.detect()
         if bounce_point:
-            self.balls.appendleft(Ball(bounce_point, colorIndx=1))
+            bounce = Ball(bounce_point)
+            bounce.is_bounce = True
+            self.balls.appendleft(bounce)
             self.bounceQueue.clear()
             return bounce_point
         return None
 
-    def update_history(self, center):
-        self.balls.appendleft(Ball(center, colorIndx=0))
+    def update_history(self, ball):
+        ball.is_bounce = False
+        self.balls.appendleft(ball)
 
     def clear_history(self):
         self.balls.clear()
