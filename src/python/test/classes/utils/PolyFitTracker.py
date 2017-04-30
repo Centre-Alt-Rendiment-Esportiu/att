@@ -26,7 +26,7 @@ class PolyFitTracker:
         x1, x2 = b1.center[0], b2.center[0]
 
         extrapol_x = 2 * x1 - x2  # x1 + (x1 - x2)
-        if abs(extrapol_x - x_bound) > max_length / 4:
+        if abs(extrapol_x - x_bound) > max_length / 2:
             return
 
         # Evaluate parabola at next possible point
