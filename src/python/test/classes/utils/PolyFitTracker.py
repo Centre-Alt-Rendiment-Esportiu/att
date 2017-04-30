@@ -18,7 +18,7 @@ class PolyFitTracker:
         if len(real_balls) < 3:
             return
 
-        # Don't extrapolate if it's further than 1/8th of the way
+        # Don't extrapolate if it's very far away from x_bound in terms of max_length
         max_length = abs(real_balls[0].center[0] - real_balls[-1].center[0])
         x_bound = real_balls[-1].center[0]
 
