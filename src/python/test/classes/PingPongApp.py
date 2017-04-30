@@ -43,16 +43,17 @@ class PingPongApp(object):
                 continue
 
             tracked_frame = self.ball_tracker.track(frame)
-            cv2.imshow("PingPongApp", tracked_frame)
 
-            # Write to file if necessary
+            # Write to file if asked
             if self.writer is not None:
                 self.writer.write(tracked_frame)
+                bar.update(self.camera.get_curr_frame_number())
+            # If not, show on screen
+            else:
+                cv2.imshow("PingPongApp", tracked_frame)
 
             if cv2.waitKey(1) & 0xFF is ord('q'):
                 break
-
-            bar.update(self.camera.get_curr_frame_number())
 
         # Clean up the camera and close any open windows
         self.camera.release()
