@@ -15,7 +15,7 @@ class PolyFitTracker:
 
     def extrapolate(self):
         real_balls = list(filter(lambda x: not x.is_extrapolate, self.ball_queue))
-        if len(real_balls) < 3:
+        if len(real_balls) < 5:
             return
 
         # Don't extrapolate if it's very far away from x_bound in terms of max_length
