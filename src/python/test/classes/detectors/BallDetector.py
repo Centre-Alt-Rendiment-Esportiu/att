@@ -87,6 +87,9 @@ class BallDetector:
         # Not found anywhere: return None
         return None
 
+    def is_inside_table(self, point):
+        return self.table.is_inside(point)
+
     @staticmethod
     def inside_detect(frame):
         mask = BallDetector.create_ball_mask(frame)

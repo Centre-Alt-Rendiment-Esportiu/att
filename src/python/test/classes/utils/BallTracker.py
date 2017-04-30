@@ -2,22 +2,42 @@ import cv2
 
 from test.classes.detectors.BallDetector import BallDetector
 from test.classes.game.BallHistory import BallHistory
-from test.classes.utils.SplineTracker import SplineTracker
+from test.classes.utils.BallState import PositionState
+from test.classes.utils.PolyFitTracker import PolyFitTracker
 
 
 class BallTracker(object):
     def __init__(self):
-        self.spline_tracker = SplineTracker()
+        self.polyfit_tracker = PolyFitTracker()
         self.ball_history = BallHistory()
         self.ball_detector = None
 
-    def first_frame(self, frame):
-        self.ball_detector = BallDetector(frame)
+    def first_frame(self, first_frame):
+        self.ball_detector = BallDetector(first_frame)
 
     def track(self, frame):
         detected_ball = self.ball_detector.detect(frame)
-        if detected_ball:
+        if detected_ball is not None:
+            if self.ball_history.check_direction_change(detected_ball):
+                self.polyfit_tracker.clear()
+
+            self.polyfit_tracker.add_ball(detected_ball)
+
+            bounce = self.polyfit_tracker.find_bounce()
+            if bounce is not None:
+                bounce.position_state = PositionState.IN \
+                    if self.ball_detector.is_inside_table(bounce.center) \
+                    else PositionState.OUT
+                self.ball_history.update_history(bounce)
+
             self.ball_history.update_history(detected_ball)
+
+        else:
+            extrapol_ball = self.polyfit_tracker.extrapolate()
+            if extrapol_ball is not None:
+                # self.polyfit_tracker.add_ball(extrapol_ball)
+                self.ball_history.update_history(extrapol_ball)
+
         tracked_frame = self.paint_info(frame)
         return tracked_frame
 
