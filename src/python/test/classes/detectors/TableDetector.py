@@ -10,7 +10,7 @@ class TableDetector:
     def __init__(self, first_frame):
         height, width = first_frame.shape[:2]
         table_mask = np.zeros((height, width), np.uint8)
-        # 0 is table, 1 is background
+        # 1 is table, 0 is background
         self.table_contours = TableDetector.detect(first_frame)
         cv2.fillConvexPoly(table_mask, self.table_contours, 1)
         self.table_mask = np.dstack(3 * (table_mask,))
