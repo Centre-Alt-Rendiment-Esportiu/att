@@ -1,7 +1,8 @@
+import cv2
+import numpy as np
+
 from test.classes.game.BallHistory import BallHistory
 from test.classes.game.Player import Player
-import numpy as np
-import cv2
 
 
 class Game:

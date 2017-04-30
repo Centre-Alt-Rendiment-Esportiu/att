@@ -1,6 +1,6 @@
 from test.classes.utils.BallState import PositionState
 
-ballColors = ((0, 255, 0), (255, 0, 0))
+ballColors = ((0, 255, 0), (255, 0, 0), (51, 102, 0))
 
 
 class Ball:
@@ -11,7 +11,12 @@ class Ball:
         self.position_state = PositionState.UNKNOWN
 
     def get_color(self):
-        return ballColors[1 if self.is_bounce else 0]
+        if self.is_bounce and self.position_state == PositionState.IN:
+            return ballColors[1]
+        if self.is_extrapolate:
+            return ballColors[2]
+        else:
+            return ballColors[0]
 
     def get_size(self):
-        return 10 if self.is_bounce else 5
+        return 10 if (self.is_bounce and self.position_state != PositionState.OUT) or self.is_extrapolate else 5
