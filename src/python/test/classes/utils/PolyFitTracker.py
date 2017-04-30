@@ -48,7 +48,7 @@ class PolyFitTracker:
         y_val = np.array([p.center[1] for p in last_balls])
         _pol, res, _rank, _sing, _rcond = np.polyfit(x_val, y_val, 2, full=True)
 
-        if res > 10:
+        if res > 7:
             last_balls_without_last = list(self.ball_queue)[-self.max_history+1:-1]
             x_val = np.array([p.center[0] for p in last_balls_without_last])
             y_val = np.array([p.center[1] for p in last_balls_without_last])

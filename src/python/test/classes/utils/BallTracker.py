@@ -36,6 +36,15 @@ class BallTracker(object):
             extrapol_ball = self.polyfit_tracker.extrapolate()
             if extrapol_ball is not None:
                 # self.polyfit_tracker.add_ball(extrapol_ball)
+                self.ball_detector.update_prev(extrapol_ball.center)
+
+                bounce = self.polyfit_tracker.find_bounce()
+                if bounce is not None:
+                    bounce.position_state = PositionState.IN \
+                        if self.ball_detector.is_inside_table(bounce.center) \
+                        else PositionState.OUT
+                    self.ball_history.update_history(bounce)
+
                 self.ball_history.update_history(extrapol_ball)
 
         tracked_frame = self.paint_info(frame)

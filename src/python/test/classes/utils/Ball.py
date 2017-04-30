@@ -11,7 +11,7 @@ class Ball:
         self.position_state = PositionState.UNKNOWN
 
     def get_color(self):
-        if self.is_bounce and self.position_state == PositionState.IN:
+        if self.is_bounce:
             return ballColors[1]
         if self.is_extrapolate:
             return ballColors[2]
@@ -19,4 +19,4 @@ class Ball:
             return ballColors[0]
 
     def get_size(self):
-        return 10 if (self.is_bounce and self.position_state != PositionState.OUT) or self.is_extrapolate else 5
+        return 10 if self.is_bounce or self.is_extrapolate else 5

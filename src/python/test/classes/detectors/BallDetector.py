@@ -62,8 +62,7 @@ class BallDetector:
         frame_in_table = self.table.apply(frame_neighborhood)
         center = BallDetector.inside_detect(frame_in_table)
         if center:
-            self.prev2 = self.prev1
-            self.prev1 = center
+            self.update_prev(center)
             detected_ball = Ball(center)
             detected_ball.position_state = PositionState.IN
             return detected_ball
@@ -76,19 +75,21 @@ class BallDetector:
 
         center = BallDetector.outside_detect(background_sub)
         if center:
-            self.prev2 = self.prev1
-            self.prev1 = center
+            self.update_prev(center)
             detected_ball = Ball(center)
             detected_ball.position_state = PositionState.OUT
             return detected_ball
 
-        self.prev2 = self.prev1
-        self.prev1 = None
+        self.update_prev(None)
         # Not found anywhere: return None
         return None
 
     def is_inside_table(self, point):
         return self.table.is_inside(point)
+
+    def update_prev(self, prev):
+        self.prev2 = self.prev1
+        self.prev1 = prev
 
     @staticmethod
     def inside_detect(frame):
