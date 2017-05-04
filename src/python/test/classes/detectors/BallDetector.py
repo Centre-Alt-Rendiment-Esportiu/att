@@ -55,14 +55,14 @@ class BallDetector:
         # CREATE NEIGHBORHOOD FRAME
         # Circle centered in prev1, with radius 2 * norm(prev2-prev1)
         # if prev1 and prev2 exist, otherwise it leaves frame as it is
-        frame_neighborhood = Neighborhood.apply(frame, self.prev1, self.prev2)
+        neighborhood = Neighborhood(self.prev1, self.prev2)
+        frame_neighborhood = neighborhood.apply_to_frame(frame)
 
         # SEARCH INSIDE TABLE
 
         frame_in_table = self.table.apply(frame_neighborhood)
         center = BallDetector.inside_detect(frame_in_table)
         if center:
-            self.update_prev(center)
             detected_ball = Ball(center)
             detected_ball.position_state = PositionState.IN
             return detected_ball
@@ -75,21 +75,19 @@ class BallDetector:
 
         center = BallDetector.outside_detect(background_sub)
         if center:
-            self.update_prev(center)
             detected_ball = Ball(center)
             detected_ball.position_state = PositionState.OUT
             return detected_ball
 
-        self.update_prev(None)
         # Not found anywhere: return None
         return None
 
     def is_inside_table(self, point):
         return self.table.is_inside(point)
 
-    def update_prev(self, prev):
+    def update_prev(self, ball):
         self.prev2 = self.prev1
-        self.prev1 = prev
+        self.prev1 = ball
 
     @staticmethod
     def inside_detect(frame):

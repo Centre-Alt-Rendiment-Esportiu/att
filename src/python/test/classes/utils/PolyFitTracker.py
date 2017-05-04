@@ -1,17 +1,16 @@
-from collections import deque
-
 import numpy as np
 
 from test.classes.utils.Ball import Ball
+from test.classes.utils.BallHistory import BallHistory
 
 
 class PolyFitTracker:
     def __init__(self):
         self.max_history = 8
-        self.ball_queue = deque()
+        self.ball_queue = BallHistory(tail_size=8)
 
-    def add_ball(self, point):
-        self.ball_queue.append(point)
+    def add_ball(self, ball):
+        self.ball_queue.update_history(ball)
 
     def extrapolate(self):
         real_balls = list(filter(lambda x: not x.is_extrapolate, self.ball_queue))
@@ -93,4 +92,4 @@ class PolyFitTracker:
         return None
 
     def clear(self):
-        self.ball_queue.clear()
+        self.ball_queue.clear_history()
