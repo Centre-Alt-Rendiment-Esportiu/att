@@ -1,12 +1,12 @@
 from test.classes.detectors.BallDetector import BallDetector
 from test.classes.detectors.BounceDetector import BounceDetector
 from test.classes.detectors.Extrapolator import Extrapolator
+from test.classes.utils.BallHistory import BallHistory
 
 
 class BallTracker:
     def __init__(self):
-        self.bounce_detector = BounceDetector()
-        self.extrapolator = Extrapolator()
+        self.ball_history = BallHistory()
         self.ball_detector = None
 
     def first_frame(self, first_frame):
@@ -15,27 +15,23 @@ class BallTracker:
     def track(self, frame):
         found_ball = self.ball_detector.detect(frame)
 
-        # TODO Limit extrapolations
         if found_ball.is_none():
-            found_ball = self.extrapolator.extrapolate()
+            found_ball = Extrapolator.extrapolate(self.ball_history)
 
-        self.update_detectors(found_ball)
+        # TODO Remove vertical movement
+        self.ball_history.update_history(found_ball)
 
         return found_ball
 
     def get_bounce(self):
-        bounce = self.bounce_detector.find_bounce()
+        bounce = BounceDetector.find_bounce(self.ball_history)
+        if not bounce.is_none():
+            # Bounces are detected after happening
+            after_bounce_ball = self.ball_history[-1]
+            self.ball_history.clear_history()
+            self.ball_history.update_history(after_bounce_ball)
         # TODO see if ball's inside or outside table - undo fisheye effect
         # bounce.position_state = PositionState.IN \
         #     if self.ball_detector.is_inside_table(bounce.center) \
         #     else PositionState.OUT
         return bounce
-
-    def update_detectors(self, ball):
-        # TODO Delete vertical movement
-        self.extrapolator.add_ball(ball)
-        self.bounce_detector.add_ball(ball)
-
-    def clear(self):
-        self.extrapolator.clear()
-        self.bounce_detector.clear()
