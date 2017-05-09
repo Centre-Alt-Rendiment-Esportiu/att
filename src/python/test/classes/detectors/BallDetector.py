@@ -55,7 +55,7 @@ class BallDetector:
         # CREATE NEIGHBORHOOD FRAME
         # Circle centered in prev1, with radius 2 * norm(prev2-prev1)
         # if prev1 and prev2 exist, otherwise it leaves frame as it is
-        neighborhood = Neighborhood(self.prev1, self.prev2)
+        neighborhood = Neighborhood(self.prev1, self.prev2, factor=2)
         frame_neighborhood = neighborhood.apply_to_frame(frame)
 
         # SEARCH INSIDE TABLE
