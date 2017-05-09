@@ -17,7 +17,7 @@ class BounceDetector:
     def find_bounce(self):
         # If we don't have enough points to find bounce, return None
         if len(self.ball_queue) < MIN_HISTORY_BOUNCE + 1:
-            return None
+            return Ball()
 
         # Fit a parabola through last MIN_HISTORY_BOUNCE points
         last_balls = list(self.ball_queue)[-MIN_HISTORY_BOUNCE:]
@@ -51,11 +51,11 @@ class BounceDetector:
             bounce_ball = Ball(tuple([center_x, center_y]))
             bounce_ball.is_bounce = True
             return bounce_ball
-        return None
+        return Ball()
 
     def find_bounce2(self):
         if len(self.ball_queue) < MIN_HISTORY_BOUNCE + 1:
-            return
+            return Ball()
 
         last_balls_without_last = list(self.ball_queue)[-MIN_HISTORY_BOUNCE - 1:-1]
         x_val = np.array([p.center[0] for p in last_balls_without_last])
@@ -77,7 +77,7 @@ class BounceDetector:
             bounce_ball = Ball(tuple([center_x, center_y]))
             bounce_ball.is_bounce = True
             return bounce_ball
-        return None
+        return Ball()
 
     def clear(self):
         self.ball_queue.clear_history()

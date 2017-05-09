@@ -17,7 +17,7 @@ class Extrapolator:
         real_balls = list(filter(lambda x: not x.is_extrapolate, self.ball_queue))
         # Don't extrapolate if there aren't enough balls to do so
         if len(real_balls) < MIN_HISTORY_EXTRAPOL:
-            return None
+            return Ball()
 
         max_length = abs(real_balls[0].center[0] - real_balls[-1].center[0])
         x_bound = real_balls[-1].center[0]
@@ -30,7 +30,7 @@ class Extrapolator:
 
         # Don't extrapolate if it's very far away from x_bound in terms of max_length
         if abs(extrapol_x - x_bound) > max_length / 3:
-            return None
+            return Ball()
 
         # Pass parabola through all real_balls
         x_val = np.array([p.center[0] for p in real_balls])

@@ -11,7 +11,7 @@ class PaintHistory:
         self.frames_since_ball = 0
 
     def update_history(self, ball):
-        if ball is not None:
+        if not ball.is_none():
             # NOTE Cannot paint floats!
             ball.center = tuple([int(ball.center[0]), int(ball.center[1])])
             self.ball_history.update_history(ball)

@@ -12,8 +12,8 @@ class BallDetector:
         self.inside = BallInsideSearch(first_frame)
         self.outside = BallOutsideSearch(first_frame)
         self.prevs = deque(maxlen=2)
-        self.prevs.append(None)
-        self.prevs.append(None)
+        self.prevs.append(Ball())
+        self.prevs.append(Ball())
 
     def detect(self, frame):
         # Update detectors
@@ -26,26 +26,27 @@ class BallDetector:
         frame_neighborhood = neighborhood.apply(frame)
 
         # SEARCH INSIDE TABLE
-        center = self.inside.search(frame_neighborhood)
-        if center:
-            detected_ball = Ball(center)
-            detected_ball.position_state = PositionState.IN
-            self.prevs.append(detected_ball)
-            return detected_ball
+        in_center = self.inside.search(frame_neighborhood)
+        if in_center:
+            in_detected_ball = Ball(in_center)
+            in_detected_ball.position_state = PositionState.IN
+            self.prevs.append(in_detected_ball)
+            return in_detected_ball
 
         # If not found inside table,
         # SEARCH OUTSIDE TABLE
 
-        center = self.outside.search(frame_neighborhood)
-        if center:
-            detected_ball = Ball(center)
-            detected_ball.position_state = PositionState.OUT
-            self.prevs.append(detected_ball)
-            return detected_ball
+        out_center = self.outside.search(frame_neighborhood)
+        if out_center:
+            out_detected_ball = Ball(out_center)
+            out_detected_ball.position_state = PositionState.OUT
+            self.prevs.append(out_detected_ball)
+            return out_detected_ball
 
         # Not found anywhere: return None
-        self.prevs.append(None)
-        return None
+        not_found = Ball()
+        self.prevs.append(not_found)
+        return not_found
 
     def update_detectors(self, frame):
         self.inside.update(frame)
