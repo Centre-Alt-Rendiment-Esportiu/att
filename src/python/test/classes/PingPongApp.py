@@ -45,22 +45,22 @@ class PingPongApp(object):
                 first_frame = False
                 continue
 
-            found_ball = self.ball_tracker.track(frame)
-            bounce_ball = self.ball_tracker.get_bounce()
+            found_ball, bounce_ball = self.ball_tracker.track(frame)
 
             # Reversed order because bounce is before
-            self.paint_history.update_history(bounce_ball)
+            if bounce_ball is not None:
+                self.paint_history.update_history(bounce_ball)
             self.paint_history.update_history(found_ball)
 
             tracked_frame = self.paint_history.draw_info(frame)
-
-            # Write to file if asked
-            if self.writer is not None:
-                self.writer.write(tracked_frame)
-                bar.update(self.camera.get_curr_frame_number())
-            # If not, show on screen
-            else:
-                cv2.imshow("PingPongApp", tracked_frame)
+            if tracked_frame is not None:
+                # Write to file if asked
+                if self.writer is not None:
+                    self.writer.write(tracked_frame)
+                    bar.update(self.camera.get_curr_frame_number())
+                # If not, show on screen
+                else:
+                    cv2.imshow("PingPongApp", tracked_frame)
 
             if cv2.waitKey(1) & 0xFF is ord('q'):
                 break

@@ -4,6 +4,7 @@ ballColors = ((0, 255, 0), (255, 0, 0), (51, 102, 0))
 
 
 class Ball:
+    # TODO work with center=None instead of throwing None's around
     def __init__(self, center):
         self.center = center
         self.is_bounce = False
@@ -19,4 +20,9 @@ class Ball:
             return ballColors[0]
 
     def get_size(self):
-        return 10 if self.is_bounce or self.is_extrapolate else 5
+        if self.is_bounce:
+            return 10
+        if self.is_extrapolate:
+            return 7
+        else:
+            return 5

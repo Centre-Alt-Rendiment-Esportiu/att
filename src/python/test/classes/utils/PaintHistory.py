@@ -1,43 +1,53 @@
+from collections import deque
+
 import cv2
 
 from test.classes.utils.BallHistory import BallHistory
-from test.classes.utils.Neighborhood import Neighborhood
+
+MAX_FRAMES_SINCE_BALL = 5
 
 
 class PaintHistory:
     def __init__(self):
         self.ball_history = BallHistory(tail_size=16)
-        self.prev1 = None
-        self.prev2 = None
+        self.frame_buffer = deque(maxlen=3)
+        self.frames_since_ball = 0
 
     def update_history(self, ball):
-        neighborhood = Neighborhood(self.prev1, ball)
-        if not neighborhood.is_inside(self.prev2):
-            # If self.prev2 is not in a reasonable region, we discard it
-            self.prev2 = None
-
-        self.ball_history.update_history(self.prev2)
-
-        self.prev2 = self.prev1
-        self.prev1 = ball
+        if ball is not None:
+            # NOTE Cannot paint floats!
+            ball.center = tuple([int(ball.center[0]), int(ball.center[1])])
+            self.ball_history.update_history(ball)
+            self.frames_since_ball = 0
+        else:
+            # If too much time has passed since we last had balls, just delete everything
+            if self.frames_since_ball > MAX_FRAMES_SINCE_BALL:
+                self.clear()
+            else:
+                self.frames_since_ball += 1
 
     def draw_info(self, frame):
         # TODO : Paint scoreboard
         # text = 'Points: ' + str(self.game.players[0].score) + ' - ' + str(self.game.players[1].score)
         # cv2.putText(frame, text, (10, 500), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
 
-        # loop over the set of tracked points
-        # And paint them on the frame
+        self.frame_buffer.append(frame)
+        if len(self.frame_buffer) < 3:
+            return
+        curr_frame = self.frame_buffer.popleft()
+
+        # Loop over the set of tracked points
+        # Paint them on the frame
 
         b_h = self.ball_history
         if len(b_h) > 0:
-            cv2.circle(frame, b_h[0].center, b_h[0].get_size(), b_h[0].get_color(), -1)
+            cv2.circle(curr_frame, b_h[0].center, b_h[0].get_size(), b_h[0].get_color(), -1)
             for i in range(1, len(b_h)):
                 prev_b, curr_b = b_h[i - 1], b_h[i]
                 thickness = 3
-                cv2.line(frame, prev_b.center, curr_b.center, b_h.line_color(), thickness)
-                cv2.circle(frame, curr_b.center, curr_b.get_size(), curr_b.get_color(), -1)
-        return frame
+                cv2.line(curr_frame, prev_b.center, curr_b.center, b_h.line_color(), thickness)
+                cv2.circle(curr_frame, curr_b.center, curr_b.get_size(), curr_b.get_color(), -1)
+        return curr_frame
 
     def clear(self):
         self.ball_history.clear_history()
