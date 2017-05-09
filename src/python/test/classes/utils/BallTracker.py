@@ -16,7 +16,7 @@ class BallTracker:
         found_ball = self.ball_detector.detect(frame)
 
         # TODO Limit extrapolations
-        if found_ball is None:
+        if found_ball.is_none():
             found_ball = self.extrapolator.extrapolate()
 
         self.update_detectors(found_ball)
@@ -26,10 +26,9 @@ class BallTracker:
     def get_bounce(self):
         bounce = self.bounce_detector.find_bounce()
         # TODO see if ball's inside or outside table - undo fisheye effect
-        # if bounce is not None:
-        #     bounce.position_state = PositionState.IN \
-        #         if self.ball_detector.is_inside_table(bounce.center) \
-        #         else PositionState.OUT
+        # bounce.position_state = PositionState.IN \
+        #     if self.ball_detector.is_inside_table(bounce.center) \
+        #     else PositionState.OUT
         return bounce
 
     def update_detectors(self, ball):

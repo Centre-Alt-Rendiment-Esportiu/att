@@ -4,7 +4,7 @@ import numpy as np
 
 class Neighborhood:
     def __init__(self, b1, b2, factor):
-        if b1 is None or b2 is None:
+        if b1.is_none() or b2.is_none():
             self.center = None
             self.radius = -1
             self.factor = -1

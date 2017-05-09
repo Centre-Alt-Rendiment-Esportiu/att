@@ -29,7 +29,7 @@ class BallHistory:
         self.clear_history()
 
     def update_history(self, ball):
-        if ball is None:
+        if ball.is_none():
             return
         if self.check_direction_change(ball):
             self.change_direction()
