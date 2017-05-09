@@ -1,4 +1,4 @@
-from test.classes.game.BallHistory import BallHistory
+from test.classes.utils.BallHistory import BallHistory
 from test.test_classes.BounceDetectorTest import BounceDetectorTest
 
 

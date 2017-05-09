@@ -5,6 +5,7 @@ import progressbar
 
 from test.classes.utils.BallTracker import BallTracker
 from test.classes.utils.Camera import Camera
+from test.classes.utils.PaintHistory import PaintHistory
 
 
 class PingPongApp(object):
@@ -19,6 +20,7 @@ class PingPongApp(object):
             self.writer = cv2.VideoWriter(args["output"], fourcc, args["frames"], (width, height), True)
 
         self.ball_tracker = BallTracker()
+        self.paint_history = PaintHistory()
         self.loop = args["LOOP"]
 
     def run(self):
@@ -32,7 +34,8 @@ class PingPongApp(object):
             frame = self.camera.get_next_frame()
             if frame is None:
                 if self.loop:
-                    self.ball_tracker.clear_history()
+                    self.paint_history.clear()
+                    self.ball_tracker.clear()
                     continue
                 else:
                     break
@@ -42,8 +45,14 @@ class PingPongApp(object):
                 first_frame = False
                 continue
 
-            tracked_frame = self.ball_tracker.track(frame)
+            found_ball = self.ball_tracker.track(frame)
+            bounce_ball = self.ball_tracker.get_bounce()
 
+            # Reversed order because bounce is previous to found
+            self.paint_history.update_history(bounce_ball)
+            self.paint_history.update_history(found_ball)
+
+            tracked_frame = self.paint_history.draw_info(frame)
             # Write to file if asked
             if self.writer is not None:
                 self.writer.write(tracked_frame)

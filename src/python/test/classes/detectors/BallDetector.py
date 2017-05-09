@@ -1,3 +1,5 @@
+from collections import deque
+
 import cv2
 import numpy as np
 
@@ -8,7 +10,7 @@ from test.classes.utils.BallState import PositionState
 from test.classes.utils.Neighborhood import Neighborhood
 
 sensitivity = 15
-lower_white = np.array([0, 0, 255-sensitivity])
+lower_white = np.array([0, 0, 255 - sensitivity])
 upper_white = np.array([255, sensitivity, 255])
 
 # Setup SimpleBlobDetector parameters.
@@ -45,8 +47,9 @@ class BallDetector:
     def __init__(self, first_frame):
         self.table = TableDetector(first_frame)
         self.background = BackgroundDetector()
-        self.prev1 = None
-        self.prev2 = None
+        self.prevs = deque(maxlen=2)
+        self.prevs.append(None)
+        self.prevs.append(None)
 
     def detect(self, frame):
         # Update background subtractor
@@ -55,16 +58,18 @@ class BallDetector:
         # CREATE NEIGHBORHOOD FRAME
         # Circle centered in prev1, with radius 2 * norm(prev2-prev1)
         # if prev1 and prev2 exist, otherwise it leaves frame as it is
-        frame_neighborhood = Neighborhood.apply(frame, self.prev1, self.prev2)
+
+        neighborhood = Neighborhood(self.prevs[-1], self.prevs[-2], factor=2)
+        frame_neighborhood = neighborhood.apply(frame)
 
         # SEARCH INSIDE TABLE
 
         frame_in_table = self.table.apply(frame_neighborhood)
         center = BallDetector.inside_detect(frame_in_table)
         if center:
-            self.update_prev(center)
             detected_ball = Ball(center)
             detected_ball.position_state = PositionState.IN
+            self.update_prev(detected_ball)
             return detected_ball
 
         # If not found inside table,
@@ -75,21 +80,17 @@ class BallDetector:
 
         center = BallDetector.outside_detect(background_sub)
         if center:
-            self.update_prev(center)
             detected_ball = Ball(center)
             detected_ball.position_state = PositionState.OUT
+            self.update_prev(detected_ball)
             return detected_ball
 
         self.update_prev(None)
         # Not found anywhere: return None
         return None
 
-    def is_inside_table(self, point):
-        return self.table.is_inside(point)
-
     def update_prev(self, prev):
-        self.prev2 = self.prev1
-        self.prev1 = prev
+        self.prevs.append(prev)
 
     @staticmethod
     def inside_detect(frame):
@@ -101,7 +102,7 @@ class BallDetector:
             cmax = max(cnts, key=cv2.contourArea)
             M = cv2.moments(cmax)
             if M["m00"] > 0:
-                center = (int(np.rint(M["m10"] / M["m00"])), int(np.rint(M["m01"] / M["m00"])))
+                center = (M["m10"] / M["m00"], M["m01"] / M["m00"])
         return center
 
     @staticmethod
@@ -111,7 +112,7 @@ class BallDetector:
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             # Search for the whitest of all blobs
             whitest_point = max(keypoints, key=lambda x: hsv[int(x.pt[1])][int(x.pt[0])][2])
-            return tuple([int(whitest_point.pt[0]), int(whitest_point.pt[1])])
+            return tuple([whitest_point.pt[0], whitest_point.pt[1]])
         return None
 
     @staticmethod
