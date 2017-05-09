@@ -7,29 +7,28 @@ MIN_HISTORY_EXTRAPOL = 5
 
 
 class Extrapolator:
-    def __init__(self):
-        self.ball_queue = BallHistory()
-
-    def add_ball(self, ball):
-        self.ball_queue.update_history(ball)
-
-    def extrapolate(self):
-        real_balls = list(filter(lambda x: not x.is_extrapolate, self.ball_queue))
+    @staticmethod
+    def extrapolate(history):
+        real_balls = list(filter(lambda x: not x.is_extrapolate, history))
         # Don't extrapolate if there aren't enough balls to do so
         if len(real_balls) < MIN_HISTORY_EXTRAPOL:
+            return Ball()
+
+        # Do not extrapolate more than twice in a row
+        if history[-1].is_extrapolate and history[-2].is_extrapolate:
             return Ball()
 
         max_length = abs(real_balls[0].center[0] - real_balls[-1].center[0])
         x_bound = real_balls[-1].center[0]
 
-        b1, b2 = self.ball_queue[-1], self.ball_queue[-2]
+        b1, b2 = history[-1], history[-2]
         x1, x2 = b1.center[0], b2.center[0]
 
         # Predicted value is at x = x1 + (x1-x2) = 2*x1 - x2
         extrapol_x = 2 * x1 - x2
 
         # Don't extrapolate if it's very far away from x_bound in terms of max_length
-        if abs(extrapol_x - x_bound) > max_length / 3:
+        if abs(extrapol_x - x_bound) > max_length / 2:
             return Ball()
 
         # Pass parabola through all real_balls
@@ -40,9 +39,6 @@ class Extrapolator:
         # Evaluate parabola at x = 2*x1 - x2
         extrapol_y = np.polyval(pol, extrapol_x)
 
-        extrapol_ball = Ball(tuple([extrapol_x, extrapol_y]))
+        extrapol_ball = Ball((extrapol_x, extrapol_y))
         extrapol_ball.is_extrapolate = True
         return extrapol_ball
-
-    def clear(self):
-        self.ball_queue.clear_history()
