@@ -4,7 +4,7 @@ from test.classes.utils.Ball import Ball
 from test.classes.utils.BallHistory import BallHistory
 
 MIN_HISTORY_BOUNCE = 4
-RESIDUE_THRESHOLD = 0.1
+RESIDUE_THRESHOLD = 1
 
 
 class BounceDetector:
@@ -34,7 +34,7 @@ class BounceDetector:
             # Since we have detected bounce AFTER it happened
             # To find coordinates, we have to go back to one in history
             # Pass a parabola through those points and find coordinates
-            last_balls_without_last = list(self.ball_queue)[-MIN_HISTORY_BOUNCE-1:-1]
+            last_balls_without_last = list(self.ball_queue)[-MIN_HISTORY_BOUNCE - 1:-1]
             x_val = np.array([p.center[0] for p in last_balls_without_last])
             y_val = np.array([p.center[1] for p in last_balls_without_last])
             pol = np.polyfit(x_val, y_val, 2, full=False)  # We don't need quadratic residue
@@ -54,10 +54,10 @@ class BounceDetector:
         return None
 
     def find_bounce2(self):
-        if len(self.ball_queue) < MIN_HISTORY_BOUNCE+1:
+        if len(self.ball_queue) < MIN_HISTORY_BOUNCE + 1:
             return
 
-        last_balls_without_last = list(self.ball_queue)[-MIN_HISTORY_BOUNCE-1:-1]
+        last_balls_without_last = list(self.ball_queue)[-MIN_HISTORY_BOUNCE - 1:-1]
         x_val = np.array([p.center[0] for p in last_balls_without_last])
         y_val = np.array([p.center[1] for p in last_balls_without_last])
         pol = np.polyfit(x_val, y_val, 2, full=False)
@@ -66,7 +66,7 @@ class BounceDetector:
         x2 = self.ball_queue[-2].center[0]
         y2 = int(np.rint(np.polyval(pol, x1)))
 
-        if abs(y1-y2) > 0.3 * abs(x1-x2):
+        if abs(y1 - y2) > 0.3 * abs(x1 - x2):
             center_x = int(np.rint(x1 + x2) / 2)
             center_y = int(np.rint(np.polyval(pol, center_x)))
 

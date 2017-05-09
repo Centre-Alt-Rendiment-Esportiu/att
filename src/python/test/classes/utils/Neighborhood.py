@@ -11,7 +11,7 @@ class Neighborhood:
         else:
             c1, c2 = np.array(b1.center), np.array(b2.center)
             self.center = tuple([int(b1.center[0]), int(b1.center[1])])
-            self.radius = int(np.linalg.norm(c2-c1))
+            self.radius = int(np.linalg.norm(c2 - c1))
             self.factor = int(factor)
 
     def is_inside(self, b):
@@ -22,7 +22,7 @@ class Neighborhood:
         c2 = np.array(b.center)
         return int(np.linalg.norm(c2 - self.center)) <= self.radius * self.factor
 
-    def apply_to_frame(self, frame):
+    def apply(self, frame):
         if self.center is None:
             return frame
         height, width = frame.shape[:2]

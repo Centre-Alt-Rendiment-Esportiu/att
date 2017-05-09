@@ -11,16 +11,16 @@ class BallHistory:
             self.balls = deque()
         else:
             self.balls = deque(maxlen=tail_size)
-        self.direction = 0
+        self.direction = 0  # 0 or 1 commuted
 
     def check_direction_change(self, ball):
         center = ball.center
         if len(self) > 0:
+            # If the last ball's center is has moved in contrary direction
+            # Direction change detected.
             if (self[-1].center[0] - center[0]) < 0 and self.direction != 0:
-                self.change_direction()
                 return True
             elif (self[-1].center[0] - center[0]) > 0 and self.direction != 1:
-                self.change_direction()
                 return True
         return False
 
@@ -31,7 +31,8 @@ class BallHistory:
     def update_history(self, ball):
         if ball is None:
             return
-        self.check_direction_change(ball)
+        if self.check_direction_change(ball):
+            self.change_direction()
         self.balls.append(ball)
 
     def clear_history(self):
