@@ -48,8 +48,7 @@ class BallDetector:
         self.table = TableDetector(first_frame)
         self.background = BackgroundDetector()
         self.prevs = deque(maxlen=2)
-        self.prevs.append(Ball())
-        self.prevs.append(Ball())
+        self.clear()
 
     def detect(self, frame):
         # Update background subtractor
@@ -75,7 +74,7 @@ class BallDetector:
         # If not found inside table,
         # SEARCH OUTSIDE TABLE
 
-        frame_out_table = frame_neighborhood
+        frame_out_table = self.table.apply_inverse(frame_neighborhood)
         background_sub = self.background.apply(frame_out_table)
 
         center = BallDetector.outside_detect(background_sub)
@@ -91,6 +90,13 @@ class BallDetector:
 
     def update_prev(self, prev):
         self.prevs.append(prev)
+
+    def clear(self):
+        self.prevs.append(Ball())
+        self.prevs.append(Ball())
+
+    def is_inside_table(self, ball):
+        return self.table.is_inside(ball.center)
 
     @staticmethod
     def inside_detect(frame):

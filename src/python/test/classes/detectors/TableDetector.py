@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
 
-min_color = (131, 0, 255)
-max_color = (255, 255, 255)
+sensitivity = 15
+lower_white = np.array([0, 0, 255 - sensitivity])
+upper_white = np.array([255, sensitivity, 255])
 ARC_EPSILON = 0.1
 
 
@@ -14,9 +15,14 @@ class TableDetector:
         self.table_contours = TableDetector.detect(first_frame)
         cv2.fillConvexPoly(table_mask, self.table_contours, 1)
         self.table_mask = np.dstack(3 * (table_mask,))
+        inverse_mask = 1 - table_mask
+        self.inverse_table_mask = np.dstack(3 * (inverse_mask,))
 
     def apply(self, frame):
         return frame * self.table_mask
+
+    def apply_inverse(self, frame):
+        return frame * self.inverse_table_mask
 
     def is_inside(self, point):
         return cv2.pointPolygonTest(self.table_contours, point, False) >= 0
@@ -24,7 +30,7 @@ class TableDetector:
     @staticmethod
     def detect(frame):
         frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(frame_hsv, min_color, max_color)
+        mask = cv2.inRange(frame_hsv, lower_white, upper_white)
         mask = cv2.dilate(mask, np.ones((5, 5), np.uint8), iterations=5)
         mask = cv2.erode(mask, None, iterations=5)
         cnts = cv2.findContours(mask.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)[-2]

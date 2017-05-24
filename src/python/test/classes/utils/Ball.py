@@ -28,3 +28,6 @@ class Ball:
 
     def is_none(self):
         return self.center is None
+
+    def __eq__(self, other):
+        return self.center == other.center
