@@ -1,7 +1,11 @@
 from test.classes.detectors.BallDetector import BallDetector
 from test.classes.detectors.BounceDetector import BounceDetector
 from test.classes.detectors.Extrapolator import Extrapolator
+from test.classes.utils.Ball import Ball
 from test.classes.utils.BallHistory import BallHistory
+
+
+VERTICAL_THRESHOLD = 10
 
 
 class BallTracker:
@@ -19,7 +23,13 @@ class BallTracker:
             found_ball = Extrapolator.extrapolate(self.ball_history)
 
         # TODO Remove vertical movement
-        self.ball_history.update_history(found_ball)
+        if len(self.ball_history) == 0 or self.ball_history[-1].is_none() or found_ball.is_none():
+            self.ball_history.update_history(found_ball)
+        else:
+            if abs(self.ball_history[-1].center[0] - found_ball.center[0]) < VERTICAL_THRESHOLD:
+                self.ball_history.update_history(Ball())
+            else:
+                self.ball_history.update_history(found_ball)
 
         return found_ball
 
