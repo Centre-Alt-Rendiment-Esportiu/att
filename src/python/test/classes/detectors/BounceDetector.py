@@ -1,7 +1,7 @@
 import numpy as np
+import warnings
 
 from test.classes.utils.Ball import Ball
-from test.classes.utils.BallHistory import BallHistory
 
 LEN_HISTORY_BOUNCE = 4
 RESIDUE_THRESHOLD = 1
@@ -11,10 +11,10 @@ class BounceDetector:
     @staticmethod
     def find_bounce(history):
         # If we don't have enough points to find bounce, return None
-        if len(history) < LEN_HISTORY_BOUNCE + 1:
+        if len(history) < LEN_HISTORY_BOUNCE:
             return Ball()
 
-        # Fit a parabola through last MIN_HISTORY_BOUNCE points
+        # Fit a parabola through last LEN_HISTORY_BOUNCE points
         last_balls = list(history)[-LEN_HISTORY_BOUNCE:]
         x_val = np.array([p.center[0] for p in last_balls])
         y_val = np.array([p.center[1] for p in last_balls])
@@ -32,7 +32,12 @@ class BounceDetector:
             last_balls_without_last = list(history)[-LEN_HISTORY_BOUNCE - 1:-1]
             x_val = np.array([p.center[0] for p in last_balls_without_last])
             y_val = np.array([p.center[1] for p in last_balls_without_last])
-            pol = np.polyfit(x_val, y_val, 2, full=False)  # We don't need quadratic residue
+            with warnings.catch_warnings():
+                warnings.filterwarnings('error')
+                try:
+                    pol = np.polyfit(x_val, y_val, 2, full=False)  # We don't need quadratic residue
+                except np.RankWarning:
+                    return Ball()
 
             # For minimizing the error, consider it as between last 2 points
             # TODO if post-processed, intersect parabolas of before and after
