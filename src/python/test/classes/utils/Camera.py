@@ -2,6 +2,8 @@ import time
 
 import cv2
 
+from test.classes.utils.CameraCalibrate import CameraCalibrate
+
 
 class Camera:
     def __init__(self, args):
@@ -12,6 +14,8 @@ class Camera:
         self.width = int(self.camera.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.num_frames = int(self.camera.get(cv2.CAP_PROP_FRAME_COUNT))
         self.loop = args["LOOP"]
+
+        self.calibrator = CameraCalibrate()
 
     def get_next_frame(self):
         (grabbed, frame) = self.camera.read()
@@ -24,7 +28,8 @@ class Camera:
                 time.sleep(0.02)
             return None
 
-        return frame
+        undistorted_frame = self.calibrator.undistort(frame)
+        return undistorted_frame
 
     def get_curr_frame_number(self):
         return int(self.camera.get(cv2.CAP_PROP_POS_FRAMES))
