@@ -12,12 +12,10 @@ class PingPongApp(object):
     def __init__(self, args):
         self.camera = Camera(args)
 
-        self.writer = None
-        if args.get("output", True):
-            height = self.camera.height
-            width = self.camera.width
-            fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-            self.writer = cv2.VideoWriter(args["output"], fourcc, args["frames"], (width, height), True)
+        self.should_write = args.get("output", True)
+        if self.should_write:
+            self.fps = args["frames"]
+            self.output = args["output"]
 
         self.ball_tracker = BallTracker()
         self.paint_history = PaintHistory()
@@ -41,6 +39,11 @@ class PingPongApp(object):
                     break
 
             if first_frame:
+                writer = None
+                if self.should_write:
+                    height, width = frame.shape[:2]
+                    fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
+                    writer = cv2.VideoWriter(self.output, fourcc, self.fps, (width, height), True)
                 self.ball_tracker.first_frame(frame)
                 first_frame = False
                 continue
@@ -54,8 +57,8 @@ class PingPongApp(object):
 
             tracked_frame = self.paint_history.draw_info(frame)
             # Write to file if asked
-            if self.writer is not None:
-                self.writer.write(tracked_frame)
+            if writer is not None:
+                writer.write(tracked_frame)
                 bar.update(self.camera.get_curr_frame_number())
             # If not, show on screen
             else:
@@ -66,6 +69,6 @@ class PingPongApp(object):
 
         # Clean up the camera and close any open windows
         self.camera.release()
-        if self.writer:
-            self.writer.release()
+        if writer:
+            writer.release()
         cv2.destroyAllWindows()

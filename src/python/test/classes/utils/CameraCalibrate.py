@@ -1,44 +1,23 @@
 import numpy as np
 import cv2
-import glob
 
 
 class CameraCalibrate:
     def __init__(self):
-        # termination criteria
-        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-        row, col = 7, 7
-        # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
-        objp = np.zeros((row * col, 3), np.float32)
-        objp[:, :2] = np.mgrid[0:row, 0:col].T.reshape(-1, 2)
-        # Arrays to store object points and image points from all the images.
-        objpoints = []  # 3d point in real world space
-        imgpoints = []  # 2d points in image plane.
+        f_x, f_y = 1.0424e+03, 813.7234
+        c_x, c_y = 485.1304, -89.7278
+        self.cam_matrix = np.matrix([[f_x, 0, c_x], [0, f_y, c_y], [0, 0, 1]])
 
-        images = glob.glob('*.png')  # TODO hardcode images
-        for fname in images:
-            img = cv2.imread(fname)
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            # Find the chess board corners
-            ret, corners = cv2.findChessboardCorners(gray, (row, col), None)
-            # If found, add object points, image points (after refining them)
-            if ret:
-                objpoints.append(objp)
-                cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
-                imgpoints.append(corners)
-                # Draw and display the corners
-                cv2.drawChessboardCorners(img, (row, col), corners, ret)
-                cv2.imshow('img', img)
-                cv2.waitKey(1)
-
-        ret, self.mtx, self.dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+        k1, k2, k3 = -0.3692, -0.0680, 0.1172
+        p1, p2 = 0.1360, -0.0018
+        self.coeffs = np.asarray([k1, k2, p1, p2, k3])
 
     def undistort(self, frame):
         img = frame
         h, w = img.shape[:2]
-        newcameramtx, roi = cv2.getOptimalNewCameraMatrix(self.mtx, self.dist, (w, h), 1, (w, h))
+        newcameramtx, roi = cv2.getOptimalNewCameraMatrix(self.cam_matrix, self.coeffs, (w, h), 1, (w, h))
         # undistort
-        dst = cv2.undistort(img, self.mtx, self.dist, None, newcameramtx)
+        dst = cv2.undistort(img, self.cam_matrix, self.coeffs, None, newcameramtx)
 
         # crop the image
         x, y, w, h = roi
