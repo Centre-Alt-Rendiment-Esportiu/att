@@ -54,7 +54,7 @@ class BallDetector:
         # It will be extrapolated anyways and adds error to detection
         frame_hsv = cv2.cvtColor(first_frame, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(frame_hsv, lower_white, upper_white)
-        mask = cv2.dilate(mask, np.ones((5, 5), np.uint8), iterations=1)
+        mask = cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=1)
         self.filter_mask = 255 - mask
 
     def detect(self, fr):
