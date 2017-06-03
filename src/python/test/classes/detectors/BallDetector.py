@@ -50,8 +50,16 @@ class BallDetector:
         self.prevs = deque(maxlen=2)
         self.clear()
 
-    def detect(self, frame):
+        # We only search the ball if it's not on the white line
+        # It will be extrapolated anyways and adds error to detection
+        frame_hsv = cv2.cvtColor(first_frame, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(frame_hsv, lower_white, upper_white)
+        mask = cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=1)
+        self.filter_mask = 255 - mask
+
+    def detect(self, fr):
         # Update background subtractor
+        frame = cv2.bitwise_and(fr, fr, mask=self.filter_mask)
         self.background.update(frame)
 
         # CREATE NEIGHBORHOOD FRAME
@@ -63,7 +71,7 @@ class BallDetector:
 
         # SEARCH INSIDE TABLE
 
-        frame_in_table = self.table.apply(frame_neighborhood)
+        frame_in_table = self.table.apply_inside(frame_neighborhood)
         center = BallDetector.inside_detect(frame_in_table)
         if center:
             detected_ball = Ball(center)
@@ -74,7 +82,7 @@ class BallDetector:
         # If not found inside table,
         # SEARCH OUTSIDE TABLE
 
-        frame_out_table = self.table.apply_inverse(frame_neighborhood)
+        frame_out_table = self.table.apply_outside(frame_neighborhood)
         background_sub = self.background.apply(frame_out_table)
 
         center = BallDetector.outside_detect(background_sub)
@@ -100,8 +108,10 @@ class BallDetector:
 
     @staticmethod
     def inside_detect(frame):
-        mask = BallDetector.create_ball_mask(frame)
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(hsv, lower_white, upper_white)
         cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
+
         center = None
         # only proceed if at least one contour was found
         if len(cnts) > 0:
@@ -120,9 +130,3 @@ class BallDetector:
             whitest_point = max(keypoints, key=lambda x: hsv[int(x.pt[1])][int(x.pt[0])][2])
             return tuple([whitest_point.pt[0], whitest_point.pt[1]])
         return None
-
-    @staticmethod
-    def create_ball_mask(frame):
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, lower_white, upper_white)
-        return mask
