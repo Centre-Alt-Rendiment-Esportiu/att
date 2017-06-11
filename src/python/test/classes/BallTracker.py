@@ -49,10 +49,6 @@ class BallTracker:
         if not self.ball_detector.is_inside_table(bounce):
             return Ball()
 
-        # TODO see if ball's inside or outside table - undo fisheye effect
-        # bounce.position_state = PositionState.IN \
-        #     if self.ball_detector.is_inside_table(bounce.center) \
-        #     else PositionState.OUT
         return bounce
 
     def clear(self):
