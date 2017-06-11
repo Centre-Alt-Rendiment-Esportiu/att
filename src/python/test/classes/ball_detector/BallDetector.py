@@ -3,63 +3,39 @@ from collections import deque
 import cv2
 import numpy as np
 
-from test.classes.detectors.BackgroundDetector import BackgroundDetector
-from test.classes.detectors.TableDetector import TableDetector
+from test.classes.ball_detector.BackgroundDetector import BackgroundDetector
+from test.classes.ball_detector.BlobDetector import BlobDetector
+from test.classes.ball_detector.Neighborhood import Neighborhood
+from test.classes.ball_detector.TableDetector import TableDetector
 from test.classes.utils.Ball import Ball
 from test.classes.utils.BallState import PositionState
-from test.classes.utils.Neighborhood import Neighborhood
 
 sensitivity = 15
 lower_white = np.array([0, 0, 255 - sensitivity])
 upper_white = np.array([255, sensitivity, 255])
 
-# Setup SimpleBlobDetector parameters.
-params = cv2.SimpleBlobDetector_Params()
-
-# Change thresholds
-# params.minThreshold = 10
-# params.maxThreshold = 200
-
-params.filterByColor = True
-params.blobColor = 255
-
-# Filter by Area.
-params.filterByArea = True
-params.minArea = 100
-# params.maxArea = 2000
-
-# Filter by Circularity
-params.filterByCircularity = True
-params.minCircularity = 0.75
-
-# Filter by Convexity
-params.filterByConvexity = True
-params.minConvexity = 0.9
-
-# Filter by Inertia
-params.filterByInertia = True
-params.minInertiaRatio = 0.08
-
-detector = cv2.SimpleBlobDetector_create(params)
-
 
 class BallDetector:
     def __init__(self, first_frame):
-        self.table = TableDetector(first_frame)
+        # We only search the ball if it's not on the white line
+        # We do that by removing all white pixels on initial image - dilation just in case
+        # It would be extrapolated anyways and adds error to detection otherwise
+        frame_hsv = cv2.cvtColor(first_frame, cv2.COLOR_BGR2HSV)
+        white_mask = cv2.inRange(frame_hsv, lower_white, upper_white)
+        white_mask = cv2.dilate(white_mask, np.ones((3, 3), np.uint8), iterations=1)
+        self.non_white_mask = 255 - white_mask
+
+        self.table = TableDetector(white_mask)
+
         self.background = BackgroundDetector()
+        self.blobs = BlobDetector()
         self.prevs = deque(maxlen=2)
         self.clear()
 
-        # We only search the ball if it's not on the white line
-        # It will be extrapolated anyways and adds error to detection
-        frame_hsv = cv2.cvtColor(first_frame, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(frame_hsv, lower_white, upper_white)
-        mask = cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=1)
-        self.filter_mask = 255 - mask
-
     def detect(self, fr):
+        # Filter out white pixels
+        frame = cv2.bitwise_and(fr, fr, mask=self.non_white_mask)
         # Update background subtractor
-        frame = cv2.bitwise_and(fr, fr, mask=self.filter_mask)
         self.background.update(frame)
 
         # CREATE NEIGHBORHOOD FRAME
@@ -72,7 +48,7 @@ class BallDetector:
         # SEARCH INSIDE TABLE
 
         frame_in_table = self.table.apply_inside(frame_neighborhood)
-        center = BallDetector.inside_detect(frame_in_table)
+        center = self.inside_detect(frame_in_table)
         if center:
             detected_ball = Ball(center)
             detected_ball.position_state = PositionState.IN
@@ -85,7 +61,7 @@ class BallDetector:
         frame_out_table = self.table.apply_outside(frame_neighborhood)
         background_sub = self.background.apply(frame_out_table)
 
-        center = BallDetector.outside_detect(background_sub)
+        center = self.outside_detect(background_sub)
         if center:
             detected_ball = Ball(center)
             detected_ball.position_state = PositionState.OUT
@@ -106,8 +82,7 @@ class BallDetector:
     def is_inside_table(self, ball):
         return self.table.is_inside(ball.center)
 
-    @staticmethod
-    def inside_detect(frame):
+    def inside_detect(self, frame):
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, lower_white, upper_white)
         cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
@@ -121,12 +96,5 @@ class BallDetector:
                 center = (M["m10"] / M["m00"], M["m01"] / M["m00"])
         return center
 
-    @staticmethod
-    def outside_detect(frame):
-        keypoints = detector.detect(frame)
-        if keypoints:
-            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            # Search for the whitest of all blobs
-            whitest_point = max(keypoints, key=lambda x: hsv[int(x.pt[1])][int(x.pt[0])][2])
-            return tuple([whitest_point.pt[0], whitest_point.pt[1]])
-        return None
+    def outside_detect(self, frame):
+        return self.blobs.detect_ball(frame)

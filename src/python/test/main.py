@@ -11,10 +11,6 @@ ap.add_argument("-v", "--video",
 ap.add_argument("-o", "--output",
                 help="if present, path to the output video file")
 
-# Should detect table, not enter it
-# ap.add_argument("-t", "--table",
-#               help="if present, table contour points")
-
 ap.add_argument("-f", "--frames",
                 help="if present, output video frames per second ", default=20)
 

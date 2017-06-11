@@ -3,8 +3,8 @@
 import cv2
 import progressbar
 
-from test.classes.utils.BallTracker import BallTracker
-from test.classes.utils.Camera import Camera
+from test.classes.BallTracker import BallTracker
+from test.classes.camera.Camera import Camera
 from test.classes.utils.PaintHistory import PaintHistory
 
 
@@ -41,6 +41,7 @@ class PingPongApp(object):
             if first_frame:
                 writer = None
                 if self.should_write:
+                    # We need to do it here, because the camera calibration crops the frames
                     height, width = frame.shape[:2]
                     fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
                     writer = cv2.VideoWriter(self.output, fourcc, self.fps, (width, height), True)
@@ -59,16 +60,17 @@ class PingPongApp(object):
             # Write to file if asked
             if writer is not None:
                 writer.write(tracked_frame)
-                bar.update(self.camera.get_curr_frame_number())
             # If not, show on screen
             else:
                 cv2.imshow("PingPongApp", tracked_frame)
+
+            bar.update(self.camera.get_curr_frame_number())
 
             if cv2.waitKey(1) & 0xFF is ord('q'):
                 break
 
         # Clean up the camera and close any open windows
         self.camera.release()
-        if writer:
+        if writer is not None:
             writer.release()
         cv2.destroyAllWindows()

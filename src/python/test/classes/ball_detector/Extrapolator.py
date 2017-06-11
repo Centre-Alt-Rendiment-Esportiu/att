@@ -4,19 +4,18 @@ import numpy as np
 
 from test.classes.utils.Ball import Ball
 
-LEN_EXTRAPOL = 5
+LEN_EXTRAPOL = 4
 
 
 class Extrapolator:
-    @staticmethod
-    def extrapolate(history):
+    def extrapolate(self, history):
         real_balls = list(filter(lambda x: not x.is_extrapolate, history))
         # Don't extrapolate if there aren't enough balls to do so
         if len(real_balls) < LEN_EXTRAPOL:
             return Ball()
 
-        # Do not extrapolate more than twice in a row
-        if history[-1].is_extrapolate:  # and history[-2].is_extrapolate:
+        # Do not extrapolate more than once in a row
+        if history[-1].is_extrapolate:
             return Ball()
 
         # Fit parabola on all real_balls
