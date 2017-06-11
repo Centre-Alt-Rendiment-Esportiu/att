@@ -84,7 +84,6 @@ class BallDetector:
 
     def inside_detect(self, frame):
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
         mask = cv2.inRange(hsv, lower_white, upper_white)
         cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
 
