@@ -20,6 +20,7 @@ class PingPongApp(object):
         self.ball_tracker = BallTracker()
         self.paint_history = PaintHistory()
         self.loop = args["LOOP"]
+        self.test = args["TEST"]
 
     def run(self):
         first_frame = True
@@ -60,7 +61,10 @@ class PingPongApp(object):
             # Write to file if asked
             if writer is not None:
                 writer.write(tracked_frame)
-            # If not, show on screen
+            # Don't show anything if testing
+            elif self.test:
+                pass
+            # Else, show processed frame on screen
             else:
                 cv2.imshow("PingPongApp", tracked_frame)
 
