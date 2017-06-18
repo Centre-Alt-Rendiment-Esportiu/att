@@ -4,7 +4,7 @@ import warnings
 from test.classes.utils.Ball import Ball
 
 LEN_HISTORY_BOUNCE = 4
-RESIDUE_THRESHOLD = 0.8
+RESIDUE_THRESHOLD = 0.5
 
 
 class BounceCalculator:
