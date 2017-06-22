@@ -24,13 +24,6 @@ class PaintHistory:
                 self.frames_since_ball += 1
 
     def draw_info(self, frame):
-        # TODO : Paint scoreboard
-        # text = 'Points: ' + str(self.game.players[0].score) + ' - ' + str(self.game.players[1].score)
-        # cv2.putText(frame, text, (10, 500), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
-
-        # Loop over the set of tracked points
-        # Paint them on the frame
-
         b_h = self.ball_history
         if len(b_h) > 0:
             cv2.circle(frame, b_h[0].center, b_h[0].get_size(), b_h[0].get_color(), -1)

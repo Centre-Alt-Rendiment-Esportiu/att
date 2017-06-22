@@ -4,7 +4,7 @@ import warnings
 from test.classes.utils.Ball import Ball
 
 LEN_HISTORY_BOUNCE = 4
-RESIDUE_THRESHOLD = 0.5
+RESIDUE_THRESHOLD = 0.6
 
 
 class BounceCalculator:
@@ -28,8 +28,6 @@ class BounceCalculator:
 
     @staticmethod
     def calculate_bounce(history):
-        # TODO If we are in the beginning, the bounce needs not necessarily be in where I found it
-
         # Since we have detected bounce AFTER it happened
         # To find coordinates, we have to go back one in history
         # Pass a parabola through those points and find coordinates
@@ -44,7 +42,6 @@ class BounceCalculator:
                 return Ball()
 
         # For minimizing the error, consider it as between last 2 points
-        # TODO if post-processed, intersect parabolas of before and after
         center_x = (history[-1].center[0] + history[-2].center[0]) / 2
         center_y = np.polyval(pol, center_x)
 

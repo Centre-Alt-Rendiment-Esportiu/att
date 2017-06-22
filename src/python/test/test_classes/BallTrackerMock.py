@@ -34,4 +34,5 @@ class BallTrackerMock(BallTracker):
     def end_test(self):
         self.bounce_calculator.end_test()
         print('\n----- TRACKER RANKINGS: -----')
-        TestWriter(real_frames, self.found_frames, tol1=0, tol2=0).test()
+        total_set = list(range(1, 16421+1))
+        TestWriter(total_set, real_frames, self.found_frames, tol1=0, tol2=0).test()
